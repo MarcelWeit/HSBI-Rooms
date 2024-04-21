@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface AusstattungRepository extends JpaRepository<Ausstattung, Long>, JpaSpecificationExecutor<Ausstattung> {
+    Ausstattung findByBez(String bez);
 }

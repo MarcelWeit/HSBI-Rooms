@@ -68,14 +68,21 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        if (accessChecker.hasAccess(BuchungAnlegenView.class)) {
-            nav.addItem(
-                    new SideNavItem("BuchungAnlegen", BuchungAnlegenView.class, LineAwesomeIcon.FILTER_SOLID.create()));
-
-        }
         if(accessChecker.hasAccess(CreateRoomView.class)){
             nav.addItem(
-                    new SideNavItem("CreateRoom", CreateRoomView.class, LineAwesomeIcon.PLUS_SOLID.create()));
+                    new SideNavItem("Raum", CreateRoomView.class, LineAwesomeIcon.PLUS_SOLID.create()));
+        }
+        if(accessChecker.hasAccess(ShowRoomsView.class)){
+            nav.addItem(
+                    new SideNavItem("Räume", ShowRoomsView.class, LineAwesomeIcon.LIST_SOLID.create()));
+        }
+        if(accessChecker.hasAccess(AddAusstattungView.class)){
+            nav.addItem(
+                    new SideNavItem("Ausstattung", AddAusstattungView.class, LineAwesomeIcon.PLUS_SOLID.create()));
+        }
+        if(accessChecker.hasAccess(AusstattungView.class)){
+            nav.addItem(
+                    new SideNavItem("Ausstattungen", AusstattungView.class, LineAwesomeIcon.PLUS_SOLID.create()));
         }
 
         return nav;

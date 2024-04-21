@@ -9,12 +9,11 @@ import java.util.Set;
 public class Room {
 
     @Id
-    private long refNr;
+    private String refNr;
 
     private String typ;
     private int capacity;
-    private String location;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Ausstattung> ausstattung;
     private String fachbereich;
 
@@ -22,20 +21,19 @@ public class Room {
         // Empty constructor is needed by Spring Data / JPA
     }
 
-    public Room(int capacity, String location, Set<Ausstattung> ausstattung, long refNr, String typ, String fachbereich) {
+    public Room(int capacity, Set<Ausstattung> ausstattung, String refNr, String typ, String fachbereich) {
         this.capacity = capacity;
-        this.location = location;
         this.ausstattung = ausstattung;
         this.refNr = refNr;
         this.typ = typ;
         this.fachbereich = fachbereich;
     }
 
-    public long getRefNr() {
+    public String getRefNr() {
         return refNr;
     }
 
-    public void setRefNr(long refNr) {
+    public void setRefNr(String refNr) {
         this.refNr = refNr;
     }
 
@@ -45,14 +43,6 @@ public class Room {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public Set<Ausstattung> getAusstattung() {

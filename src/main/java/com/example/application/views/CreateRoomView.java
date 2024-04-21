@@ -16,6 +16,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -46,47 +47,63 @@ public class CreateRoomView extends VerticalLayout {
 
     private void createComponents() {
 
+        Binder<Room> binder = new Binder<>(Room.class);
+        TextField refNr = new TextField("ReferenzBezeichnung");
+        binder.forField(refNr)
+                .withValidator(refNrValue -> refNrValue.matches("^[a-zA-Z]{1}.{0,3}$"),
+                        "ReferenzBezeichnung muss mit einem Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
+                .bind(Room::getRefNr, Room::setRefNr);
+
         IntegerField kapa = new IntegerField("Kapazität");
         kapa.setErrorMessage("Bitte geben Sie eine Zahl ein");
         kapa.setValue(30);
         kapa.setStepButtonsVisible(true);
         kapa.setMin(1);
         kapa.setMax(1000);
+        binder.forField(kapa)
+                .bind(Room::getCapacity, Room::setCapacity);
 
-        TextField name = new TextField("Name");
-        IntegerField refNr = new IntegerField("Referenznummer");
-        TextField location = new TextField("Standort");
         MultiSelectComboBox<Ausstattung> ausstattung = new MultiSelectComboBox<>("Ausstattung");
         ausstattung.setItems(ausstattungService.findAll());
         ausstattung.setItemLabelGenerator(Ausstattung::getBez);
+        binder.forField(ausstattung)
+                .bind(Room::getAusstattung, Room::setAusstattung);
+
 
         ComboBox<String> typ = new ComboBox<>("Raumtyp");
         typ.setItems("Hörsaal", "Seminarraum", "Rechnerraum", "Besprechungsraum");
+        binder.forField(typ)
+                .bind(Room::getTyp, Room::setTyp);
 
         ComboBox<String> fachbereich = new ComboBox<>("Fachbereich");
         fachbereich.setItems("Wirtschaft", "Gestaltung", "Sozialwesen", "Ingenieurwissenschaften und Mathematik", "Gesundheit", "Campus Minden", "Campus Gütersloh");
+        binder.forField(fachbereich)
+                .bind(Room::getFachbereich, Room::setFachbereich);
 
         Button create = new Button("Create", new Icon("lumo", "plus"));
         create.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         create.addClickShortcut(Key.ENTER);
 
-        add(refNr, ausstattung, kapa, location, typ, fachbereich, create);
+        add(refNr, ausstattung, kapa, typ, fachbereich, create);
 
         create.addClickListener(e -> {
-            if (location.isEmpty() || refNr.isEmpty() || fachbereich.isEmpty() || typ.isEmpty()){
+            if (refNr.isEmpty() || fachbereich.isEmpty() || typ.isEmpty()){
                 Notification.show("Bitte alle Pflichtfelder befüllen", 2000, Notification.Position.MIDDLE);
             } else {
-                long refNrValue = refNr.getValue();
-                if (roomService.existsById(refNrValue)) {
-                    Notification.show("Referenznummer existiert bereits", 2000, Notification.Position.MIDDLE);
+                Room room = new Room();
+                if (binder.writeBeanIfValid(room)) {
+                    // If the validation passes, the room object will be updated with the field values
+                    if (roomService.existsById(room.getRefNr())) {
+                        Notification.show("Raum existiert bereits", 2000, Notification.Position.MIDDLE);
+                    } else {
+                        roomService.update(room);
+                        refNr.clear();
+                        typ.clear();
+                        fachbereich.clear();
+                        ausstattung.clear();
+                    }
                 } else {
-                    roomService.update(new Room(kapa.getValue(), location.getValue(), ausstattung.getSelectedItems(), refNr.getValue(), typ.getValue(), fachbereich.getValue()));
-                    kapa.clear();
-                    location.clear();
-                    refNr.clear();
-                    typ.clear();
-                    fachbereich.clear();
-                    ausstattung.clear();
+                    Notification.show("Bitte alle Pflichtfelder befüllen", 2000, Notification.Position.MIDDLE);
                 }
             }
         });
