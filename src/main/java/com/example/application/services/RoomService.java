@@ -17,4 +17,7 @@ public class RoomService {
         return repository.save(entity);
     }
 
+    public boolean existsById(long refNr) {
+        return repository.existsById(refNr);
+    }
 }

@@ -1,6 +1,8 @@
 package com.example.application.views;
 
+import com.example.application.data.entities.Ausstattung;
 import com.example.application.data.entities.Room;
+import com.example.application.services.AusstattungService;
 import com.example.application.services.RoomService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -12,6 +14,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -32,10 +35,12 @@ import jakarta.annotation.security.RolesAllowed;
 public class CreateRoomView extends VerticalLayout {
 
     private final RoomService roomService;
+    private final AusstattungService ausstattungService;
 
-    public CreateRoomView(RoomService roomService) {
+    public CreateRoomView(RoomService roomService, AusstattungService ausstattungService) {
         addClassNames("create-room");
         this.roomService = roomService;
+        this.ausstattungService = ausstattungService;
         createComponents();
     }
 
@@ -49,10 +54,11 @@ public class CreateRoomView extends VerticalLayout {
         kapa.setMax(1000);
 
         TextField name = new TextField("Name");
-        TextField refNr = new TextField("Referenznummer");
+        IntegerField refNr = new IntegerField("Referenznummer");
         TextField location = new TextField("Standort");
-        MultiSelectComboBox<String> ausstattung = new MultiSelectComboBox<String>("Ausstattung");
-        ausstattung.setItems("Beamer", "Whiteboard", "Computer", "Kamera");
+        MultiSelectComboBox<Ausstattung> ausstattung = new MultiSelectComboBox<>("Ausstattung");
+        ausstattung.setItems(ausstattungService.findAll());
+        ausstattung.setItemLabelGenerator(Ausstattung::getBez);
 
         ComboBox<String> typ = new ComboBox<>("Raumtyp");
         typ.setItems("Hörsaal", "Seminarraum", "Rechnerraum", "Besprechungsraum");
@@ -67,17 +73,21 @@ public class CreateRoomView extends VerticalLayout {
         add(refNr, ausstattung, kapa, location, typ, fachbereich, create);
 
         create.addClickListener(e -> {
-            if (name.isEmpty() || kapa.isEmpty() || location.isEmpty() || ausstattung.isEmpty() || refNr.isEmpty()){
-                Notification.show("Bitte alle Felder befüllen", 2000, Notification.Position.MIDDLE);
+            if (location.isEmpty() || refNr.isEmpty() || fachbereich.isEmpty() || typ.isEmpty()){
+                Notification.show("Bitte alle Pflichtfelder befüllen", 2000, Notification.Position.MIDDLE);
             } else {
-                roomService.update(new Room(name.getValue(), kapa.getValue().intValue(), location.getValue(), ausstattung.getValue(), refNr.getValue(), typ.getValue(), fachbereich.getValue()));
-                name.clear();
-                kapa.clear();
-                location.clear();
-                refNr.clear();
-                typ.clear();
-                fachbereich.clear();
-                ausstattung.clear();
+                long refNrValue = refNr.getValue();
+                if (roomService.existsById(refNrValue)) {
+                    Notification.show("Referenznummer existiert bereits", 2000, Notification.Position.MIDDLE);
+                } else {
+                    roomService.update(new Room(kapa.getValue(), location.getValue(), ausstattung.getSelectedItems(), refNr.getValue(), typ.getValue(), fachbereich.getValue()));
+                    kapa.clear();
+                    location.clear();
+                    refNr.clear();
+                    typ.clear();
+                    fachbereich.clear();
+                    ausstattung.clear();
+                }
             }
         });
     }
