@@ -1,7 +1,7 @@
 package com.example.application.security;
 
-import com.example.application.data.User;
-import com.example.application.data.UserRepository;
+import com.example.application.data.entities.User;
+import com.example.application.data.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;

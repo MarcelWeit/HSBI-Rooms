@@ -1,5 +1,6 @@
-package com.example.application.data;
+package com.example.application.data.entities;
 
+import com.example.application.data.AbstractEntity;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.Email;
 import java.time.LocalDate;

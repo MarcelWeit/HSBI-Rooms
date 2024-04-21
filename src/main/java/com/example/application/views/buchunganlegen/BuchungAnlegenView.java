@@ -1,6 +1,6 @@
 package com.example.application.views.buchunganlegen;
 
-import com.example.application.data.SamplePerson;
+import com.example.application.data.entities.SamplePerson;
 import com.example.application.services.SamplePersonService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Component;
