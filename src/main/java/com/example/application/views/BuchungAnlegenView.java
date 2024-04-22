@@ -38,7 +38,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 @PageTitle("BuchungAnlegen")
 @Route(value = "grid-with-filters", layout = MainLayout.class)
-@RouteAlias(value = "", layout = MainLayout.class)
 @RolesAllowed("USER")
 @Uses(Icon.class)
 public class BuchungAnlegenView extends Div {
