@@ -32,8 +32,8 @@ public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
 
-    private AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
+    private final AuthenticatedUser authenticatedUser;
+    private final AccessAnnotationChecker accessChecker;
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
@@ -67,10 +67,6 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        if(accessChecker.hasAccess(CreateRoomView.class)){
-            nav.addItem(
-                    new SideNavItem("Raum", CreateRoomView.class, LineAwesomeIcon.PLUS_SOLID.create()));
-        }
         if(accessChecker.hasAccess(ShowRoomsView.class)){
             nav.addItem(
                     new SideNavItem("Räume", ShowRoomsView.class, LineAwesomeIcon.LIST_SOLID.create()));
@@ -113,9 +109,9 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
-            userName.getSubMenu().addItem("Sign out", e -> {
-                authenticatedUser.logout();
-            });
+            userName.getSubMenu().addItem("Sign out", e ->
+                authenticatedUser.logout()
+            );
 
             layout.add(userMenu);
         } else {
