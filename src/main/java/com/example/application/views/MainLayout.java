@@ -2,7 +2,6 @@ package com.example.application.views;
 
 import com.example.application.data.entities.User;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.views.buchunganlegen.BuchungAnlegenView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -82,7 +81,7 @@ public class MainLayout extends AppLayout {
         }
         if(accessChecker.hasAccess(AusstattungView.class)){
             nav.addItem(
-                    new SideNavItem("Ausstattungen", AusstattungView.class, LineAwesomeIcon.PLUS_SOLID.create()));
+                    new SideNavItem("Ausstattungen", AusstattungView.class, LineAwesomeIcon.LIST_SOLID.create()));
         }
 
         return nav;

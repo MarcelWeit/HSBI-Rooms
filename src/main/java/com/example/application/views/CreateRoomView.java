@@ -29,7 +29,7 @@ import jakarta.annotation.security.RolesAllowed;
  *
  */
 
-@PageTitle("CreateRoom")
+@PageTitle("Raum erstellen")
 @Route(value = "create-room", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)

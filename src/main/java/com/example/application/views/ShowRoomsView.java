@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@PageTitle("Show Rooms")
+@PageTitle("Räume anzeigen")
 @Route(value = "show-rooms", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)

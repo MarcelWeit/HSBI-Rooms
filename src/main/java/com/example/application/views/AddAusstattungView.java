@@ -14,7 +14,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
-@PageTitle("Add Ausstattung")
+@PageTitle("Ausstattung hinzufügen")
 @Route(value = "add-ausstattung", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)
