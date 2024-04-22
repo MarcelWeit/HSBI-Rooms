@@ -12,9 +12,9 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
@@ -100,9 +100,12 @@ public class CreateRoomView extends VerticalLayout {
                     } else {
                         roomService.update(room);
                         refNr.clear();
+                        refNr.setErrorMessage("");
+                        refNr.setInvalid(false);
                         typ.clear();
                         fachbereich.clear();
                         ausstattung.clear();
+                        Notification.show("Raum erstellt", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     }
                 } else {
                     Notification.show("Bitte alle Pflichtfelder befüllen", 2000, Notification.Position.MIDDLE);
