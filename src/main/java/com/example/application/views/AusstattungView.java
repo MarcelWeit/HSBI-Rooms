@@ -9,6 +9,7 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -88,7 +89,9 @@ public class AusstattungView extends VerticalLayout {
             button.setIcon(new Icon(VaadinIcon.TRASH));
         })).setHeader("Löschen");
 
-        add(grid);
+        GridPro<String> gridpro = new GridPro<>();
+
+        add(grid, gridpro);
     }
 
 }
