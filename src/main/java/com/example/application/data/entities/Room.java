@@ -1,40 +1,31 @@
 package com.example.application.data.entities;
 
 import com.example.application.data.AbstractEntity;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.util.Set;
 
 @Entity
-public class Room extends AbstractEntity {
+public class Room {
 
-    @GeneratedValue
     @Id
-    private long id;
+    private String refNr;
 
     private String typ;
-    private String name;
     private int capacity;
-    private String location;
-    @ElementCollection
-    private Set<String> ausstattung;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Ausstattung> ausstattung;
     private String fachbereich;
-    private String refNr;
 
     public Room() {
         // Empty constructor is needed by Spring Data / JPA
     }
 
-    public Room(String name, int capacity, String location, Set<String> ausstattung, String refNr, String typ, String fachbereich) {
-        this.name = name;
-        this.typ = typ;
+    public Room(int capacity, Set<Ausstattung> ausstattung, String refNr, String typ, String fachbereich) {
         this.capacity = capacity;
-        this.location = location;
         this.ausstattung = ausstattung;
         this.refNr = refNr;
+        this.typ = typ;
         this.fachbereich = fachbereich;
     }
 
@@ -46,14 +37,6 @@ public class Room extends AbstractEntity {
         this.refNr = refNr;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getCapacity() {
         return capacity;
     }
@@ -62,19 +45,11 @@ public class Room extends AbstractEntity {
         this.capacity = capacity;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public Set<String> getAusstattung() {
+    public Set<Ausstattung> getAusstattung() {
         return ausstattung;
     }
 
-    public void setAusstattung(Set<String> ausstattung) {
+    public void setAusstattung(Set<Ausstattung> ausstattung) {
         this.ausstattung = ausstattung;
     }
 
@@ -93,5 +68,6 @@ public class Room extends AbstractEntity {
     public void setFachbereich(String fachbereich) {
         this.fachbereich = fachbereich;
     }
+
 }
 

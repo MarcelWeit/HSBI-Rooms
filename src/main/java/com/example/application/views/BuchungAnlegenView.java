@@ -1,8 +1,7 @@
-package com.example.application.views.buchunganlegen;
+package com.example.application.views;
 
 import com.example.application.data.entities.SamplePerson;
 import com.example.application.services.SamplePersonService;
-import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -39,7 +38,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 @PageTitle("BuchungAnlegen")
 @Route(value = "grid-with-filters", layout = MainLayout.class)
-@RouteAlias(value = "", layout = MainLayout.class)
 @RolesAllowed("USER")
 @Uses(Icon.class)
 public class BuchungAnlegenView extends Div {
