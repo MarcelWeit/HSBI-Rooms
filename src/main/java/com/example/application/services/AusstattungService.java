@@ -1,14 +1,11 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.entities.Room;
 import com.example.application.data.repository.AusstattungRepository;
 import com.example.application.data.repository.RoomAusstattungRepository;
-import com.example.application.data.repository.RoomRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
