@@ -67,9 +67,9 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        if(accessChecker.hasAccess(ShowRoomsView.class)){
+        if(accessChecker.hasAccess(RoomManagement.class)){
             nav.addItem(
-                    new SideNavItem("Räume", ShowRoomsView.class, LineAwesomeIcon.LIST_SOLID.create()));
+                    new SideNavItem("Räume", RoomManagement.class, LineAwesomeIcon.LIST_SOLID.create()));
         }
         if(accessChecker.hasAccess(AddAusstattungView.class)){
             nav.addItem(

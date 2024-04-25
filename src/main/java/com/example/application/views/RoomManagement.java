@@ -22,24 +22,26 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import jakarta.annotation.security.RolesAllowed;
 import org.hibernate.Hibernate;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@PageTitle("Räume anzeigen")
+@PageTitle("Räume")
 @Route(value = "show-rooms", layout = MainLayout.class)
+@RouteAlias(value = "", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)
-public class ShowRoomsView extends VerticalLayout {
+public class RoomManagement extends VerticalLayout {
 
         private final RoomService roomService;
         private final AusstattungService ausstattungService;
 
         private Grid<Room> grid;
 
-        public ShowRoomsView(RoomService roomService, AusstattungService ausstattungService) {
+        public RoomManagement(RoomService roomService, AusstattungService ausstattungService) {
             addClassNames("show-rooms");
             this.roomService = roomService;
             this.ausstattungService = ausstattungService;
