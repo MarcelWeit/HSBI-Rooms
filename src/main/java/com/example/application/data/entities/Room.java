@@ -1,6 +1,5 @@
 package com.example.application.data.entities;
 
-import com.example.application.data.AbstractEntity;
 import jakarta.persistence.*;
 
 import java.util.Set;
