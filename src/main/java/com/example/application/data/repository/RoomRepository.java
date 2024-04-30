@@ -5,9 +5,10 @@ import com.example.application.data.entities.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
+import java.util.Set;
 
 public interface RoomRepository extends JpaRepository<Room, String>, JpaSpecificationExecutor<Room>{
-    List<Room> findAllByAusstattungContains(Ausstattung entity);
+    Set<Room> findAllByAusstattungContains(Ausstattung entity);
     int countByAusstattungContains(Ausstattung entity);
+    Room findByRefNr(String refNr);
 }

@@ -1,8 +1,10 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.repository.RoomRepository;
+import com.example.application.data.entities.Room;
 import com.example.application.services.AusstattungService;
+import com.example.application.services.RoomService;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -23,9 +25,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.Set;
 
 /**
- *
  * @author: marcel weithoener
- *
  */
 
 //@Todo: Ausstattung löschbar machen, wenn in Raum verwendet
@@ -37,14 +37,14 @@ import java.util.Set;
 public class AusstattungView extends VerticalLayout {
 
     private final AusstattungService ausstattungService;
-    private final RoomRepository roomRepository;
+    private final RoomService roomService;
 
     private Grid<Ausstattung> grid;
 
-    public AusstattungView(AusstattungService ausstattungService, RoomRepository roomRepository) {
+    public AusstattungView(AusstattungService ausstattungService, RoomService roomService) {
         addClassNames("ausstattung-view");
         this.ausstattungService = ausstattungService;
-        this.roomRepository = roomRepository;
+        this.roomService = roomService;
         createAddButton();
         createGrid();
     }
@@ -56,10 +56,10 @@ public class AusstattungView extends VerticalLayout {
         Button addButton = new Button("Hinzufügen");
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addButton.addClickListener(e -> {
-            if(ausstattungService.existsByBez(bez.getValue())) {
+            if (ausstattungService.existsByBez(bez.getValue())) {
                 bez.setErrorMessage("Ausstattung existiert bereits");
                 bez.setInvalid(true);
-            } else if(bez.getValue().isEmpty()){
+            } else if (bez.getValue().isEmpty()) {
                 bez.setErrorMessage("Bitte geben Sie eine Bezeichnung ein");
                 bez.setInvalid(true);
             } else {
@@ -70,6 +70,7 @@ public class AusstattungView extends VerticalLayout {
                 bez.clear();
             }
         });
+        addButton.addClickShortcut(Key.ENTER);
 
         addLayout.add(bez, addButton);
         add(addLayout);
@@ -82,38 +83,35 @@ public class AusstattungView extends VerticalLayout {
 
         grid.addColumn(Ausstattung::getBez).setHeader("Bezeichnung");
         grid.addColumn(new ComponentRenderer<>(Button::new, (button, ausstattung) -> {
-            button.addThemeVariants(ButtonVariant.LUMO_ICON,
-                    ButtonVariant.LUMO_ERROR,
-                    ButtonVariant.LUMO_TERTIARY);
+            button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> {
                 Dialog dialog = new Dialog();
                 dialog.setCloseOnEsc(false);
 
-                int roomCount = roomRepository.countByAusstattungContains(ausstattung);
+                int roomCount = roomService.countByAusstattungContains(ausstattung);
 
                 HorizontalLayout buttonLayout = new HorizontalLayout();
-                Text message;
-                if(roomCount > 0) {
-                    message = new Text("Diese Ausstattung wird in " + roomCount + " Räumen verwendet. Bitte löschen Sie zuerst die Räume, die diese Ausstattung verwenden.");
-                    Button verstandenButton = new Button("Verstanden", event -> dialog.close());
-                    buttonLayout.add(verstandenButton);
-                } else {
-                    message = new Text("Diese Ausstattung wird in " + roomCount + " Räumen verwendet. Sind Sie sicher, dass Sie diese Ausstattung löschen möchten?");
-                    dialog.setCloseOnOutsideClick(false);
+                Text message = roomCount == 1 ? new Text("Diese " + "Ausstattung wird in einem Raum verwendet. " + "Sind Sie sicher, dass Sie diese " + "Ausstattung löschen möchten?") : new Text("Diese " + "Ausstattung wird in " + roomCount + " " + "Räumen verwendet. Sind Sie sicher, dass " + "Sie diese Ausstattung löschen möchten?");
+                dialog.setCloseOnOutsideClick(false);
 
-                    Button confirmButton = new Button("Bestätigen", event -> {
-                        ausstattungService.delete(ausstattung);
-                        grid.setItems(ausstattungService.findAll());
-                        dialog.close();
+                Button confirmButton = new Button("Bestätigen", event -> {
+
+                    Set<Room> roomsWithAusstattung = roomService.findAllByAusstattungContains(ausstattung);
+                    roomsWithAusstattung.forEach(room -> {
+                        room.removeAusstattung(ausstattung);
+                        roomService.save(room);
                     });
+                    ausstattungService.delete(ausstattung);
 
-                    Button cancelButton = new Button("Abbrechen", event -> dialog.close());
-                    buttonLayout.add(confirmButton, cancelButton);
-                }
+                    grid.setItems(ausstattungService.findAll());
+                    dialog.close();
+                });
+
+                Button cancelButton = new Button("Abbrechen", event -> dialog.close());
+                buttonLayout.add(confirmButton, cancelButton);
 
                 dialog.add(message, buttonLayout);
 
-                // Open the dialog
                 dialog.open();
             });
             button.setIcon(new Icon(VaadinIcon.TRASH));

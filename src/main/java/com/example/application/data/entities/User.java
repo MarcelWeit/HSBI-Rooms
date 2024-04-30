@@ -1,6 +1,5 @@
 package com.example.application.data.entities;
 
-import com.example.application.data.AbstractEntity;
 import com.example.application.data.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
