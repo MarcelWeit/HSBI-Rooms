@@ -8,6 +8,7 @@ import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
@@ -16,7 +17,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
@@ -60,17 +60,22 @@ public class MainLayout extends AppLayout {
         addToDrawer(header, scroller, createFooter());
     }
 
+    // Navigation an der linken Seite erstellen
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
+        // Kopf Navigation Verwaltung mit Unterpunkten
+        SideNavItem verwNav = new SideNavItem("Verwaltung");
         if(accessChecker.hasAccess(AusstattungView.class)){
-            nav.addItem(
-                    new SideNavItem("Ausstattungen", AusstattungView.class, LineAwesomeIcon.LIST_SOLID.create()));
+            verwNav.addItem(
+                    new SideNavItem("Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
         }
         if(accessChecker.hasAccess(RoomCrud.class)){
-            nav.addItem(
-                    new SideNavItem("RäumeCrud", RoomCrud.class, LineAwesomeIcon.LIST_SOLID.create()));
+            verwNav.addItem(
+                    new SideNavItem("Raum", RoomCrud.class, VaadinIcon.TABLE.create()));
         }
+        verwNav.setExpanded(true);
+        nav.addItem(verwNav);
 
         return nav;
     }
