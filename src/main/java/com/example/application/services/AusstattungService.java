@@ -23,8 +23,8 @@ public class AusstattungService {
         repository.save(entity);
     }
 
-    public boolean existsByBez(String bez) {
-        return repository.findByBez(bez) != null;
+    public boolean existsByBezEqualsIgnoreCase(String bez) {
+        return repository.existsByBezEqualsIgnoreCase(bez);
     }
 
     public void delete(Ausstattung entity) {

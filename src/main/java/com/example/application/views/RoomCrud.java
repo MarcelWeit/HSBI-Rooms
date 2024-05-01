@@ -26,9 +26,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 @Route(value = "room-crud", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
@@ -39,15 +36,15 @@ public class RoomCrud extends Div {
     private final AusstattungService ausstattungService;
     private final RoomService roomService;
 
-    private Crud<Room> crud;
+    private final Crud<Room> crud;
 
-    private String FACHBEREICH = "fachbereich";
-    private String POSITION = "position";
-    private String TYP = "typ";
-    private String CAPACITY = "capacity";
-    private String AUSSTATTUNG = "ausstattung";
-    private String REFNR = "refNr";
-    private String EDIT_COLUMN = "vaadin-crud-edit-column";
+    private final String FACHBEREICH = "fachbereich";
+    private final String POSITION = "position";
+    private final String TYP = "typ";
+    private final String CAPACITY = "capacity";
+    private final String AUSSTATTUNG = "ausstattung";
+    private final String REFNR = "refNr";
+    private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
     public RoomCrud(AusstattungService ausstattungService, RoomService roomService) {
         this.ausstattungService = ausstattungService;
@@ -70,11 +67,13 @@ public class RoomCrud extends Div {
         MultiSelectComboBox<Ausstattung> ausstattung = new MultiSelectComboBox<>("Ausstattung");
         ausstattung.setItems(ausstattungService.findAll());
         ausstattung.setItemLabelGenerator(Ausstattung::getBez);
-        ComboBox<String> typ = new ComboBox<>("Raumtyp");
-        typ.setItems(Arrays.stream(Raumtyp.values()).map(Raumtyp::getAnzeigeName).collect(Collectors.toList()));
-        ComboBox<String> fachbereich = new ComboBox<>("Fachbereich");
+        ComboBox<Raumtyp> typ = new ComboBox<>("Raumtyp");
+        typ.setItems(Raumtyp.values());
+        typ.setItemLabelGenerator(Raumtyp::toString);
+        ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
+        fachbereich.setItems(Fachbereich.values());
+        fachbereich.setItemLabelGenerator(Fachbereich::toString);
         fachbereich.setRequired(true);
-        fachbereich.setItems(Arrays.stream(Fachbereich.values()).map(Fachbereich::getAnzeigeName).collect(Collectors.toList()));
         TextField position = new TextField("Position");
 
         FormLayout form = new FormLayout(refNr, kapa, ausstattung, typ, fachbereich, position);
@@ -107,6 +106,7 @@ public class RoomCrud extends Div {
 
         grid.removeColumn(grid.getColumnByKey("id"));
         grid.getColumnByKey(CAPACITY).setHeader("Kapazität");
+        grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
 
         // Reorder the columns (alphabetical by default)
         grid.setColumnOrder(grid.getColumnByKey(REFNR),
@@ -139,6 +139,21 @@ public class RoomCrud extends Div {
         i18n.setCancel("Abbrechen");
         i18n.setDeleteItem("Löschen");
         i18n.setEditLabel("Bearbeiten");
+
+        CrudI18n.Confirmations.Confirmation delete = i18n.getConfirm()
+                .getDelete();
+        delete.setTitle("Eintrag löschen");
+        delete.setContent(
+                "Sind Sie sicher, dass Sie diesen Eintrag löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.");
+        delete.getButton().setConfirm("Bestätigen");
+        delete.getButton().setDismiss("Zurück");
+
+        CrudI18n.Confirmations.Confirmation cancel = i18n.getConfirm()
+                .getCancel();
+        cancel.setTitle("Änderungen verwerfen");
+        cancel.setContent("Sie haben Änderungen an diesem Eintrag vorgenommen, die noch nicht gespeichert wurden.");
+        cancel.getButton().setConfirm("Verwerfen");
+        cancel.getButton().setDismiss("Zurück");
 
         crud.setI18n(i18n);
     }

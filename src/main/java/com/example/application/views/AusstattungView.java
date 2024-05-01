@@ -11,7 +11,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.gridpro.GridPro;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -56,7 +55,7 @@ public class AusstattungView extends VerticalLayout {
         Button addButton = new Button("Hinzufügen");
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addButton.addClickListener(e -> {
-            if (ausstattungService.existsByBez(bez.getValue())) {
+            if (ausstattungService.existsByBezEqualsIgnoreCase(bez.getValue())) {
                 bez.setErrorMessage("Ausstattung existiert bereits");
                 bez.setInvalid(true);
             } else if (bez.getValue().isEmpty()) {
@@ -117,9 +116,7 @@ public class AusstattungView extends VerticalLayout {
             button.setIcon(new Icon(VaadinIcon.TRASH));
         })).setHeader("Löschen");
 
-        GridPro<String> gridpro = new GridPro<>();
-
-        add(grid, gridpro);
+        add(grid);
     }
 
 }

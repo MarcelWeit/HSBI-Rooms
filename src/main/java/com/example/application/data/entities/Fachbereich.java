@@ -7,15 +7,15 @@ public enum Fachbereich {
     INGENIEURWISSENSCHAFTENUNDMATHEMATIK("Ingenieurwissenschaften und Mathematik"),
     GESUNDHEIT("Gesundheit"),
     CAMPUSMINDEN("Campus Minden"),
-    CAMPUSGÜTERSLOH("Campus Gütersloh");
+    CAMPUSGUETERSLOH("Campus Gütersloh");
 
-    private String anzeigeName;
+    private final String anzeigeName;
 
     Fachbereich(String anzeigeName) {
         this.anzeigeName = anzeigeName;
     }
 
-    public String getAnzeigeName() {
+    public String toString(){
         return anzeigeName;
     }
 }

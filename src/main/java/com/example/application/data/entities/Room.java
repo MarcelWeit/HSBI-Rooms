@@ -14,7 +14,7 @@ public class Room{
 
     private String refNr;
 
-    private String typ;
+    private Raumtyp typ;
     private int capacity;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -22,7 +22,7 @@ public class Room{
             joinColumns = @JoinColumn(name = "room_refNr"),
             inverseJoinColumns = @JoinColumn(name = "ausstattung_id"))
     private Set<Ausstattung> ausstattung = new HashSet<>();
-    private String fachbereich;
+    private Fachbereich fachbereich;
     private String position;
 
     public Room() {
@@ -42,7 +42,8 @@ public class Room{
     }
 
     public void setRefNr(String refNr) {
-        this.refNr = refNr;
+        // Capitalize the first letter of the reference number
+        this.refNr = refNr.substring(0, 1).toUpperCase() + refNr.substring(1);
     }
 
     public int getCapacity() {
@@ -69,19 +70,19 @@ public class Room{
         this.ausstattung.add(ausstattung);
     }
 
-    public String getTyp() {
+    public Raumtyp getTyp() {
         return typ;
     }
 
-    public void setTyp(String typ) {
+    public void setTyp(Raumtyp typ) {
         this.typ = typ;
     }
 
-    public String getFachbereich() {
+    public Fachbereich getFachbereich() {
         return fachbereich;
     }
 
-    public void setFachbereich(String fachbereich) {
+    public void setFachbereich(Fachbereich fachbereich) {
         this.fachbereich = fachbereich;
     }
     

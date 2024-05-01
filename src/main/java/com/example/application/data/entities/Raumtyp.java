@@ -6,13 +6,13 @@ public enum Raumtyp {
     RECHNERRAUM("Rechnerraum"),
     BESPRECHUNGSRAUM("Besprechungsraum");
 
-    private String anzeigeName;
+    private final String anzeigeName;
 
     Raumtyp(String anzeigeName) {
         this.anzeigeName = anzeigeName;
     }
 
-    public String getAnzeigeName() {
+    public String toString(){
         return anzeigeName;
     }
 }
