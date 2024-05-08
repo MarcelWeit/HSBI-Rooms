@@ -5,11 +5,14 @@ import com.example.application.security.AuthenticatedUser;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
@@ -38,6 +41,7 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
+        getElement().getThemeList().add("dark");
     }
 
     private void addHeaderContent() {
@@ -47,7 +51,27 @@ public class MainLayout extends AppLayout {
         viewTitle = new H2();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
-        addToNavbar(true, toggle, viewTitle);
+        // Add a button to switch between light and dark mode
+        Button themeSwitcher = new Button("Switch Theme", click -> {
+            if (getElement().getThemeList().contains("dark")) {
+                getElement().getThemeList().remove("dark");
+                getElement().getThemeList().add("light");
+            } else {
+                getElement().getThemeList().remove("light");
+                getElement().getThemeList().add("dark");
+            }
+        });
+
+        // Create a HorizontalLayout to align the viewTitle and themeSwitcher
+        HorizontalLayout layout = new HorizontalLayout(viewTitle, themeSwitcher);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        layout.setWidthFull();
+
+        // Make the viewTitle grow to push the themeSwitcher to the right
+        layout.setFlexGrow(1, viewTitle);
+
+        addToNavbar(true, toggle, layout);
     }
 
     private void addDrawerContent() {

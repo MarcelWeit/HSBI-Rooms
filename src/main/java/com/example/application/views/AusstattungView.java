@@ -27,11 +27,9 @@ import java.util.Set;
  * @author: marcel weithoener
  */
 
-//@Todo: Ausstattung löschbar machen, wenn in Raum verwendet
-
 @Route(value = "show-ausstattung", layout = MainLayout.class)
 @PageTitle("Ausstattungen anzeigen")
-@RolesAllowed("ADMIN")
+@RolesAllowed({"ADMIN", "DOZENT"})
 @Uses(Icon.class)
 public class AusstattungView extends VerticalLayout {
 

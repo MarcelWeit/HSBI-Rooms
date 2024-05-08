@@ -95,20 +95,11 @@ public class RoomCrud extends Div {
     private void setupGrid() {
         Grid<Room> grid = crud.getGrid();
 
-        //         Only show these columns (all columns shown by default):
-        //        List<String> visibleColumns = Arrays.asList(FACHBEREICH, POSITION, TYP, CAPACITY, AUSSTATTUNG, EDIT_COLUMN);
-        //        grid.getColumns().forEach(column -> {
-        //            String key = column.getKey();
-        //            if (!visibleColumns.contains(key)) {
-        //                grid.removeColumn(column);
-        //            }
-        //        });
-
         grid.removeColumn(grid.getColumnByKey("id"));
         grid.getColumnByKey(CAPACITY).setHeader("Kapazität");
         grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
 
-        // Reorder the columns (alphabetical by default)
+        // Anordnung der Spalten
         grid.setColumnOrder(grid.getColumnByKey(REFNR),
                 grid.getColumnByKey(FACHBEREICH),
                 grid.getColumnByKey(AUSSTATTUNG),
