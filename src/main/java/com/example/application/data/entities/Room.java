@@ -26,7 +26,7 @@ public class Room{
     private String position;
 
     public Room() {
-        // Empty constructor is needed by Spring Data / JPA
+
     }
 
     public long getId() {

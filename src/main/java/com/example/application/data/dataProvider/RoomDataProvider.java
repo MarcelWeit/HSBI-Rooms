@@ -1,6 +1,7 @@
-package com.example.application.services;
+package com.example.application.data.dataProvider;
 
 import com.example.application.data.entities.Room;
+import com.example.application.services.RoomService;
 import com.vaadin.flow.component.crud.CrudFilter;
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
@@ -74,8 +75,8 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
         return filter.getSortOrders().entrySet().stream().map(sortClause -> {
             try {
                 Comparator<Room> comparator = Comparator.comparing(
-                        person -> (Comparable) valueOf(sortClause.getKey(),
-                                person));
+                        room -> (Comparable) valueOf(sortClause.getKey(),
+                                room));
 
                 if (sortClause.getValue() == SortDirection.DESCENDING) {
                     comparator = comparator.reversed();

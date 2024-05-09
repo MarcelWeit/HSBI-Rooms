@@ -5,7 +5,7 @@ import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Raumtyp;
 import com.example.application.data.entities.Room;
 import com.example.application.services.AusstattungService;
-import com.example.application.services.RoomDataProvider;
+import com.example.application.data.dataProvider.RoomDataProvider;
 import com.example.application.services.RoomService;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
