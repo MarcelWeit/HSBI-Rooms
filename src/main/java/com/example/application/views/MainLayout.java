@@ -5,15 +5,14 @@ import com.example.application.security.AuthenticatedUser;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
@@ -21,9 +20,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
-import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -42,6 +41,7 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
+        getElement().getThemeList().add("dark");
     }
 
     private void addHeaderContent() {
@@ -51,7 +51,27 @@ public class MainLayout extends AppLayout {
         viewTitle = new H2();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
-        addToNavbar(true, toggle, viewTitle);
+        // Add a button to switch between light and dark mode
+        Button themeSwitcher = new Button("Switch Theme", click -> {
+            if (getElement().getThemeList().contains("dark")) {
+                getElement().getThemeList().remove("dark");
+                getElement().getThemeList().add("light");
+            } else {
+                getElement().getThemeList().remove("light");
+                getElement().getThemeList().add("dark");
+            }
+        });
+
+        // Create a HorizontalLayout to align the viewTitle and themeSwitcher
+        HorizontalLayout layout = new HorizontalLayout(viewTitle, themeSwitcher);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        layout.setWidthFull();
+
+        // Make the viewTitle grow to push the themeSwitcher to the right
+        layout.setFlexGrow(1, viewTitle);
+
+        addToNavbar(true, toggle, layout);
     }
 
     private void addDrawerContent() {
@@ -64,21 +84,26 @@ public class MainLayout extends AppLayout {
         addToDrawer(header, scroller, createFooter());
     }
 
+    // Navigation an der linken Seite erstellen
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        if(accessChecker.hasAccess(RoomManagement.class)){
-            nav.addItem(
-                    new SideNavItem("Räume", RoomManagement.class, LineAwesomeIcon.LIST_SOLID.create()));
-        }
-        if(accessChecker.hasAccess(AddAusstattungView.class)){
-            nav.addItem(
-                    new SideNavItem("Ausstattung", AddAusstattungView.class, LineAwesomeIcon.PLUS_SOLID.create()));
-        }
+        // Kopf Navigation Verwaltung mit Unterpunkten
+        SideNavItem verwNav = new SideNavItem("Verwaltung");
         if(accessChecker.hasAccess(AusstattungView.class)){
-            nav.addItem(
-                    new SideNavItem("Ausstattungen", AusstattungView.class, LineAwesomeIcon.LIST_SOLID.create()));
+            verwNav.addItem(
+                    new SideNavItem("Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
         }
+        if(accessChecker.hasAccess(RoomCrud.class)){
+            verwNav.addItem(
+                    new SideNavItem("Raum", RoomCrud.class, VaadinIcon.TABLE.create()));
+        }
+        if(accessChecker.hasAccess(VeranstaltungCrud.class)){
+            verwNav.addItem(
+                    new SideNavItem("Veranstaltungen", VeranstaltungCrud.class, VaadinIcon.TABLE.create()));
+        }
+        verwNav.setExpanded(true);
+        nav.addItem(verwNav);
 
         return nav;
     }
