@@ -1,14 +1,15 @@
 package com.example.application;
 
-import com.example.application.data.repository.RoomRepository;
+import com.example.application.data.repository.UserRepository;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
-import javax.sql.DataSource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDatabaseInitializer;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
 import org.springframework.context.annotation.Bean;
+
+import javax.sql.DataSource;
 
 /**
  * The entry point of the Spring Boot application.
@@ -27,12 +28,12 @@ public class Application implements AppShellConfigurator {
 
     @Bean
     SqlDataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer(DataSource dataSource,
-                                                                               SqlInitializationProperties properties, RoomRepository repository) {
+                                                                               SqlInitializationProperties properties, UserRepository userRepository) {
         return new SqlDataSourceScriptDatabaseInitializer(dataSource, properties) {
             @Override
             public boolean initializeDatabase() {
-                // Continue with the initialization if the room table is empty
-                if (repository.count() == 0L) {
+                // Continue with the initialization if the user table is empty
+                if (userRepository.count() == 0L) {
                     return super.initializeDatabase();
                 }
                 return false;

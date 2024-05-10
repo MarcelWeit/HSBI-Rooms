@@ -1,26 +1,18 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.entities.Room;
 import com.example.application.data.repository.AusstattungRepository;
-import com.example.application.data.repository.RoomAusstattungRepository;
-import com.example.application.data.repository.RoomRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
 public class AusstattungService {
 
     private final AusstattungRepository repository;
-    private final RoomAusstattungRepository roomAusstattungRepository; // Assuming you have a RoomRepository
 
-
-    public AusstattungService(AusstattungRepository repository, RoomAusstattungRepository roomRepository) {
+    public AusstattungService(AusstattungRepository repository) {
         this.repository = repository;
-        this.roomAusstattungRepository = roomRepository;
     }
 
     public Set<Ausstattung> findAll() {
@@ -31,14 +23,11 @@ public class AusstattungService {
         repository.save(entity);
     }
 
-    public boolean existsByBez(String bez) {
-        return repository.findByBez(bez) != null;
+    public boolean existsByBezEqualsIgnoreCase(String bez) {
+        return repository.existsByBezEqualsIgnoreCase(bez);
     }
 
-    @Transactional
     public void delete(Ausstattung entity) {
-        roomAusstattungRepository.deleteByAusstattung(entity);
-        // Now you can delete the Ausstattung
         repository.delete(entity);
     }
 
