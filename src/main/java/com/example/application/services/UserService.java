@@ -2,11 +2,12 @@ package com.example.application.services;
 
 import com.example.application.data.entities.User;
 import com.example.application.data.repository.UserRepository;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -31,6 +32,10 @@ public class UserService {
 
     public Page<User> list(Pageable pageable) {
         return repository.findAll(pageable);
+    }
+
+    public User save(User entity) {
+        return repository.save(entity);
     }
 
     public Page<User> list(Pageable pageable, Specification<User> filter) {

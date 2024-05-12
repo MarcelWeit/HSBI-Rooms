@@ -1,0 +1,5 @@
+vaadin-login-form-wrapper::part(footer) {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

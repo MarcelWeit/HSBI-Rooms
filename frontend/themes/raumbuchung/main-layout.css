@@ -18,3 +18,10 @@ vaadin-side-nav-item vaadin-icon {
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
+
+.top-right-button {
+  position: absolute;
+  top: 10%;
+  right: 1%;
+  border: 1px solid white; /* Change the color as needed */
+}
