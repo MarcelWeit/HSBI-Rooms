@@ -24,7 +24,7 @@ public class Startseite extends VerticalLayout {
         LocalDate today = LocalDate.now();
         int weekNumber = today.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
 
-        H3 h3 = new H3("Herzlich Willkommen bei RoomHSBI, dem Raumplanungstool der HSBI");
+        H3 h3 = new H3("Herzlich Willkommen bei dem Raumplanungstool der HSBI");
         Span dateSpan = new Span("Heutiges Datum: " + today.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         dateSpan.getStyle().set("border", "1px solid white");
         dateSpan.getStyle().set("padding", "10px");
