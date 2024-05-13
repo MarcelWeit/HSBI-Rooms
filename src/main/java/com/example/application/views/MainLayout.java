@@ -57,6 +57,8 @@ public class MainLayout extends AppLayout {
                 getElement().getThemeList().add("dark");
             }
         });
+        //<theme-editor-local-classname>
+        themeSwitcher.addClassName("main-layout-button-1");
         themeSwitcher.addClassName("top-right-button");
 
         addToNavbar(true, toggle, viewTitle, themeSwitcher);
