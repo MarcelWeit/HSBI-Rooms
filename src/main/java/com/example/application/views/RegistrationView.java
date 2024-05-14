@@ -11,6 +11,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -63,7 +64,7 @@ public class RegistrationView extends Div {
     private void createComponents() {
         FormLayout form = new FormLayout();
         form.addClassName("form");
-        H1 title = new H1("Registrierung");
+        H2 title = new H2("Registrierung");
         firstName = new TextField("Vorname");
         lastName = new TextField("Nachname");
         email = new EmailField("E-Mail");
