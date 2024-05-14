@@ -58,14 +58,13 @@ public class MainLayout extends AppLayout {
             }
         });
         //<theme-editor-local-classname>
-        themeSwitcher.addClassName("main-layout-button-1");
         themeSwitcher.addClassName("top-right-button");
 
         addToNavbar(true, toggle, viewTitle, themeSwitcher);
     }
 
     private void addDrawerContent() {
-        H1 appName = new H1("Raumbuchung");
+        H1 appName = new H1("HSBI Rooms");
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
 

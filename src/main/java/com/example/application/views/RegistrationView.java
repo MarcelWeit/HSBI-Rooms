@@ -42,28 +42,37 @@ public class RegistrationView extends VerticalLayout {
 
     private boolean enablePasswordValidation = false;
 
+    private TextField lastName;
+    private TextField firstName;
+    private EmailField email;
+    private PasswordField password;
+    private Button submitButton;
+    private ComboBox<Fachbereich> fachbereich;
+    private Button backButton;
+
     @Autowired
     public RegistrationView(UserService userService, PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         addClassName("registration-view");
         createComponents();
+        fillTestData();
     }
 
     private void createComponents() {
         FormLayout form = new FormLayout();
         H1 title = new H1("Registrierung");
-        TextField firstName = new TextField("Vorname");
-        TextField lastName = new TextField("Nachname");
-        EmailField email = new EmailField("E-Mail");
-        PasswordField password = new PasswordField("Passwort");
-        Button submitButton = new Button("Registrieren");
+        firstName = new TextField("Vorname");
+        lastName = new TextField("Nachname");
+        email = new EmailField("E-Mail");
+        password = new PasswordField("Passwort");
+        submitButton = new Button("Registrieren");
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
+        fachbereich = new ComboBox<>("Fachbereich");
         fachbereich.setItems(Fachbereich.values());
 //        ComboBox<Role> role = new ComboBox<>("Rolle");
 //        role.setItems(Role.values());
-        Button backButton = new Button("Zurück");
+        backButton = new Button("Zurück");
         backButton.addClickListener(e -> UI.getCurrent().navigate("login"));
 
         submitButton.addClickListener(e -> {
@@ -125,6 +134,15 @@ public class RegistrationView extends VerticalLayout {
         }
 
         return ValidationResult.error("Passwords do not match");
+    }
+
+    private void fillTestData(){
+        firstName.setValue("Max");
+        lastName.setValue("Mustermann");
+        email.setValue("max@gmail.com");
+        password.setValue("12345678");
+        confirmPassword.setValue("12345678");
+        fachbereich.setValue(Fachbereich.WIRTSCHAFT);
     }
 
 }
