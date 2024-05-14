@@ -1,6 +1,5 @@
 @import "theme-editor.css";
 @import url('./main-layout.css');
-@import url('./views/buchung-anlegen-view.css');
 @import url('./views/login-rich-content.css');
 @import url('./views/login-view.css');
 @import url('./views/registration-view.css');

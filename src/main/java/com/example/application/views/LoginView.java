@@ -38,7 +38,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
 
     private void setupFooter() {
         Button registerButton = new Button("Registrieren");
-        registerButton.addClassName(LumoUtility.TextAlignment.CENTER);
+//        registerButton.addClassName(LumoUtility.TextAlignment.CENTER);
         registerButton.addClickListener(e -> {
             loginOverlay.setOpened(false);
             getUI().ifPresent(ui -> ui.navigate("register"));
@@ -62,8 +62,23 @@ public class LoginView extends Div implements BeforeEnterObserver {
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("HSBI Rooms");
         i18n.getHeader().setDescription("Das Raumbuchungstool");
+
+        LoginI18n.Form i18nForm = i18n.getForm();
+        i18nForm.setTitle("Einloggen");
+        i18nForm.setUsername("E-Mail");
+        i18nForm.setPassword("Passwort");
+        i18nForm.setSubmit("Einloggen");
+        i18nForm.setForgotPassword("Passwort vergessen?");
+        i18n.setForm(i18nForm);
+
+        LoginI18n.ErrorMessage i18nErrorMessage = i18n.getErrorMessage();
+        i18nErrorMessage.setTitle("Falsche E-Mail oder Passwort");
+        i18nErrorMessage.setMessage("Bitte prüfen Sie Ihre Eingaben");
+        i18n.setErrorMessage(i18nErrorMessage);
+
         i18n.setAdditionalInformation(null);
         loginOverlay.setI18n(i18n);
+        loginOverlay.setError(true);
     }
 
 

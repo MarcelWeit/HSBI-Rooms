@@ -4,14 +4,14 @@ import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Role;
 import com.example.application.data.entities.User;
 import com.example.application.services.UserService;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -30,10 +30,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.HashSet;
 import java.util.Set;
 
-@PageTitle("Register")
+
+@PageTitle("Registrierung")
 @AnonymousAllowed
 @Route(value = "register")
-public class RegistrationView extends Div {
+public class RegistrationView extends VerticalLayout {
 
     private final Binder<User> binder = new Binder<>(User.class);
     private final UserService userService;
@@ -63,8 +64,8 @@ public class RegistrationView extends Div {
 
     private void createComponents() {
         FormLayout form = new FormLayout();
-        form.addClassName("form");
-        H2 title = new H2("Registrierung");
+        H2 title = new H2("HSBI Rooms");
+        H4 subTitle = new H4("Registrierung");
         firstName = new TextField("Vorname");
         lastName = new TextField("Nachname");
         email = new EmailField("E-Mail");
@@ -74,8 +75,8 @@ public class RegistrationView extends Div {
         submitButton.addClassName("submit-button");
         fachbereich = new ComboBox<>("Fachbereich");
         fachbereich.setItems(Fachbereich.values());
-//        ComboBox<Role> role = new ComboBox<>("Rolle");
-//        role.setItems(Role.values());
+        //        ComboBox<Role> role = new ComboBox<>("Rolle");
+        //        role.setItems(Role.values());
         backButton = new Button("Zurück");
         backButton.addClickListener(e -> UI.getCurrent().navigate("login"));
 
@@ -92,6 +93,7 @@ public class RegistrationView extends Div {
                 Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
             }
         });
+        submitButton.addClickShortcut(Key.ENTER);
 
         confirmPassword.addValueChangeListener(e -> {
             enablePasswordValidation = true;
@@ -102,9 +104,10 @@ public class RegistrationView extends Div {
         binder.forField(lastName).asRequired().bind(User::getLastName, User::setLastName);
         binder.forField(email)
                 .withValidator(new EmailValidator("invalid email", false))
+                .withValidator(email -> !userService.emailExists(email), "Email already exists")
                 .withValidationStatusHandler(status -> {
                     if (status.isError()) {
-                        email.setErrorMessage("Invalid email");
+                        email.setErrorMessage("Ungültige E-Mail");
                     }
                 })
                 .bind(User::getUsername, User::setUsername);
@@ -115,10 +118,10 @@ public class RegistrationView extends Div {
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
         binder.forField(confirmPassword).asRequired();
 
-        form.setMaxWidth("300px");
+        form.setMaxWidth("320px");
 
-        form.add(title, firstName, lastName, email, password, confirmPassword, fachbereich, submitButton, backButton);
-//        setHorizontalComponentAlignment(Alignment.CENTER, form);
+        form.add(title, subTitle, firstName, lastName, email, password, confirmPassword, fachbereich, submitButton, backButton);
+        //        setHorizontalComponentAlignment(Alignment.CENTER, form);
         add(form);
     }
 

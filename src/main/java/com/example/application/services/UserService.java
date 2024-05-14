@@ -46,4 +46,7 @@ public class UserService {
         return (int) repository.count();
     }
 
+    public boolean emailExists(String email) {
+        return repository.findByUsername(email) != null;
+    }
 }
