@@ -9,6 +9,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -31,7 +32,7 @@ import java.util.Set;
 @PageTitle("Register")
 @AnonymousAllowed
 @Route(value = "register")
-public class RegistrationView extends VerticalLayout {
+public class RegistrationView extends Div {
 
     private final Binder<User> binder = new Binder<>(User.class);
     private final UserService userService;
@@ -61,6 +62,7 @@ public class RegistrationView extends VerticalLayout {
 
     private void createComponents() {
         FormLayout form = new FormLayout();
+        form.addClassName("form");
         H1 title = new H1("Registrierung");
         firstName = new TextField("Vorname");
         lastName = new TextField("Nachname");
@@ -68,6 +70,7 @@ public class RegistrationView extends VerticalLayout {
         password = new PasswordField("Passwort");
         submitButton = new Button("Registrieren");
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        submitButton.addClassName("submit-button");
         fachbereich = new ComboBox<>("Fachbereich");
         fachbereich.setItems(Fachbereich.values());
 //        ComboBox<Role> role = new ComboBox<>("Rolle");
@@ -106,13 +109,10 @@ public class RegistrationView extends VerticalLayout {
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
         binder.forField(confirmPassword).asRequired();
 
-        form.setMaxWidth("500px");
-        form.setColspan(title, 2);
-        form.setColspan(email, 2);
-        form.setColspan(submitButton, 2);
+        form.setMaxWidth("300px");
 
         form.add(title, firstName, lastName, email, password, confirmPassword, fachbereich, submitButton, backButton);
-        setHorizontalComponentAlignment(Alignment.CENTER, form);
+//        setHorizontalComponentAlignment(Alignment.CENTER, form);
         add(form);
     }
 
