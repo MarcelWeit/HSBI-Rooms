@@ -10,7 +10,7 @@ public class Veranstaltung {
     private String id;
 
     private String bezeichnung;
-    private Dozent dozent; //Placeholder bis Klasse Dozent
+    private Dozent dozent;
     private int teilnehmerzahl;
     private Fachbereich fachbereich;
 
@@ -18,7 +18,7 @@ public class Veranstaltung {
 
     public String getId() {return id;}
     public String getBezeichnung() {return bezeichnung;}
-    public String getDozent() {return dozent;}
+    public Dozent getDozent() {return dozent;}
     public int getTeilnehmerzahl() {return teilnehmerzahl;}
     public Fachbereich getFachbereich() {return fachbereich;}
 
