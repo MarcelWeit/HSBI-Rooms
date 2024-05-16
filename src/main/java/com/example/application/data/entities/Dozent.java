@@ -18,9 +18,7 @@ public class Dozent extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-    @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<Fachbereich> fachbereich;
+    private String fachbereich;
 
     // Konstruktor
     public Dozent() {
@@ -58,11 +56,11 @@ public class Dozent extends AbstractEntity {
         this.roles = roles;
     }
 
-    public Set<Fachbereich> getFachbereich() {
+    public String getFachbereich() {
         return fachbereich;
     }
 
-    public void setFachbereich(Set<Fachbereich> fachbereich) {
+    public void setFachbereich(String fachbereich) {
         this.fachbereich = fachbereich;
     }
 }
