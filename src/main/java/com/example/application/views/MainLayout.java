@@ -97,7 +97,6 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
         }
 
-
         verwNav.setExpanded(true);
         nav.addItem(verwNav);
 
