@@ -10,7 +10,7 @@ public class Veranstaltung {
     private String id;
 
     private String bezeichnung;
-    private String dozent; //Placeholder bis Klasse Dozent
+    private Dozent dozent; //Placeholder bis Klasse Dozent
     private int teilnehmerzahl;
     private Fachbereich fachbereich;
 

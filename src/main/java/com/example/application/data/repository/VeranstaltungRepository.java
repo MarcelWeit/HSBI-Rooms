@@ -7,19 +7,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+@Repository
 public interface VeranstaltungRepository extends JpaRepository<Veranstaltung, Long>, JpaSpecificationExecutor<Veranstaltung> {
-//    @Query("select v from Veranstaltung as v where :id in v.id")
-    Veranstaltung findById(@Param("id") String id);
+    Veranstaltung findById(String id);
 
-//    @Query("select v from Veranstaltung as v where v.bezeichnung like %:bezeichnung%")
-    Set<Veranstaltung> findByBezeichnung(@Param("bezeichnung") String bezeichnung);
+    Set<Veranstaltung> findAllByByBezeichnung( String bezeichnung);
 
-//    @Query("select v from Veranstaltung as v where 'test' like %:fachbereich%")
-    Set<Veranstaltung> findByFachbereich(@Param("fachbereich") Fachbereich fachbereich);
+    Set<Veranstaltung> findAllByFachbereich( Fachbereich fachbereich);
 
-//    @Query("select v from Veranstaltung as v where v.dozent like %:dozent%")
-    Set<Veranstaltung> findByDozent(@Param("dozent") String dozent); //Dozent mit Dozent Klasse ersetzen!!!
+    Set<Veranstaltung> findAllByDozent(Dozent dozent); //Dozent mit Dozent Klasse ersetzen!!!
 }

@@ -3,9 +3,11 @@ package com.example.application.services;
 import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.data.repository.VeranstaltungRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+@Service
 public class VeranstaltungService {
 
     private final VeranstaltungRepository repository;
@@ -20,12 +22,12 @@ public class VeranstaltungService {
         return repository.findById(id);
     }
     public Set<Veranstaltung> findVeranstaltungSet(String bezeichnung) {
-        return Set.copyOf(repository.findByBezeichnung(bezeichnung));
+        return Set.copyOf(repository.findAllByBezeichnung(bezeichnung));
     }
-    /*/public Set<Veranstaltung> findVeranstaltungSet(String dozent) { Fehler weil beides String (durch Dozent Klasse ersetzen)
-        return Set.copyOf(repository.findByDozent(dozent));
-    }/*/
+    public Set<Veranstaltung> findVeranstaltungSet(Dozent dozent) {
+        return Set.copyOf(repository.findAllByDozent(dozent));
+    }
     public Set<Veranstaltung> findVeranstaltungSet(Fachbereich fachbereich) {
-        return Set.copyOf(repository.findByFachbereich(fachbereich));
+        return Set.copyOf(repository.findAllByFachbereich(fachbereich));
     }
 }
