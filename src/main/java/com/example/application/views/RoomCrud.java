@@ -24,8 +24,13 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.security.access.annotation.Secured;
 
+/**
+ * @author marcel weithoener
+ */
 @Route(value = "room-crud", layout = MainLayout.class)
+@Secured("ADMIN")
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)
 @PageTitle("Räume")
@@ -44,6 +49,11 @@ public class RoomCrud extends Div {
     private final String REFNR = "refNr";
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
+    /**
+     *
+     * @param ausstattungService Service für Ausstattung
+     * @param roomService Service für Räume
+     */
     public RoomCrud(AusstattungService ausstattungService, RoomService roomService) {
         this.ausstattungService = ausstattungService;
         this.roomService = roomService;
@@ -57,6 +67,12 @@ public class RoomCrud extends Div {
         add(crud);
     }
 
+    /**
+     *
+     * Erstellen des Editors
+     *
+     * @return BinderCrudEditor<>(binder, form)
+     */
     private CrudEditor<Room> createEditor() {
 
         TextField refNr = new TextField("ReferenzBezeichnung");
@@ -90,6 +106,9 @@ public class RoomCrud extends Div {
         return new BinderCrudEditor<>(binder, form);
     }
 
+    /**
+     * Grid anpassen
+     */
     private void setupGrid() {
         Grid<Room> grid = crud.getGrid();
 
@@ -107,6 +126,9 @@ public class RoomCrud extends Div {
                 grid.getColumnByKey(EDIT_COLUMN));
     }
 
+    /**
+     * Datenprovider für das CRUD-Objekt setzen
+     */
     private void setupDataProvider() {
         RoomDataProvider dataProvider = new RoomDataProvider(roomService);
         crud.setDataProvider(dataProvider);
@@ -120,6 +142,9 @@ public class RoomCrud extends Div {
         });
     }
 
+    /**
+     * Text der Vaadin Komponenten auf Deutsch setzen
+     */
     private void setupLanguage() {
         CrudI18n i18n = CrudI18n.createDefault();
         i18n.setNewItem("Neuer Eintrag");

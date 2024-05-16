@@ -19,42 +19,12 @@ import java.util.stream.Stream;
 public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilter> {
 
     private final RoomService roomService;
-    private List<Room> rooms;
+    private final List<Room> rooms;
     private Consumer<Long> sizeChangeListener;
 
     public RoomDataProvider(RoomService roomService) {
         this.roomService = roomService;
         rooms = new ArrayList<>(roomService.findAll());
-    }
-
-    @Override
-    protected Stream<Room> fetchFromBackEnd(Query<Room, CrudFilter> query) {
-        int offset = query.getOffset();
-        int limit = query.getLimit();
-
-        Stream<Room> stream = rooms.stream();
-
-        if (query.getFilter().isPresent()) {
-            stream = stream.filter(predicate(query.getFilter().get()))
-                    .sorted(comparator(query.getFilter().get()));
-        }
-
-        return stream.skip(offset).limit(limit);
-    }
-
-    @Override
-    protected int sizeInBackEnd(Query<Room, CrudFilter> query) {
-        long count = fetchFromBackEnd(query).count();
-
-        if (sizeChangeListener != null) {
-            sizeChangeListener.accept(count);
-        }
-
-        return (int) count;
-    }
-
-    void setSizeChangeListener(Consumer<Long> listener) {
-        sizeChangeListener = listener;
     }
 
     private static Predicate<Room> predicate(CrudFilter filter) {
@@ -100,9 +70,39 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
         }
     }
 
+    @Override
+    protected Stream<Room> fetchFromBackEnd(Query<Room, CrudFilter> query) {
+        int offset = query.getOffset();
+        int limit = query.getLimit();
+
+        Stream<Room> stream = rooms.stream();
+
+        if (query.getFilter().isPresent()) {
+            stream = stream.filter(predicate(query.getFilter().get()))
+                    .sorted(comparator(query.getFilter().get()));
+        }
+
+        return stream.skip(offset).limit(limit);
+    }
+
+    @Override
+    protected int sizeInBackEnd(Query<Room, CrudFilter> query) {
+        long count = fetchFromBackEnd(query).count();
+
+        if (sizeChangeListener != null) {
+            sizeChangeListener.accept(count);
+        }
+
+        return (int) count;
+    }
+
+    void setSizeChangeListener(Consumer<Long> listener) {
+        sizeChangeListener = listener;
+    }
+
     public void save(Room room) {
         roomService.save(room);
-        rooms = roomService.findAll();
+        rooms.add(room);
     }
 
     Optional<Room> find(String refNr) {
@@ -111,6 +111,6 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
 
     public void delete(Room room) {
         roomService.delete(room);
-        rooms = roomService.findAll();
+        rooms.remove(room);
     }
 }

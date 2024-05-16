@@ -20,16 +20,18 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.security.access.annotation.Secured;
 
 import java.util.Set;
 
 /**
- * @author: marcel weithoener
+ * @author marcel weithoener
  */
 
 @Route(value = "show-ausstattung", layout = MainLayout.class)
 @PageTitle("Ausstattung")
-@RolesAllowed({"ADMIN", "DOZENT"})
+@Secured({"ADMIN", "FBPLANUNG"})
+@RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
 @Uses(Icon.class)
 public class AusstattungView extends VerticalLayout {
 
@@ -69,6 +71,7 @@ public class AusstattungView extends VerticalLayout {
         });
         addButton.addClickShortcut(Key.ENTER);
 
+
         addLayout.add(bez, addButton);
         add(addLayout);
     }
@@ -81,16 +84,14 @@ public class AusstattungView extends VerticalLayout {
         grid.addColumn(Ausstattung::getBez).setHeader("Bezeichnung");
         grid.addColumn(new ComponentRenderer<>(Button::new, (button, ausstattung) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
-            button.addClickListener(e -> {
-                openDialog(ausstattung);
-            });
+            button.addClickListener(e -> openDialog(ausstattung));
             button.setIcon(new Icon(VaadinIcon.TRASH));
         })).setHeader("Löschen");
 
         add(grid);
     }
 
-    private void openDialog(Ausstattung ausstattung){
+    private void openDialog(Ausstattung ausstattung) {
         Dialog dialog = new Dialog();
         dialog.setCloseOnEsc(false);
 
