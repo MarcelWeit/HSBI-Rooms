@@ -1,6 +1,7 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Dozent;
+import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.repository.DozentRepository;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,7 @@ public class DozentService {
         return repository.findByVornameAndNachname(vorname, nachname);
     }
 
-    public List<Dozent> findByFachbereich(String fachbereich) {
+    public List<Dozent> findByFachbereich(Fachbereich fachbereich) {
         return repository.findByFachbereich(fachbereich);
     }
 }

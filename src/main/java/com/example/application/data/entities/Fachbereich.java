@@ -1,5 +1,9 @@
 package com.example.application.data.entities;
 
+/**
+ * @author marcel weithoener
+ */
+
 public enum Fachbereich {
     WIRTSCHAFT("Wirtschaft"),
     GESTALTUNG("Gestaltung"),
@@ -15,7 +19,7 @@ public enum Fachbereich {
         this.anzeigeName = anzeigeName;
     }
 
-    public String toString(){
+    public String toString() {
         return anzeigeName;
     }
 }

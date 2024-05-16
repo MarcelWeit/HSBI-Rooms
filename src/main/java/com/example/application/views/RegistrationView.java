@@ -9,9 +9,9 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -24,13 +24,14 @@ import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ * @author marcel weithoener
+ */
 @PageTitle("Registrierung")
 @AnonymousAllowed
 @Route(value = "register")
@@ -42,18 +43,21 @@ public class RegistrationView extends VerticalLayout {
     private final PasswordEncoder passwordEncoder;
 
     private final PasswordField confirmPassword = new PasswordField("Passwort bestätigen");
-
+    private final TextField lastName = new TextField("Nachname");
+    private final TextField firstName = new TextField("Vorname");
+    private final EmailField email = new EmailField("E-Mail");
+    private final PasswordField password = new PasswordField("Passwort");
+    private final Button submitButton = new Button("Registrieren");
+    private final ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
+    private final Button backButton = new Button("Zurück");
     private boolean enablePasswordValidation = false;
 
-    private TextField lastName;
-    private TextField firstName;
-    private EmailField email;
-    private PasswordField password;
-    private Button submitButton;
-    private ComboBox<Fachbereich> fachbereich;
-    private Button backButton;
-
-    @Autowired
+    /**
+     * Konstruktor für die Registrierungsseite
+     *
+     * @param userService
+     * @param passwordEncoder
+     */
     public RegistrationView(UserService userService, PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
@@ -62,24 +66,33 @@ public class RegistrationView extends VerticalLayout {
         fillTestData();
     }
 
+    /**
+     * Komponenten für die Registrierung erzeugen
+     */
     private void createComponents() {
         FormLayout form = new FormLayout();
         H2 title = new H2("HSBI Rooms");
         H4 subTitle = new H4("Registrierung");
-        firstName = new TextField("Vorname");
-        lastName = new TextField("Nachname");
-        email = new EmailField("E-Mail");
-        password = new PasswordField("Passwort");
-        submitButton = new Button("Registrieren");
+
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         submitButton.addClassName("submit-button");
-        fachbereich = new ComboBox<>("Fachbereich");
         fachbereich.setItems(Fachbereich.values());
         //        ComboBox<Role> role = new ComboBox<>("Rolle");
         //        role.setItems(Role.values());
-        backButton = new Button("Zurück");
         backButton.addClickListener(e -> UI.getCurrent().navigate("login"));
 
+        setupEventHandler();
+        setupBinder();
+
+        form.setMaxWidth("320px");
+        form.add(title, subTitle, firstName, lastName, email, password, confirmPassword, fachbereich, submitButton, backButton);
+        add(form);
+    }
+
+    /**
+     * Event Handler für die Buttons erzeugen
+     */
+    private void setupEventHandler() {
         submitButton.addClickListener(e -> {
             User user = new User();
             if (binder.writeBeanIfValid(user)) {
@@ -99,7 +112,12 @@ public class RegistrationView extends VerticalLayout {
             enablePasswordValidation = true;
             binder.validate();
         });
+    }
 
+    /**
+     * Binder für die Formularfelder erzeugen
+     */
+    private void setupBinder() {
         binder.forField(firstName).asRequired().bind(User::getFirstName, User::setFirstName);
         binder.forField(lastName).asRequired().bind(User::getLastName, User::setLastName);
         binder.forField(email)
@@ -117,14 +135,13 @@ public class RegistrationView extends VerticalLayout {
                 .bind(User::getHashedPassword, User::setHashedPassword);
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
         binder.forField(confirmPassword).asRequired();
-
-        form.setMaxWidth("320px");
-
-        form.add(title, subTitle, firstName, lastName, email, password, confirmPassword, fachbereich, submitButton, backButton);
-        //        setHorizontalComponentAlignment(Alignment.CENTER, form);
-        add(form);
     }
 
+    /**
+     * @param password
+     * @param valueContext
+     * @return ValidationResult
+     */
     private ValidationResult passwordValidator(String password, ValueContext valueContext) {
         if (password == null || password.length() < 8) {
             return ValidationResult.error("Password should be at least 8 characters long");
@@ -138,14 +155,15 @@ public class RegistrationView extends VerticalLayout {
 
         String confirmPasswordString = confirmPassword.getValue();
 
-        if(confirmPasswordString != null && confirmPasswordString.equals(password)) {
+        if (confirmPasswordString != null && confirmPasswordString.equals(password)) {
             return ValidationResult.ok();
         }
 
         return ValidationResult.error("Passwords do not match");
     }
 
-    private void fillTestData(){
+    // TEMPORARY
+    private void fillTestData() {
         firstName.setValue("Max");
         lastName.setValue("Mustermann");
         email.setValue("max@gmail.com");

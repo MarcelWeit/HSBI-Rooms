@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author marcel weithoener
+ */
 @Service
 public class RoomService {
 
@@ -17,12 +20,8 @@ public class RoomService {
         this.repository = repository;
     }
 
-    public Room save(Room entity) {
-        return repository.save(entity);
-    }
-
-    public boolean existsById(String refNr) {
-        return repository.existsById(refNr);
+    public void save(Room entity) {
+        repository.save(entity);
     }
 
     public List<Room> findAll() {
@@ -39,10 +38,6 @@ public class RoomService {
 
     public void delete(Room room) {
         repository.delete(room);
-    }
-
-    public long countAll() {
-        return repository.count();
     }
 
     public Room findByRefNr(String refNr) {

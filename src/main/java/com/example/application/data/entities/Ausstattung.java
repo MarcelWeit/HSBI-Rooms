@@ -6,6 +6,9 @@ import org.hibernate.proxy.HibernateProxy;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * @author marcel weithoener
+ */
 @Entity
 public class Ausstattung {
 
@@ -27,16 +30,16 @@ public class Ausstattung {
         return rooms;
     }
 
+    public void setRooms(Set<Room> rooms) {
+        this.rooms = rooms;
+    }
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setRooms(Set<Room> rooms) {
-        this.rooms = rooms;
     }
 
     public String getBez() {
