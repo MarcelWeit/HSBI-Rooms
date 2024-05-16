@@ -33,9 +33,9 @@ public class Application implements AppShellConfigurator {
             @Override
             public boolean initializeDatabase() {
                 // Continue with the initialization if the user table is empty
-                if (userRepository.count() == 0L) {
-                    return super.initializeDatabase();
-                }
+//                if (userRepository.count() == 0L) {
+//                    return super.initializeDatabase();
+//                }
                 return false;
             }
         };

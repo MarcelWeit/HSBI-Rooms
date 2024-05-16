@@ -1,11 +1,11 @@
 package com.example.application.views;
 
+import com.example.application.data.dataProvider.RoomDataProvider;
 import com.example.application.data.entities.Ausstattung;
 import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Raumtyp;
 import com.example.application.data.entities.Room;
 import com.example.application.services.AusstattungService;
-import com.example.application.data.dataProvider.RoomDataProvider;
 import com.example.application.services.RoomService;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
@@ -23,11 +23,9 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import jakarta.annotation.security.RolesAllowed;
 
 @Route(value = "room-crud", layout = MainLayout.class)
-@RouteAlias(value = "", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)
 @PageTitle("Räume")
@@ -80,7 +78,7 @@ public class RoomCrud extends Div {
 
         Binder<Room> binder = new Binder<>(Room.class);
         binder.forField(kapa).asRequired().bind(Room::getCapacity, Room::setCapacity);
-        binder.forField(ausstattung).bind(Room::getAusstattung, Room::setAusstattung);
+        binder.forField(ausstattung).asRequired().bind(Room::getAusstattung, Room::setAusstattung);
         binder.forField(typ).asRequired().bind(Room::getTyp, Room::setTyp);
         binder.forField(fachbereich).asRequired().bind(Room::getFachbereich, Room::setFachbereich);
         binder.forField(position).asRequired().bind(Room::getPosition, Room::setPosition);

@@ -1,30 +1,38 @@
 package com.example.application.data.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+
 import java.util.Set;
 
 @Entity
 @Table(name = "application_user")
-public class User extends AbstractEntity {
+public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "idgenerator", initialValue = 1000)
+    private Long id;
+
+    @Email
     private String username;
-    private String name;
+
+    private String lastName;
+    private String firstName;
+
     @JsonIgnore
     private String hashedPassword;
+
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-    @Lob
-    @Column(length = 1000000)
-    private byte[] profilePicture;
+
+//    @Lob
+//    @Column(length = 1000000)
+//    private byte[] profilePicture;
+
+    private Fachbereich fachbereich;
 
     public String getUsername() {
         return username;
@@ -32,11 +40,17 @@ public class User extends AbstractEntity {
     public void setUsername(String username) {
         this.username = username;
     }
-    public String getName() {
-        return name;
+    public String getLastName() {
+        return lastName;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
     public String getHashedPassword() {
         return hashedPassword;
@@ -50,11 +64,23 @@ public class User extends AbstractEntity {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-    public byte[] getProfilePicture() {
-        return profilePicture;
+//    public byte[] getProfilePicture() {
+//        return profilePicture;
+//    }
+//    public void setProfilePicture(byte[] profilePicture) {
+//        this.profilePicture = profilePicture;
+//    }
+    public Fachbereich getFachbereich() {
+        return fachbereich;
     }
-    public void setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
+    public void setFachbereich(Fachbereich fachbereich) {
+        this.fachbereich = fachbereich;
+    }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
 }

@@ -11,17 +11,13 @@ import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
 /**
@@ -61,21 +57,14 @@ public class MainLayout extends AppLayout {
                 getElement().getThemeList().add("dark");
             }
         });
+        //<theme-editor-local-classname>
+        themeSwitcher.addClassName("top-right-button");
 
-        // Create a HorizontalLayout to align the viewTitle and themeSwitcher
-        HorizontalLayout layout = new HorizontalLayout(viewTitle, themeSwitcher);
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-        layout.setWidthFull();
-
-        // Make the viewTitle grow to push the themeSwitcher to the right
-        layout.setFlexGrow(1, viewTitle);
-
-        addToNavbar(true, toggle, layout);
+        addToNavbar(true, toggle, viewTitle, themeSwitcher);
     }
 
     private void addDrawerContent() {
-        H1 appName = new H1("Raumbuchung");
+        H1 appName = new H1("HSBI Rooms");
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
 
@@ -88,6 +77,11 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
+        if(accessChecker.hasAccess(Startseite.class)){
+            nav.addItem(
+                    new SideNavItem("Startseite", Startseite.class, VaadinIcon.HOME.create()));
+        }
+
         // Kopf Navigation Verwaltung mit Unterpunkten
         SideNavItem verwNav = new SideNavItem("Verwaltung");
         if(accessChecker.hasAccess(AusstattungView.class)){
@@ -97,6 +91,10 @@ public class MainLayout extends AppLayout {
         if(accessChecker.hasAccess(RoomCrud.class)){
             verwNav.addItem(
                     new SideNavItem("Raum", RoomCrud.class, VaadinIcon.TABLE.create()));
+        }
+        if(accessChecker.hasAccess(VeranstaltungVerwaltungView.class)){
+            verwNav.addItem(
+                    new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
         }
 
         verwNav.setExpanded(true);
@@ -112,10 +110,10 @@ public class MainLayout extends AppLayout {
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
 
-            Avatar avatar = new Avatar(user.getName());
-            StreamResource resource = new StreamResource("profile-pic",
-                    () -> new ByteArrayInputStream(user.getProfilePicture()));
-            avatar.setImageResource(resource);
+            Avatar avatar = new Avatar(user.getFirstName());
+//            StreamResource resource = new StreamResource("profile-pic",
+//                    () -> new ByteArrayInputStream(user.getProfilePicture()));
+//            avatar.setImageResource(resource);
             avatar.setThemeName("xsmall");
             avatar.getElement().setAttribute("tabindex", "-1");
 
@@ -125,7 +123,7 @@ public class MainLayout extends AppLayout {
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
             div.add(avatar);
-            div.add(user.getName());
+            div.add(user.getFirstName() + " " + user.getLastName());
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");

@@ -28,7 +28,7 @@ import java.util.Set;
  */
 
 @Route(value = "show-ausstattung", layout = MainLayout.class)
-@PageTitle("Ausstattungen anzeigen")
+@PageTitle("Ausstattung")
 @RolesAllowed({"ADMIN", "DOZENT"})
 @Uses(Icon.class)
 public class AusstattungView extends VerticalLayout {
@@ -82,39 +82,45 @@ public class AusstattungView extends VerticalLayout {
         grid.addColumn(new ComponentRenderer<>(Button::new, (button, ausstattung) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> {
-                Dialog dialog = new Dialog();
-                dialog.setCloseOnEsc(false);
-
-                int roomCount = roomService.countByAusstattungContains(ausstattung);
-
-                HorizontalLayout buttonLayout = new HorizontalLayout();
-                Text message = roomCount == 1 ? new Text("Diese " + "Ausstattung wird in einem Raum verwendet. " + "Sind Sie sicher, dass Sie diese " + "Ausstattung löschen möchten?") : new Text("Diese " + "Ausstattung wird in " + roomCount + " " + "Räumen verwendet. Sind Sie sicher, dass " + "Sie diese Ausstattung löschen möchten?");
-                dialog.setCloseOnOutsideClick(false);
-
-                Button confirmButton = new Button("Bestätigen", event -> {
-
-                    Set<Room> roomsWithAusstattung = roomService.findAllByAusstattungContains(ausstattung);
-                    roomsWithAusstattung.forEach(room -> {
-                        room.removeAusstattung(ausstattung);
-                        roomService.save(room);
-                    });
-                    ausstattungService.delete(ausstattung);
-
-                    grid.setItems(ausstattungService.findAll());
-                    dialog.close();
-                });
-
-                Button cancelButton = new Button("Abbrechen", event -> dialog.close());
-                buttonLayout.add(confirmButton, cancelButton);
-
-                dialog.add(message, buttonLayout);
-
-                dialog.open();
+                openDialog(ausstattung);
             });
             button.setIcon(new Icon(VaadinIcon.TRASH));
         })).setHeader("Löschen");
 
         add(grid);
+    }
+
+    private void openDialog(Ausstattung ausstattung){
+        Dialog dialog = new Dialog();
+        dialog.setCloseOnEsc(false);
+
+        int roomCount = roomService.countByAusstattungContains(ausstattung);
+
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        Text message = roomCount == 1 ? new Text("Diese Ausstattung wird in einem Raum verwendet. Sind Sie sicher, dass Sie diese Ausstattung löschen möchten?")
+                : roomCount == 0 ? new Text("Diese Ausstattung wird in keinem Raum verwendet. Sind Sie sicher, dass Sie diese Ausstattung löschen möchten?")
+                : new Text("Diese Ausstattung wird in " + roomCount + " " + "Räumen verwendet. Sind Sie sicher, dass Sie diese Ausstattung löschen möchten?");
+        dialog.setCloseOnOutsideClick(false);
+
+        Button confirmButton = new Button("Bestätigen", event -> {
+
+            Set<Room> roomsWithAusstattung = roomService.findAllByAusstattungContains(ausstattung);
+            roomsWithAusstattung.forEach(room -> {
+                room.removeAusstattung(ausstattung);
+                roomService.save(room);
+            });
+            ausstattungService.delete(ausstattung);
+
+            grid.setItems(ausstattungService.findAll());
+            dialog.close();
+        });
+
+        Button cancelButton = new Button("Abbrechen", event -> dialog.close());
+        buttonLayout.add(confirmButton, cancelButton);
+
+        dialog.add(message, buttonLayout);
+
+        dialog.open();
     }
 
 }
