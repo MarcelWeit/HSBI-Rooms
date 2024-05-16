@@ -50,9 +50,8 @@ public class RoomCrud extends Div {
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
     /**
-     *
      * @param ausstattungService Service für Ausstattung
-     * @param roomService Service für Räume
+     * @param roomService        Service für Räume
      */
     public RoomCrud(AusstattungService ausstattungService, RoomService roomService) {
         this.ausstattungService = ausstattungService;
@@ -64,11 +63,12 @@ public class RoomCrud extends Div {
         setupDataProvider();
         setupLanguage();
 
+        crud.setMinHeight("80vh");
+
         add(crud);
     }
 
     /**
-     *
      * Erstellen des Editors
      *
      * @return BinderCrudEditor<>(binder, form)
@@ -113,8 +113,16 @@ public class RoomCrud extends Div {
         Grid<Room> grid = crud.getGrid();
 
         grid.removeColumn(grid.getColumnByKey("id"));
-        grid.getColumnByKey(CAPACITY).setHeader("Kapazität");
-        grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
+        grid.getColumnByKey(CAPACITY)
+                .setAutoWidth(true).setFlexGrow(0)
+                .setHeader("Kapazität");
+        grid.getColumnByKey(REFNR).setAutoWidth(true).setFlexGrow(0);
+        grid.getColumnByKey(FACHBEREICH).setAutoWidth(true).setFlexGrow(0);
+        grid.getColumnByKey(AUSSTATTUNG).setAutoWidth(true);
+        grid.getColumnByKey(TYP).setAutoWidth(true).setFlexGrow(0);
+        grid.getColumnByKey(POSITION).setAutoWidth(true);
+        grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true).setFlexGrow(0);
+
 
         // Anordnung der Spalten
         grid.setColumnOrder(grid.getColumnByKey(REFNR),
@@ -124,6 +132,7 @@ public class RoomCrud extends Div {
                 grid.getColumnByKey(CAPACITY),
                 grid.getColumnByKey(POSITION),
                 grid.getColumnByKey(EDIT_COLUMN));
+
     }
 
     /**

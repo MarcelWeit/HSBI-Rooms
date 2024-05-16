@@ -11,6 +11,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -46,6 +47,7 @@ public class AusstattungView extends VerticalLayout {
         this.roomService = roomService;
         createAddButton();
         createGrid();
+        grid.setHeight("70vh");
     }
 
     private void createAddButton() {
@@ -81,12 +83,15 @@ public class AusstattungView extends VerticalLayout {
         Set<Ausstattung> rooms = ausstattungService.findAll();
         grid.setItems(rooms);
 
-        grid.addColumn(Ausstattung::getBez).setHeader("Bezeichnung");
-        grid.addColumn(new ComponentRenderer<>(Button::new, (button, ausstattung) -> {
+        Grid.Column<Ausstattung> bezColumn = grid.addColumn(Ausstattung::getBez).setHeader("Bezeichnung").setAutoWidth(true).setFlexGrow(0).setResizable(true);
+        Grid.Column<Ausstattung> deleteColumn = grid.addColumn(new ComponentRenderer<>(Button::new, (button, ausstattung) -> {
             button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
             button.addClickListener(e -> openDialog(ausstattung));
             button.setIcon(new Icon(VaadinIcon.TRASH));
         })).setHeader("Löschen");
+
+        // Sortierung nach Bezeichnung aufsteigend alphabetisch
+        grid.sort(GridSortOrder.asc(bezColumn).build());
 
         add(grid);
     }

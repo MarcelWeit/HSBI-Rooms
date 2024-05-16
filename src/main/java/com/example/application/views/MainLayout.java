@@ -25,19 +25,18 @@ import java.util.Optional;
  */
 public class MainLayout extends AppLayout {
 
-    private H2 viewTitle;
-
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
+    private H2 viewTitle;
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
+        getElement().getThemeList().add("dark");
 
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
-        getElement().getThemeList().add("dark");
     }
 
     private void addHeaderContent() {
@@ -77,22 +76,22 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        if(accessChecker.hasAccess(Startseite.class)){
+        if (accessChecker.hasAccess(Startseite.class)) {
             nav.addItem(
                     new SideNavItem("Startseite", Startseite.class, VaadinIcon.HOME.create()));
         }
 
         // Kopf Navigation Verwaltung mit Unterpunkten
         SideNavItem verwNav = new SideNavItem("Verwaltung");
-        if(accessChecker.hasAccess(AusstattungView.class)){
+        if (accessChecker.hasAccess(AusstattungView.class)) {
             verwNav.addItem(
                     new SideNavItem("Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
         }
-        if(accessChecker.hasAccess(RoomCrud.class)){
+        if (accessChecker.hasAccess(RoomCrud.class)) {
             verwNav.addItem(
                     new SideNavItem("Raum", RoomCrud.class, VaadinIcon.TABLE.create()));
         }
-        if(accessChecker.hasAccess(VeranstaltungVerwaltungView.class)){
+        if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
             verwNav.addItem(
                     new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
         }
@@ -111,9 +110,9 @@ public class MainLayout extends AppLayout {
             User user = maybeUser.get();
 
             Avatar avatar = new Avatar(user.getFirstName());
-//            StreamResource resource = new StreamResource("profile-pic",
-//                    () -> new ByteArrayInputStream(user.getProfilePicture()));
-//            avatar.setImageResource(resource);
+            //            StreamResource resource = new StreamResource("profile-pic",
+            //                    () -> new ByteArrayInputStream(user.getProfilePicture()));
+            //            avatar.setImageResource(resource);
             avatar.setThemeName("xsmall");
             avatar.getElement().setAttribute("tabindex", "-1");
 
@@ -130,7 +129,7 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
             userName.getSubMenu().addItem("Sign out", e ->
-                authenticatedUser.logout()
+                    authenticatedUser.logout()
             );
 
             layout.add(userMenu);
