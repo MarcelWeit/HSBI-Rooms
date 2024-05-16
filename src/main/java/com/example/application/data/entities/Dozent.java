@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import java.util.Set;
 
+
 @Entity
 @Table(name = "lecturer")
 public class Dozent extends AbstractEntity {
