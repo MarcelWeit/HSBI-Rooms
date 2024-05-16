@@ -1,5 +1,6 @@
 package com.example.application.services;
 
+import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.data.repository.VeranstaltungRepository;

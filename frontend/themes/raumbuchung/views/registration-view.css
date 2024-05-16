@@ -1,0 +1,13 @@
+.registration-view vaadin-form-layout{
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 1px rgba(136, 136, 136, 0.3);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+}
+.registration-view vaadin-button {
+    margin-top: 15px;
+}

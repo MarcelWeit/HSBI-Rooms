@@ -1,7 +1,6 @@
 package com.example.application.data.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Veranstaltung {
@@ -10,6 +9,7 @@ public class Veranstaltung {
     private String id;
 
     private String bezeichnung;
+    @OneToOne
     private Dozent dozent;
     private int teilnehmerzahl;
     private Fachbereich fachbereich;
@@ -24,7 +24,7 @@ public class Veranstaltung {
 
     public void setId(String id) {this.id = id;}
     public void setBezeichnung(String bezeichnung) {this.bezeichnung = bezeichnung;}
-    public void setDozent(String dozent) {this.dozent = dozent;}
+    public void setDozent(Dozent dozent) {this.dozent = dozent;}
     public void setTeilnehmerzahl(int teilnehmerzahl) {this.teilnehmerzahl = teilnehmerzahl;}
     public void setFachbereich(Fachbereich fachbereich) {this.fachbereich = fachbereich;}
 
