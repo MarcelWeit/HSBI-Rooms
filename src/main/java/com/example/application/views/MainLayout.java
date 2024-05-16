@@ -98,10 +98,7 @@ public class MainLayout extends AppLayout {
             verwNav.addItem(
                     new SideNavItem("Raum", RoomCrud.class, VaadinIcon.TABLE.create()));
         }
-        if(accessChecker.hasAccess(VeranstaltungCrud.class)){
-            verwNav.addItem(
-                    new SideNavItem("Veranstaltungen", VeranstaltungCrud.class, VaadinIcon.TABLE.create()));
-        }
+
         verwNav.setExpanded(true);
         nav.addItem(verwNav);
 
