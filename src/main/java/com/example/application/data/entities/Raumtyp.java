@@ -1,5 +1,8 @@
 package com.example.application.data.entities;
 
+/**
+ * @author marcel weithoener
+ */
 public enum Raumtyp {
     SEMINARRAUM("Seminarraum"),
     HOERSAAL("Hörsaal"),

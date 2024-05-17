@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+/**
+ * @author marcel weithoener
+ */
 @Service
 public class AusstattungService {
 

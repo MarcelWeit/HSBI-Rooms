@@ -12,8 +12,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.security.access.annotation.Secured;
 
 @Route(value = "veranstaltungVerwaltung-crud", layout = MainLayout.class)
+@Secured({"ADMIN", "FBPlanung"})
 @RolesAllowed({"ADMIN", "FBPlanung"})
 @Uses(Icon.class)
 @PageTitle("Veranstaltungsen")

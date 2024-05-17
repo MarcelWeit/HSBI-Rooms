@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author marcel weithoener
+ */
 @Entity
 public class Room{
 
@@ -14,15 +17,21 @@ public class Room{
 
     private String refNr;
 
+    @Enumerated(EnumType.STRING)
     private Raumtyp typ;
+
     private int capacity;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "room_ausstattung",
             joinColumns = @JoinColumn(name = "room_refNr"),
             inverseJoinColumns = @JoinColumn(name = "ausstattung_id"))
     private Set<Ausstattung> ausstattung = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
     private Fachbereich fachbereich;
+
     private String position;
 
     public Room() {

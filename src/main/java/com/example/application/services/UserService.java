@@ -26,10 +26,6 @@ public class UserService {
         return repository.save(entity);
     }
 
-    public void delete(Long id) {
-        repository.deleteById(id);
-    }
-
     public Page<User> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
@@ -40,10 +36,6 @@ public class UserService {
 
     public Page<User> list(Pageable pageable, Specification<User> filter) {
         return repository.findAll(filter, pageable);
-    }
-
-    public int count() {
-        return (int) repository.count();
     }
 
     public boolean emailExists(String email) {

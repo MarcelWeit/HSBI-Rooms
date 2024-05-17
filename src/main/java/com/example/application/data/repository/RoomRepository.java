@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+/**
+ * @author marcel weithoener
+ */
 @Repository
 public interface RoomRepository extends JpaRepository<Room, String>, JpaSpecificationExecutor<Room>{
     Set<Room> findAllByAusstattungContains(Ausstattung entity);
