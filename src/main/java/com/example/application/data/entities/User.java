@@ -23,6 +23,7 @@ public class User {
 
     @JsonIgnore
     private String hashedPassword;
+    private boolean locked;
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -64,6 +65,10 @@ public class User {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+    public boolean isLocked() {return locked;}
+    public void setLocked(boolean locked) {this.locked = locked;}
+
+
 //    public byte[] getProfilePicture() {
 //        return profilePicture;
 //    }
