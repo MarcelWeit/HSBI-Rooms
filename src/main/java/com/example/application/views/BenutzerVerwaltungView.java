@@ -1,5 +1,6 @@
 package com.example.application.views;
 
+import com.example.application.data.dataProvider.UserDataProvider;
 import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Role;
 import com.example.application.data.entities.User;
@@ -17,10 +18,10 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.hibernate.boot.jaxb.spi.Binder;
 import org.springframework.security.access.annotation.Secured;
 
 /**
@@ -35,6 +36,7 @@ import org.springframework.security.access.annotation.Secured;
 
 public class BenutzerVerwaltungView extends VerticalLayout {
 
+    private final UserService userService;
 
     private final String FACHBEREICH = "fachbereich";
     private final String VORNAME = "vorname";
@@ -53,6 +55,7 @@ public class BenutzerVerwaltungView extends VerticalLayout {
      */
 
     public BenutzerVerwaltungView(UserService userService) {
+        this.userService = userService;
 
         crud = new Crud<>(User.class, createEditor());
 
@@ -63,7 +66,9 @@ public class BenutzerVerwaltungView extends VerticalLayout {
         add(crud);
     }
 
-    private CrudEditor<User> createEditor(UserService userService) {
+
+
+    private CrudEditor<User> createEditor() {
         TextField vorname = new TextField("Vorname");
         TextField nachname = new TextField("Nachname");
         EmailField email = new EmailField("Email");
@@ -82,7 +87,7 @@ public class BenutzerVerwaltungView extends VerticalLayout {
         binder.forField(nachname).asRequired().bind(User::getLastName, User::setLastName);
         binder.forField(email).asRequired().bind(User::getUsername, User::setUsername);
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
-        binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles);
+        //binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles); //Roles?
         binder.forField(freigeschaltet).bind(User::isLocked, User::setLocked);
 
         return new BinderCrudEditor<>(binder, form);
@@ -104,7 +109,7 @@ public class BenutzerVerwaltungView extends VerticalLayout {
                 grid.getColumnByKey(EDIT_COLUMN));
     }
 
-    private void setupDataProvider(UserService userService) {
+    private void setupDataProvider() {
         UserDataProvider dataProvider = new UserDataProvider(userService);
         crud.setDataProvider(dataProvider);
         crud.addDeleteListener(deleteEvent -> {

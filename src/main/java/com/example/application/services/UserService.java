@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +21,10 @@ public class UserService {
 
     public Optional<User> get(Long id) {
         return repository.findById(id);
+    }
+
+    public List<User> findAll() {
+        return repository.findAll();
     }
 
     public User update(User entity) {
@@ -36,6 +41,13 @@ public class UserService {
 
     public Page<User> list(Pageable pageable, Specification<User> filter) {
         return repository.findAll(filter, pageable);
+    }
+    public void delete(User user) {
+        repository.delete(user);
+    }
+
+    public User findByUsername(String username) {
+        return repository.findByUsername(username);
     }
 
     public boolean emailExists(String email) {
