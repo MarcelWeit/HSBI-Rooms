@@ -30,8 +30,8 @@ public class UserService {
         return repository.findAll(pageable);
     }
 
-    public User save(User entity) {
-        return repository.save(entity);
+    public void save(User entity) {
+        repository.save(entity);
     }
 
     public Page<User> list(Pageable pageable, Specification<User> filter) {
@@ -41,4 +41,5 @@ public class UserService {
     public boolean emailExists(String email) {
         return repository.findByUsername(email) != null;
     }
+
 }

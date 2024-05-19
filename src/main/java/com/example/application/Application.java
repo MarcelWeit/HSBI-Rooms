@@ -1,9 +1,6 @@
 package com.example.application;
 
-import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.entities.Fachbereich;
-import com.example.application.data.entities.Raumtyp;
-import com.example.application.data.entities.Room;
+import com.example.application.data.entities.*;
 import com.example.application.data.repository.AusstattungRepository;
 import com.example.application.data.repository.RoomRepository;
 import com.example.application.data.repository.UserRepository;
@@ -16,8 +13,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDatabaseInitializer;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
+import java.util.Set;
 
 /**
  * The entry point of the Spring Boot application.
@@ -34,6 +33,12 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
 
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -78,6 +83,11 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
                 room.addAusstattung(ausstattungRepository.findByBez("Computer"));
                 roomRepository.save(room);
             }
+        }
+        if (userRepository.count() == 0) {
+            User user = new User("max@gmail.com", "max", "mustermann", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
+            user.setHashedPassword(passwordEncoder.encode("admin"));
+            userRepository.save(user);
         }
     }
 }

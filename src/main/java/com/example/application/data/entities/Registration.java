@@ -7,13 +7,11 @@ import jakarta.validation.constraints.Email;
 import java.util.Set;
 
 @Entity
-@Table(name = "application_user")
-public class User {
+public class Registration {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "idgenerator", initialValue = 1000)
-    private Long id;
+    private long id;
 
     @Email
     private String username;
@@ -28,22 +26,9 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
-    //    @Lob
-    //    @Column(length = 1000000)
-    //    private byte[] profilePicture;
-
     private Fachbereich fachbereich;
 
-    public User() {
-    }
-
-    public User(String username, String lastName, String firstName, String hashedPassword, Set<Role> roles, Fachbereich fachbereich) {
-        this.username = username;
-        this.lastName = lastName;
-        this.firstName = firstName;
-        this.hashedPassword = hashedPassword;
-        this.roles = roles;
-        this.fachbereich = fachbereich;
+    public Registration() {
     }
 
     public String getUsername() {
@@ -86,12 +71,6 @@ public class User {
         this.roles = roles;
     }
 
-    //    public byte[] getProfilePicture() {
-    //        return profilePicture;
-    //    }
-    //    public void setProfilePicture(byte[] profilePicture) {
-    //        this.profilePicture = profilePicture;
-    //    }
     public Fachbereich getFachbereich() {
         return fachbereich;
     }
@@ -99,14 +78,4 @@ public class User {
     public void setFachbereich(Fachbereich fachbereich) {
         this.fachbereich = fachbereich;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 }

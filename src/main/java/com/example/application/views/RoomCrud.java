@@ -94,7 +94,7 @@ public class RoomCrud extends Div {
 
         Binder<Room> binder = new Binder<>(Room.class);
         binder.forField(kapa).asRequired().bind(Room::getCapacity, Room::setCapacity);
-        binder.forField(ausstattung).asRequired().bind(Room::getAusstattung, Room::setAusstattung);
+        binder.forField(ausstattung).bind(Room::getAusstattung, Room::setAusstattung);
         binder.forField(typ).asRequired().bind(Room::getTyp, Room::setTyp);
         binder.forField(fachbereich).asRequired().bind(Room::getFachbereich, Room::setFachbereich);
         binder.forField(position).asRequired().bind(Room::getPosition, Room::setPosition);

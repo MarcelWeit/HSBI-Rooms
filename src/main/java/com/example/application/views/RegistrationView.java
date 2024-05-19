@@ -1,8 +1,9 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Fachbereich;
+import com.example.application.data.entities.Registration;
 import com.example.application.data.entities.Role;
-import com.example.application.data.entities.User;
+import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -26,7 +27,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -37,8 +37,9 @@ import java.util.Set;
 @Route(value = "register")
 public class RegistrationView extends VerticalLayout {
 
-    private final Binder<User> binder = new Binder<>(User.class);
+    private final Binder<Registration> binder = new Binder<>(Registration.class);
     private final UserService userService;
+    private final RegistrationService registrationService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -49,18 +50,22 @@ public class RegistrationView extends VerticalLayout {
     private final PasswordField password = new PasswordField("Passwort");
     private final Button submitButton = new Button("Registrieren");
     private final ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
+    private final ComboBox<Role> role = new ComboBox<>("Rolle");
     private final Button backButton = new Button("Zurück");
     private boolean enablePasswordValidation = false;
+    private Set<Role> roles;
 
     /**
      * Konstruktor für die Registrierungsseite
      *
      * @param userService
      * @param passwordEncoder
+     * @param registrationService
      */
-    public RegistrationView(UserService userService, PasswordEncoder passwordEncoder) {
+    public RegistrationView(UserService userService, PasswordEncoder passwordEncoder, RegistrationService registrationService) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.registrationService = registrationService;
         addClassName("registration-view");
         createComponents();
         fillTestData();
@@ -77,15 +82,14 @@ public class RegistrationView extends VerticalLayout {
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         submitButton.addClassName("submit-button");
         fachbereich.setItems(Fachbereich.values());
-        //        ComboBox<Role> role = new ComboBox<>("Rolle");
-        //        role.setItems(Role.values());
+        role.setItems(Role.DOZENT, Role.FBPLANUNG);
         backButton.addClickListener(e -> UI.getCurrent().navigate("login"));
 
         setupEventHandler();
         setupBinder();
 
         form.setMaxWidth("320px");
-        form.add(title, subTitle, firstName, lastName, email, password, confirmPassword, fachbereich, submitButton, backButton);
+        form.add(title, subTitle, firstName, lastName, email, password, confirmPassword, fachbereich, role, submitButton, backButton);
         add(form);
     }
 
@@ -94,13 +98,11 @@ public class RegistrationView extends VerticalLayout {
      */
     private void setupEventHandler() {
         submitButton.addClickListener(e -> {
-            User user = new User();
-            if (binder.writeBeanIfValid(user)) {
-                Set<Role> roles = new HashSet<>();
-                roles.add(Role.ADMIN);
-                user.setRoles(roles);
-                user.setHashedPassword(passwordEncoder.encode(user.getHashedPassword()));
-                userService.save(user);
+            Registration registration = new Registration();
+            if (binder.writeBeanIfValid(registration)) {
+                registration.setRoles(Set.of(role.getValue()));
+                registration.setHashedPassword(passwordEncoder.encode(registration.getHashedPassword()));
+                registrationService.save(registration);
                 UI.getCurrent().navigate("login");
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
@@ -118,22 +120,22 @@ public class RegistrationView extends VerticalLayout {
      * Binder für die Formularfelder erzeugen
      */
     private void setupBinder() {
-        binder.forField(firstName).asRequired().bind(User::getFirstName, User::setFirstName);
-        binder.forField(lastName).asRequired().bind(User::getLastName, User::setLastName);
+        binder.forField(firstName).asRequired().bind(Registration::getFirstName, Registration::setFirstName);
+        binder.forField(lastName).asRequired().bind(Registration::getLastName, Registration::setLastName);
         binder.forField(email)
                 .withValidator(new EmailValidator("invalid email", false))
-                .withValidator(email -> !userService.emailExists(email), "Email already exists")
+                .withValidator(email -> !userService.emailExists(email) || !registrationService.emailExists(email), "Email already exists")
                 .withValidationStatusHandler(status -> {
                     if (status.isError()) {
                         email.setErrorMessage("Ungültige E-Mail");
                     }
                 })
-                .bind(User::getUsername, User::setUsername);
+                .bind(Registration::getUsername, Registration::setUsername);
         binder.forField(password)
                 .asRequired()
                 .withValidator(this::passwordValidator)
-                .bind(User::getHashedPassword, User::setHashedPassword);
-        binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
+                .bind(Registration::getHashedPassword, Registration::setHashedPassword);
+        binder.forField(fachbereich).asRequired().bind(Registration::getFachbereich, Registration::setFachbereich);
         binder.forField(confirmPassword).asRequired();
     }
 
