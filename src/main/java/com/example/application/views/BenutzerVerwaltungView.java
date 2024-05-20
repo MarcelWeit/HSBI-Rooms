@@ -28,7 +28,7 @@ import org.springframework.security.access.annotation.Secured;
  * @author tim R
  */
 
-@Route(value = "show-benutzer", layout = MainLayout.class)
+@Route(value = "user-crud", layout = MainLayout.class)
 @PageTitle("BenutzerVerwaltung")
 @Secured("ADMIN")
 @RolesAllowed("ADMIN")
@@ -39,11 +39,11 @@ public class BenutzerVerwaltungView extends VerticalLayout {
     private final UserService userService;
 
     private final String FACHBEREICH = "fachbereich";
-    private final String VORNAME = "vorname";
-    private final String NACHNAME = "nachname";
-    private final String EMAIL = "email";
-    private final String FREIGESCHALTEN = "freigeschaltet";
-    private final String ROLLE = "rolle";
+    private final String VORNAME = "firstNAme";
+    private final String NACHNAME = "lastName";
+    private final String EMAIL = "username";
+    private final String FREIGESCHALTEN = "locked";
+    private final String ROLLE = "roles";
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
     private final Crud<User> crud;
@@ -97,16 +97,19 @@ public class BenutzerVerwaltungView extends VerticalLayout {
         Grid<User> grid = crud.getGrid();
 
         grid.removeColumn(grid.getColumnByKey("id"));
-        grid.getColumnByKey(EMAIL).setHeader("Email");
+        grid.removeColumn(grid.getColumnByKey("hashedPassword"));
+
+
+
         grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
 
-        grid.setColumnOrder(grid.getColumnByKey(VORNAME),
-                grid.getColumnByKey(NACHNAME),
-                grid.getColumnByKey(EMAIL),
-                grid.getColumnByKey(FACHBEREICH),
-                grid.getColumnByKey(ROLLE),
-                grid.getColumnByKey(FREIGESCHALTEN),
-                grid.getColumnByKey(EDIT_COLUMN));
+//        grid.setColumnOrder(grid.getColumnByKey(VORNAME),
+//                grid.getColumnByKey(NACHNAME),
+//                grid.getColumnByKey(EMAIL),
+//                grid.getColumnByKey(FACHBEREICH),
+//                grid.getColumnByKey(ROLLE),
+//                grid.getColumnByKey(FREIGESCHALTEN),
+//                grid.getColumnByKey(EDIT_COLUMN));
     }
 
     private void setupDataProvider() {
