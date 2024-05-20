@@ -31,4 +31,10 @@ public class VeranstaltungService {
     public Set<Veranstaltung> findVeranstaltungSet(Fachbereich fachbereich) {
         return Set.copyOf(repository.findAllByFachbereich(fachbereich));
     }
+    public void save(Veranstaltung veranstaltung) {
+        repository.save(veranstaltung);
+    }
+    public void delete(Veranstaltung veranstaltung) {
+        repository.delete(veranstaltung);
+    }
 }
