@@ -40,6 +40,8 @@ public class RoomCrud extends Div {
     private final RoomService roomService;
 
     private final Crud<Room> crud;
+    private final Binder<Room> binder = new Binder<>(Room.class);
+    private final TextField refNr = new TextField("ReferenzBezeichnung");
 
     private final String FACHBEREICH = "fachbereich";
     private final String POSITION = "position";
@@ -50,9 +52,8 @@ public class RoomCrud extends Div {
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
     /**
-     *
      * @param ausstattungService Service für Ausstattung
-     * @param roomService Service für Räume
+     * @param roomService        Service für Räume
      */
     public RoomCrud(AusstattungService ausstattungService, RoomService roomService) {
         this.ausstattungService = ausstattungService;
@@ -64,18 +65,32 @@ public class RoomCrud extends Div {
         setupDataProvider();
         setupLanguage();
 
+        crud.setMinHeight("80vh");
+
         add(crud);
+
+        crud.getNewButton().getElement().addEventListener("click", event -> {
+            refNr.setEnabled(true);
+            binder.forField(refNr).asRequired()
+                    .withValidator(refNrValue -> refNrValue.matches("^[a-zA-Z]{1}.{0,3}$"),
+                            "ReferenzBezeichnung muss mit einem Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
+                    .withValidator(refNrValue -> !roomService.refNrExists(refNrValue),
+                            "ReferenzBezeichnung already exists")
+                    .bind(Room::getRefNr, Room::setRefNr);
+        });
+        crud.getCancelButton().getElement().addEventListener("click", event -> {
+            refNr.setEnabled(false);
+        });
     }
 
     /**
-     *
      * Erstellen des Editors
      *
      * @return BinderCrudEditor<>(binder, form)
      */
     private CrudEditor<Room> createEditor() {
 
-        TextField refNr = new TextField("ReferenzBezeichnung");
+        refNr.setEnabled(false);
 
         IntegerField kapa = new IntegerField("Kapazität");
         MultiSelectComboBox<Ausstattung> ausstattung = new MultiSelectComboBox<>("Ausstattung");
@@ -92,7 +107,6 @@ public class RoomCrud extends Div {
 
         FormLayout form = new FormLayout(refNr, kapa, ausstattung, typ, fachbereich, position);
 
-        Binder<Room> binder = new Binder<>(Room.class);
         binder.forField(kapa).asRequired().bind(Room::getCapacity, Room::setCapacity);
         binder.forField(ausstattung).asRequired().bind(Room::getAusstattung, Room::setAusstattung);
         binder.forField(typ).asRequired().bind(Room::getTyp, Room::setTyp);
@@ -102,7 +116,6 @@ public class RoomCrud extends Div {
                 .withValidator(refNrValue -> refNrValue.matches("^[a-zA-Z]{1}.{0,3}$"),
                         "ReferenzBezeichnung muss mit einem Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
                 .bind(Room::getRefNr, Room::setRefNr);
-
         return new BinderCrudEditor<>(binder, form);
     }
 
@@ -124,6 +137,7 @@ public class RoomCrud extends Div {
                 grid.getColumnByKey(CAPACITY),
                 grid.getColumnByKey(POSITION),
                 grid.getColumnByKey(EDIT_COLUMN));
+
     }
 
     /**
@@ -137,8 +151,12 @@ public class RoomCrud extends Div {
             dataProvider.refreshAll();
         });
         crud.addSaveListener(saveEvent -> {
-            dataProvider.save(saveEvent.getItem());
-            dataProvider.refreshAll();
+            if (roomService.refNrExists(saveEvent.getItem().getRefNr())) {
+                System.out.println("Error");
+            } else {
+                dataProvider.save(saveEvent.getItem());
+                dataProvider.refreshAll();
+            }
         });
     }
 

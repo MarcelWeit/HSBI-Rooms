@@ -11,8 +11,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -20,7 +18,6 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
 
     private final RoomService roomService;
     private final List<Room> rooms;
-    private Consumer<Long> sizeChangeListener;
 
     public RoomDataProvider(RoomService roomService) {
         this.roomService = roomService;
@@ -89,24 +86,12 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
     protected int sizeInBackEnd(Query<Room, CrudFilter> query) {
         long count = fetchFromBackEnd(query).count();
 
-        if (sizeChangeListener != null) {
-            sizeChangeListener.accept(count);
-        }
-
         return (int) count;
-    }
-
-    void setSizeChangeListener(Consumer<Long> listener) {
-        sizeChangeListener = listener;
     }
 
     public void save(Room room) {
         roomService.save(room);
         rooms.add(room);
-    }
-
-    Optional<Room> find(String refNr) {
-        return Optional.of(roomService.findByRefNr(refNr));
     }
 
     public void delete(Room room) {
