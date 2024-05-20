@@ -95,10 +95,6 @@ public class MainLayout extends AppLayout {
             verwNav.addItem(
                     new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
         }
-        if (accessChecker.hasAccess(RaumVerwaltung.class)) {
-            verwNav.addItem(
-                    new SideNavItem("RaumNew", RaumVerwaltung.class, VaadinIcon.TABLE.create()));
-        }
 
         verwNav.setExpanded(true);
         nav.addItem(verwNav);
