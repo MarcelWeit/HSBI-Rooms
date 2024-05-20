@@ -57,8 +57,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
-        // Check if data already exists (optional)
+    public void run(String... args) {
         if (ausstattungRepository.count() == 0) {
             ausstattungRepository.save(new Ausstattung("Beamer"));
             ausstattungRepository.save(new Ausstattung("Computer"));
@@ -85,7 +84,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             }
         }
         if (userRepository.count() == 0) {
-            User user = new User("max@gmail.com", "max", "mustermann", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
+            User user = new User("max@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
             user.setHashedPassword(passwordEncoder.encode("admin"));
             userRepository.save(user);
         }

@@ -11,22 +11,35 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * Ein DataProvider für die Räume, der die Daten aus dem Backend abruft.
+ *
+ * @author marcel.weithoener, verändert nach Vaadin
+ */
 public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilter> {
 
     private final RoomService roomService;
     private final List<Room> rooms;
-    private Consumer<Long> sizeChangeListener;
 
+    /**
+     * Erzeugt einen neuen RoomDataProvider.
+     *
+     * @param roomService der Service, der die Räume verwaltet
+     */
     public RoomDataProvider(RoomService roomService) {
         this.roomService = roomService;
         rooms = new ArrayList<>(roomService.findAll());
     }
 
+    /**
+     * Erzeugt ein Predicate auf der Grundlage der angegebenen Filter.
+     *
+     * @param filter der Filter, der die Einschränkungen definiert
+     * @return ein Predicate, das die Einschränkungen des Filters erfüllt
+     */
     private static Predicate<Room> predicate(CrudFilter filter) {
         return filter.getConstraints().entrySet().stream()
                 .map(constraint -> (Predicate<Room>) room -> {
@@ -41,6 +54,12 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
                 }).reduce(Predicate::and).orElse(e -> true);
     }
 
+    /**
+     * Erzeugt einen Komparator auf der Grundlage der angegebenen Sortierreihenfolge.
+     *
+     * @param filter
+     * @return
+     */
     private static Comparator<Room> comparator(CrudFilter filter) {
         return filter.getSortOrders().entrySet().stream().map(sortClause -> {
             try {
@@ -60,6 +79,14 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
         }).reduce(Comparator::thenComparing).orElse((o1, o2) -> 0);
     }
 
+    /**
+     * Gibt den Wert des angegebenen Felds für den Raum zurück.
+     *
+     * @param fieldName der Name des Felds
+     * @param room      der Raum, dessen Feldwert zurückgegeben werden soll
+     * @return den Wert des Felds
+     */
+
     private static Object valueOf(String fieldName, Room room) {
         try {
             Field field = Room.class.getDeclaredField(fieldName);
@@ -70,6 +97,12 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
         }
     }
 
+    /**
+     * Holt die Daten auf der Grundlage der Abfrage aus dem Backend.
+     *
+     * @param query die Abfrage, die das Sortieren, Filtern und Paging für die Daten enthält
+     * @return eine Liste von Elementen, die den Kriterien der Abfrage entsprechen
+     */
     @Override
     protected Stream<Room> fetchFromBackEnd(Query<Room, CrudFilter> query) {
         int offset = query.getOffset();
@@ -85,30 +118,32 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
         return stream.skip(offset).limit(limit);
     }
 
+    /**
+     * @param query die Abfrage, die die Filterung definiert, die für die Anzahl der Elemente verwendet werden soll
+     * @return die Anzahl der Elemente, die den Filterkriterien entsprechen
+     */
     @Override
     protected int sizeInBackEnd(Query<Room, CrudFilter> query) {
         long count = fetchFromBackEnd(query).count();
 
-        if (sizeChangeListener != null) {
-            sizeChangeListener.accept(count);
-        }
-
         return (int) count;
     }
 
-    void setSizeChangeListener(Consumer<Long> listener) {
-        sizeChangeListener = listener;
-    }
-
+    /**
+     * Speichert den Raum im Backend und aktualisiert die Liste der Räume.
+     *
+     * @param room der zu speichernde Raum
+     */
     public void save(Room room) {
         roomService.save(room);
         rooms.add(room);
     }
 
-    Optional<Room> find(String refNr) {
-        return Optional.of(roomService.findByRefNr(refNr));
-    }
-
+    /**
+     * Löscht den Raum aus dem Backend und aktualisiert die Liste der Räume.
+     *
+     * @param room der zu löschende Raum
+     */
     public void delete(Room room) {
         roomService.delete(room);
         rooms.remove(room);
