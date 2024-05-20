@@ -40,18 +40,6 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         SpringApplication.run(Application.class, args);
     }
 
-    //    @Bean
-    //    SqlDataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer(DataSource dataSource,
-    //                                                                               SqlInitializationProperties properties) {
-    //        return new SqlDataSourceScriptDatabaseInitializer(dataSource, properties) {
-    //            @Override
-    //            public boolean initializeDatabase() {
-    //
-    //                return false;
-    //            }
-    //        };
-    //    }
-
     @Override
     public void run(String... args) {
         if (ausstattungRepository.count() == 0) {

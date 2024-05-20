@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author marcel weithoener
@@ -111,6 +112,15 @@ public class Room {
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public String getAusstattungAsString() {
+        if (ausstattung.isEmpty()) {
+            return "Keine Ausstattung";
+        }
+        return ausstattung.stream()
+                .map(Ausstattung::getBez) // assuming getBez() returns the string representation of an Ausstattung
+                .collect(Collectors.joining(", "));
     }
 
 }

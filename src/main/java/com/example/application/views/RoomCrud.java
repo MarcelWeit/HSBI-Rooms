@@ -1,5 +1,6 @@
 package com.example.application.views;
 
+import com.example.application.comparator.refNrComparator;
 import com.example.application.data.entities.Ausstattung;
 import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Raumtyp;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.icon.Icon;
@@ -24,14 +26,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -46,7 +49,7 @@ public class RoomCrud extends VerticalLayout {
     private final AusstattungService ausstattungService;
     private final RoomService roomService;
 
-    private final Grid<Room> roomGrid = new Grid<>(Room.class);
+    private final Grid<Room> roomGrid = new Grid<>(Room.class, false);
     private final Binder<Room> roomBinder = new Binder<>(Room.class);
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
@@ -60,51 +63,27 @@ public class RoomCrud extends VerticalLayout {
     }
 
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
-        //        NativeLabel label = new NativeLabel(labelText);
-        //        label.getStyle().set("padding-top", "var(--lumo-space-m)")
-        //                .set("font-size", "var(--lumo-font-size-xs)");
         TextField textField = new TextField();
         textField.setValueChangeMode(ValueChangeMode.EAGER);
         textField.setClearButtonVisible(true);
-        textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        textField.setWidthFull();
-        textField.getStyle().set("max-width", "100%");
         textField.addValueChangeListener(
                 e -> filterChangeConsumer.accept(e.getValue()));
-        VerticalLayout layout = new VerticalLayout(textField);
-        layout.getThemeList().clear();
-        layout.getThemeList().add("spacing-xs");
 
-        return layout;
-    }
-
-    private static Component createFachbereichFilterHeader(Consumer<Fachbereich> filterChangeConsumer) {
-        ComboBox<Fachbereich> comboBox = new ComboBox<>();
-        comboBox.setItems(Fachbereich.values());
-        comboBox.setClearButtonVisible(true);
-        comboBox.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
-        return comboBox;
-    }
-
-    private static Component createRaumtypFilterHeader(Consumer<Raumtyp> filterChangeConsumer) {
-        ComboBox<Raumtyp> comboBox = new ComboBox<>();
-        comboBox.setItems(Raumtyp.values());
-        comboBox.setClearButtonVisible(true);
-        comboBox.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
-        return comboBox;
-    }
-
-    private Component createAusstattungFilterHeader(Consumer<Set<Ausstattung>> filterChangeConsumer) {
-        MultiSelectComboBox<Ausstattung> multiSelectComboBox = new MultiSelectComboBox<>();
-        multiSelectComboBox.setItems(ausstattungService.findAll());
-        multiSelectComboBox.setClearButtonVisible(true);
-        multiSelectComboBox.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
-        return multiSelectComboBox;
+        return textField;
     }
 
     private void setupGrid() {
         GridListDataView<Room> dataView = roomGrid.setItems(roomService.findAll());
-        roomGrid.removeColumn(roomGrid.getColumnByKey("id"));
+
+        roomGrid.addColumn(Room::getRefNr).setHeader("Referenznummer")
+                .setComparator(new refNrComparator())
+                .setKey("refNr");
+        roomGrid.addColumn(Room::getFachbereich).setHeader("Fachbereich").setKey("fachbereich");
+        roomGrid.addColumn(Room::getPosition).setHeader("Position").setKey("position");
+        roomGrid.addColumn(Room::getTyp).setHeader("Typ").setKey("typ");
+        roomGrid.addColumn(Room::getCapacity).setHeader("Kapazität").setKey("capacity");
+        roomGrid.addColumn(Room::getAusstattungAsString).setHeader("Ausstattung").setKey("ausstattung");
+
         roomGrid.getColumnByKey("capacity")
                 .setAutoWidth(true).setFlexGrow(0)
                 .setHeader("Kapazität");
@@ -114,25 +93,60 @@ public class RoomCrud extends VerticalLayout {
         roomGrid.getColumnByKey("typ").setAutoWidth(true).setFlexGrow(0);
         roomGrid.getColumnByKey("position").setAutoWidth(true).setFlexGrow(0);
 
-        roomGrid.setColumnOrder(roomGrid.getColumnByKey("refNr"),
-                roomGrid.getColumnByKey("fachbereich"),
-                roomGrid.getColumnByKey("position"),
-                roomGrid.getColumnByKey("typ"),
-                roomGrid.getColumnByKey("capacity"),
-                roomGrid.getColumnByKey("ausstattung"));
+        // Sort by reference number by default
+        GridSortOrder<Room> sortOrder = new GridSortOrder<>(roomGrid.getColumnByKey("refNr"), SortDirection.ASCENDING);
+        ArrayList<GridSortOrder<Room>> sortOrders = new ArrayList<>();
+        sortOrders.add(sortOrder);
+        roomGrid.sort(sortOrders);
 
-        roomGrid.setMinHeight("70vh");
+        roomGrid.setMinHeight("80vh");
 
+        setupFilter(dataView);
+    }
+
+    private void setupFilter(GridListDataView<Room> dataView) {
         RoomFilter roomFilter = new RoomFilter(dataView);
 
         roomGrid.getHeaderRows().clear();
         HeaderRow headerRow = roomGrid.appendHeaderRow();
 
+        Consumer<Fachbereich> fachbereichFilterChangeConsumer = roomFilter::setFachbereich;
+        ComboBox<Fachbereich> fachbereichComboBox = new ComboBox<>();
+        fachbereichComboBox.setItems(Fachbereich.values());
+        fachbereichComboBox.setClearButtonVisible(true);
+        fachbereichComboBox.addValueChangeListener(e -> fachbereichFilterChangeConsumer.accept(e.getValue()));
+        headerRow.getCell(roomGrid.getColumnByKey("fachbereich")).setComponent(fachbereichComboBox);
+
+        Consumer<Raumtyp> raumtypFilterChangeConsumer = roomFilter::setRaumtyp;
+        ComboBox<Raumtyp> raumtypComboBox = new ComboBox<>();
+        raumtypComboBox.setItems(Raumtyp.values());
+        raumtypComboBox.setClearButtonVisible(true);
+        raumtypComboBox.addValueChangeListener(e -> raumtypFilterChangeConsumer.accept(e.getValue()));
+        headerRow.getCell(roomGrid.getColumnByKey("typ")).setComponent(raumtypComboBox);
+
+        Consumer<Set<Ausstattung>> ausstattungFilterChangeConsumer = roomFilter::setAusstattung;
+        MultiSelectComboBox<Ausstattung> ausstattungMultiSelectComboBox = new MultiSelectComboBox<>();
+        ausstattungMultiSelectComboBox.setItems(ausstattungService.findAll());
+        ausstattungMultiSelectComboBox.setClearButtonVisible(true);
+        ausstattungMultiSelectComboBox.addValueChangeListener(e -> ausstattungFilterChangeConsumer.accept(e.getValue()));
+        headerRow.getCell(roomGrid.getColumnByKey("ausstattung")).setComponent(ausstattungMultiSelectComboBox);
+
+        Consumer<Integer> capacityFilterChangeConsumer = roomFilter::setCapacity;
+        IntegerField capacityField = new IntegerField();
+        capacityField.setMin(0);
+        capacityField.setMax(1000);
+        capacityField.setValue(0);
+        capacityField.setStepButtonsVisible(true);
+        capacityField.addValueChangeListener(e -> {
+            if (e.getValue() == null) {
+                capacityField.setValue(0);
+            }
+            capacityFilterChangeConsumer.accept(e.getValue());
+        });
+        headerRow.getCell(roomGrid.getColumnByKey("capacity")).setComponent(capacityField);
+
         headerRow.getCell(roomGrid.getColumnByKey("refNr")).setComponent(createStringFilterHeader(roomFilter::setRefNr));
-        headerRow.getCell(roomGrid.getColumnByKey("fachbereich")).setComponent(createFachbereichFilterHeader(roomFilter::setFachbereich));
         headerRow.getCell(roomGrid.getColumnByKey("position")).setComponent(createStringFilterHeader(roomFilter::setPosition));
-        headerRow.getCell(roomGrid.getColumnByKey("typ")).setComponent(createRaumtypFilterHeader(roomFilter::setRaumtyp));
-        headerRow.getCell(roomGrid.getColumnByKey("ausstattung")).setComponent(createAusstattungFilterHeader(roomFilter::setAusstattung));
 
     }
 
@@ -180,8 +194,8 @@ public class RoomCrud extends VerticalLayout {
 
         if (selectedRoom.isEmpty()) {
             roomBinder.forField(refNr).asRequired("Bitte eine Referenznummer angeben")
-                    .withValidator(refNrValue -> refNrValue.matches("^[a-zA-Z]{1}.{0,3}$"),
-                            "Die Referenznummer muss mit einem Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
+                    .withValidator(refNrValue -> refNrValue.matches("^[A-Z]{1}.{0,3}$"),
+                            "Die Referenznummer muss mit einem großen Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
                     .withValidator(refNrValue -> !roomService.refNrExists(refNrValue),
                             "Referenznummer existiert bereits")
                     .bind(Room::getRefNr, Room::setRefNr);
@@ -260,10 +274,16 @@ public class RoomCrud extends VerticalLayout {
         private String position;
         private Raumtyp raumtyp;
         private Set<Ausstattung> ausstattung;
+        private int capacity;
 
         public RoomFilter(GridListDataView<Room> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
+        }
+
+        public void setCapacity(int capacity) {
+            this.capacity = capacity;
+            this.dataView.refreshAll();
         }
 
         public void setRefNr(String refNr) {
@@ -306,8 +326,9 @@ public class RoomCrud extends VerticalLayout {
             if (ausstattung != null) {
                 matchesAusstattung = room.getAusstattung().containsAll(ausstattung);
             }
-            
-            return matchesRefNr && matchesFachbereich && matchesPosition && matchesRaumtyp && matchesAusstattung;
+            boolean matchesCapacity = room.getCapacity() >= capacity;
+
+            return matchesRefNr && matchesFachbereich && matchesPosition && matchesRaumtyp && matchesAusstattung && matchesCapacity;
         }
 
         private boolean matches(String value, String searchTerm) {
