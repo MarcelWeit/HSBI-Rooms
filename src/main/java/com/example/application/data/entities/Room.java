@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author marcel weithoener
  */
 @Entity
-public class Room{
+public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,6 +37,14 @@ public class Room{
 
     public Room() {
 
+    }
+
+    public Room(String refNr, Raumtyp typ, int capacity, Fachbereich fachbereich, String position) {
+        this.refNr = refNr;
+        this.typ = typ;
+        this.capacity = capacity;
+        this.fachbereich = fachbereich;
+        this.position = position;
     }
 
     public long getId() {
@@ -76,7 +85,9 @@ public class Room{
     }
 
     public void addAusstattung(Ausstattung ausstattung) {
-        this.ausstattung.add(ausstattung);
+        if (ausstattung != null) {
+            this.ausstattung.add(ausstattung);
+        }
     }
 
     public Raumtyp getTyp() {
@@ -94,13 +105,22 @@ public class Room{
     public void setFachbereich(Fachbereich fachbereich) {
         this.fachbereich = fachbereich;
     }
-    
+
     public String getPosition() {
         return position;
     }
-    
+
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public String getAusstattungAsString() {
+        if (ausstattung.isEmpty()) {
+            return "Keine Ausstattung";
+        }
+        return ausstattung.stream()
+                .map(Ausstattung::getBez) // assuming getBez() returns the string representation of an Ausstattung
+                .collect(Collectors.joining(", "));
     }
 
 }
