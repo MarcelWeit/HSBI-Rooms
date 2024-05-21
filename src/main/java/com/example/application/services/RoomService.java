@@ -6,6 +6,7 @@ import com.example.application.data.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -28,6 +29,10 @@ public class RoomService {
         return repository.findAll();
     }
 
+    public boolean refNrExists(String refNr) {
+        return repository.findByRefNr(refNr).isPresent();
+    }
+
     public int countByAusstattungContains(Ausstattung entity) {
         return repository.countByAusstattungContains(entity);
     }
@@ -40,7 +45,7 @@ public class RoomService {
         repository.delete(room);
     }
 
-    public Room findByRefNr(String refNr) {
+    public Optional<Room> findByRefNr(String refNr) {
         return repository.findByRefNr(refNr);
     }
 

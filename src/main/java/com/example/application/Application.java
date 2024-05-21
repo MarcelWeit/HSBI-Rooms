@@ -10,12 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDatabaseInitializer;
-import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.sql.DataSource;
 import java.util.Set;
 
 /**
@@ -44,47 +40,35 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
-    SqlDataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer(DataSource dataSource,
-                                                                               SqlInitializationProperties properties, UserRepository userRepository) {
-        return new SqlDataSourceScriptDatabaseInitializer(dataSource, properties) {
-            @Override
-            public boolean initializeDatabase() {
-
-                return false;
-            }
-        };
-    }
-
     @Override
     public void run(String... args) {
         if (ausstattungRepository.count() == 0) {
             ausstattungRepository.save(new Ausstattung("Beamer"));
-            ausstattungRepository.save(new Ausstattung("Computer"));
+            ausstattungRepository.save(new Ausstattung("Pult"));
             ausstattungRepository.save(new Ausstattung("Whiteboard"));
-            ausstattungRepository.save(new Ausstattung("Overheadprojektor"));
-            ausstattungRepository.save(new Ausstattung("Leinwand"));
-            ausstattungRepository.save(new Ausstattung("Laptop"));
             ausstattungRepository.save(new Ausstattung("Mikrofon"));
-            ausstattungRepository.save(new Ausstattung("Lautsprecher"));
+            ausstattungRepository.save(new Ausstattung("Soundanlage"));
             ausstattungRepository.save(new Ausstattung("Kamera"));
-            ausstattungRepository.save(new Ausstattung("Drucker"));
-            ausstattungRepository.save(new Ausstattung("Scanner"));
-            ausstattungRepository.save(new Ausstattung("Smartboard"));
-            ausstattungRepository.save(new Ausstattung("Tablet"));
-            ausstattungRepository.save(new Ausstattung("Telefon"));
         }
         if (roomRepository.count() == 0) {
-            for (int i = 0; i < 20; i++) {
-                Room room = new Room("A" + i, Raumtyp.HOERSAAL, 100, Fachbereich.INGENIEURWISSENSCHAFTENUNDMATHEMATIK, "FB IuM EG");
+            for (int i = 1; i < 5; i++) {
+                Room room = new Room("C" + i, Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 1");
                 room.addAusstattung(ausstattungRepository.findByBez("Beamer"));
                 room.addAusstattung(ausstattungRepository.findByBez("Whiteboard"));
-                room.addAusstattung(ausstattungRepository.findByBez("Computer"));
+                room.addAusstattung(ausstattungRepository.findByBez("Kamera"));
                 roomRepository.save(room);
             }
+            for (int b = 1; b < 5; b++) {
+                Room room = new Room("A" + b, Raumtyp.HOERSAAL, 100, Fachbereich.SOZIALWESEN, "Fachbereich Sozialwesen Etage 1");
+                room.addAusstattung(ausstattungRepository.findByBez("Pult"));
+                room.addAusstattung(ausstattungRepository.findByBez("Soundanlage"));
+                room.addAusstattung(ausstattungRepository.findByBez("test"));
+                roomRepository.save(room);
+            }
+            roomRepository.save(new Room("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
         }
-        if (userRepository.count() == 0) {
-            User user = new User("max@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
+        if (userRepository.findByUsername("admin@gmail.com") == null) {
+            User user = new User("admin@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
             user.setHashedPassword(passwordEncoder.encode("admin"));
             userRepository.save(user);
         }

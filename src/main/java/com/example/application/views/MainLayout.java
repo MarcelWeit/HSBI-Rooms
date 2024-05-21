@@ -25,9 +25,10 @@ import java.util.Optional;
  */
 public class MainLayout extends AppLayout {
 
+    private H2 viewTitle;
+
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
-    private H2 viewTitle;
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
@@ -80,6 +81,11 @@ public class MainLayout extends AppLayout {
             nav.addItem(
                     new SideNavItem("Startseite", Startseite.class, VaadinIcon.HOME.create()));
         }
+        if(accessChecker.hasAccess(VeranstaltungView.class)) {
+            nav.addItem(
+                    new SideNavItem("Veranstaltungen", VeranstaltungView.class, VaadinIcon.TABLE.create())
+            );
+        }
 
         // Kopf Navigation Verwaltung mit Unterpunkten
         SideNavItem verwNav = new SideNavItem("Verwaltung");
@@ -94,6 +100,10 @@ public class MainLayout extends AppLayout {
         if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
             verwNav.addItem(
                     new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
+        }
+        if (accessChecker.hasAccess(DozentCrud.class)) {
+            verwNav.addItem(
+                    new SideNavItem("Dozenten", DozentCrud.class, VaadinIcon.USERS.create()));
         }
 
         verwNav.setExpanded(true);
