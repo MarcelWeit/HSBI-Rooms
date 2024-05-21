@@ -97,6 +97,7 @@ public class BenutzerVerwaltungView extends VerticalLayout {
         Grid<User> grid = crud.getGrid();
 
         grid.removeColumn(grid.getColumnByKey("id"));
+
         grid.removeColumn(grid.getColumnByKey("hashedPassword"));
 
 
