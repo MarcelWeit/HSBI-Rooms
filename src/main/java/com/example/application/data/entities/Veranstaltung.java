@@ -16,7 +16,16 @@ public class Veranstaltung {
     private int teilnehmerzahl;
     private Fachbereich fachbereich;
 
-    public Veranstaltung() {}
+    public Veranstaltung() {
+    }
+
+    public Veranstaltung(String id, String bezeichnung, Dozent dozent, int teilnehmerzahl, Fachbereich fachbereich) {
+        this.id = id;
+        this.bezeichnung = bezeichnung;
+        this.dozent = dozent;
+        this.teilnehmerzahl = teilnehmerzahl;
+        this.fachbereich = fachbereich;
+    }
 
     public String getId() {
         return id;

@@ -32,6 +32,12 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
     private UserRepository userRepository;
 
     @Autowired
+    private VeranstaltungRepository veranstaltungRepository;
+
+    @Autowired
+    private DozentRepository dozentRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public static void main(String[] args) {
@@ -69,6 +75,15 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             User user = new User("admin@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
             user.setHashedPassword(passwordEncoder.encode("admin"));
             userRepository.save(user);
+        }
+        if(dozentRepository.count() == 0){
+            dozentRepository.save(new Dozent("Wiemann", "Volker", Fachbereich.WIRTSCHAFT));
+            dozentRepository.save(new Dozent("Küster", "Jochen", Fachbereich.WIRTSCHAFT));
+            dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
+        }
+        if(veranstaltungRepository.count() == 0){
+            veranstaltungRepository.save(new Veranstaltung("CFR23", "SoftwareEngineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CGRH26", "InternesRechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
         }
     }
 }

@@ -48,13 +48,22 @@ public class RoomCrud extends VerticalLayout {
     private final AusstattungService ausstattungService;
     private final RoomService roomService;
 
+    private final DozentService dozentService;
+    private final VeranstaltungService veranstaltungService;
+    private final BuchungService buchungService;
+
     private final Grid<Room> roomGrid = new Grid<>(Room.class, false);
     private final Binder<Room> roomBinder = new Binder<>(Room.class);
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
-    public RoomCrud(AusstattungService ausstattungService, RoomService roomService) {
+    public RoomCrud(AusstattungService ausstattungService, RoomService roomService, DozentService dozentService,
+                    VeranstaltungService veranstaltungService, BuchungService buchungService) {
         this.ausstattungService = ausstattungService;
         this.roomService = roomService;
+
+        this.dozentService = dozentService;
+        this.veranstaltungService = veranstaltungService;
+        this.buchungService = buchungService;
 
         setupButtons();
         setupGrid();
@@ -262,7 +271,21 @@ public class RoomCrud extends VerticalLayout {
         Button deleteRoomButton = new Button("Raum löschen", new Icon(VaadinIcon.TRASH));
         deleteRoomButton.addClickListener(e -> openDeleteDialog(roomService));
 
-        buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton);
+        Button bookRoomButton = new Button("Raum buchen", new Icon(VaadinIcon.PLUS));
+        bookRoomButton.addClickListener(click -> openRoomBookDialog());
+
+        buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton);
+    }
+
+    private void openRoomBookDialog() {
+        Optional<Room> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
+        if (selectedRoom.isPresent()) {
+            Dialog roomBookDialog = new BuchungAnlegenView(selectedRoom, roomService, dozentService, buchungService, veranstaltungService);
+            roomBookDialog.open();
+        } else {
+            Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);
+        }
+
     }
 
     private static class RoomFilter {
