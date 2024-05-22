@@ -1,10 +1,8 @@
 package com.example.application.views;
 
-import com.example.application.data.dataProvider.RoomDataProvider;
 import com.example.application.data.dataProvider.VeranstaltungDataProvider;
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Fachbereich;
-import com.example.application.data.entities.Room;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
@@ -79,6 +77,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         return new BinderCrudEditor<>(binder, form);
 
     }
+
     private void setupGrid() {
         Grid<Veranstaltung> grid = crud.getGrid();
 
@@ -92,6 +91,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
                 grid.getColumnByKey("fachbereich"),
                 grid.getColumnByKey("vaadin-crud-edit-column"));
     }
+
     private void setupDataProvider() {
         VeranstaltungDataProvider dataProvider = new VeranstaltungDataProvider(veranstaltungService);
         crud.setDataProvider(dataProvider);
@@ -105,6 +105,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
             dataProvider.refreshAll();
         });
     }
+
     private void setupLanguage() {
         CrudI18n i18n = CrudI18n.createDefault();
         i18n.setNewItem("Neuer Eintrag");

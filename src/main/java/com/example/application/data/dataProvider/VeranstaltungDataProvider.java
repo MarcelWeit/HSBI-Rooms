@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 
 public class VeranstaltungDataProvider extends AbstractBackEndDataProvider<Veranstaltung, CrudFilter> {
 
-    private VeranstaltungService veranstaltungService;
     private final List<Veranstaltung> veranstaltungen;
+    private final VeranstaltungService veranstaltungService;
     private Consumer<Long> sizeChangeListener;
 
     public VeranstaltungDataProvider(VeranstaltungService veranstaltungService) {
@@ -31,10 +31,12 @@ public class VeranstaltungDataProvider extends AbstractBackEndDataProvider<Veran
     protected int sizeInBackEnd(Query<Veranstaltung, CrudFilter> query) {
         return 0;
     }
+
     public void saveVeranstaltung(Veranstaltung veranstaltung) {
         veranstaltungService.save(veranstaltung);
         veranstaltungen.add(veranstaltung);
     }
+
     public void deleteVeranstaltung(Veranstaltung veranstaltung) {
         veranstaltungService.delete(veranstaltung);
         veranstaltungen.remove(veranstaltung);
