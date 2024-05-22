@@ -1,9 +1,7 @@
 package com.example.application;
 
 import com.example.application.data.entities.*;
-import com.example.application.data.repository.AusstattungRepository;
-import com.example.application.data.repository.RoomRepository;
-import com.example.application.data.repository.UserRepository;
+import com.example.application.data.repository.*;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
 import org.springframework.beans.factory.annotation.Autowired;

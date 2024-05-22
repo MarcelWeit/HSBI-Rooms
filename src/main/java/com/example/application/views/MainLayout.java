@@ -80,7 +80,7 @@ public class MainLayout extends AppLayout {
             nav.addItem(
                     new SideNavItem("Startseite", Startseite.class, VaadinIcon.HOME.create()));
         }
-        if(accessChecker.hasAccess(VeranstaltungView.class)) {
+        if (accessChecker.hasAccess(VeranstaltungView.class)) {
             nav.addItem(
                     new SideNavItem("Veranstaltungen", VeranstaltungView.class, VaadinIcon.TABLE.create())
             );
@@ -103,6 +103,10 @@ public class MainLayout extends AppLayout {
         if (accessChecker.hasAccess(DozentCrud.class)) {
             verwNav.addItem(
                     new SideNavItem("Dozenten", DozentCrud.class, VaadinIcon.USERS.create()));
+        }
+        if (accessChecker.hasAccess(DozentCrud.class)) {
+            verwNav.addItem(
+                    new SideNavItem("Raumbuchungen", RaumBuchungenView.class, VaadinIcon.TABLE.create()));
         }
 
         verwNav.setExpanded(true);
