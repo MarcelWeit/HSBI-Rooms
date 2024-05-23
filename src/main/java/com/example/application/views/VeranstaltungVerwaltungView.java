@@ -77,6 +77,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         return new BinderCrudEditor<>(binder, form);
 
     }
+
     private void setupGrid() {
         Grid<Veranstaltung> grid = crud.getGrid();
 
@@ -90,6 +91,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
                 grid.getColumnByKey("fachbereich"),
                 grid.getColumnByKey("vaadin-crud-edit-column"));
     }
+
     private void setupDataProvider() {
         VeranstaltungDataProvider dataProvider = new VeranstaltungDataProvider(veranstaltungService);
         crud.setDataProvider(dataProvider);
@@ -103,6 +105,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
             dataProvider.refreshAll();
         });
     }
+
     private void setupLanguage() {
         CrudI18n i18n = CrudI18n.createDefault();
         i18n.setNewItem("Neuer Eintrag");

@@ -1,9 +1,9 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Buchung;
-import com.example.application.data.entities.Room;
+import com.example.application.data.entities.Raum;
 import com.example.application.services.BuchungService;
-import com.example.application.services.RoomService;
+import com.example.application.services.RaumService;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
@@ -27,9 +27,9 @@ public class RaumBuchungenView extends VerticalLayout {
 
     private final BuchungService buchungService;
     private final Grid<Buchung> raumBuchungGrid = new Grid<>(Buchung.class, false);
-    private final RoomService roomService;
+    private final RaumService roomService;
 
-    public RaumBuchungenView(BuchungService buchungService, RoomService roomService) {
+    public RaumBuchungenView(BuchungService buchungService, RaumService roomService) {
         this.buchungService = buchungService;
         this.roomService = roomService;
         setupGrid();
@@ -60,7 +60,7 @@ public class RaumBuchungenView extends VerticalLayout {
         sortOrders.add(sortOrderTime);
         raumBuchungGrid.sort(sortOrders);
 
-//        setupFilter(dataView);
+        //        setupFilter(dataView);
     }
 
     private void setupFilter(GridListDataView<Buchung> dataView) {
@@ -69,8 +69,8 @@ public class RaumBuchungenView extends VerticalLayout {
         raumBuchungGrid.getHeaderRows().clear();
         HeaderRow headerRow = raumBuchungGrid.appendHeaderRow();
 
-        Consumer<Room> roomFilterChangeConsumer = buchungFilter::setRoom;
-        ComboBox<Room> roomComboBox = new ComboBox<>();
+        Consumer<Raum> roomFilterChangeConsumer = buchungFilter::setRoom;
+        ComboBox<Raum> roomComboBox = new ComboBox<>();
         roomComboBox.setItems(roomService.findAll());
         roomComboBox.setClearButtonVisible(true);
         roomComboBox.addValueChangeListener(e -> roomFilterChangeConsumer.accept(e.getValue()));
@@ -80,7 +80,7 @@ public class RaumBuchungenView extends VerticalLayout {
 
     private static class BuchungFilter {
         private final GridListDataView<Buchung> dataView;
-        private Room room;
+        private Raum room;
         private LocalDate date;
         private LocalTime startZeit;
         private LocalTime endZeit;
@@ -90,18 +90,21 @@ public class RaumBuchungenView extends VerticalLayout {
             this.dataView.addFilter(this::test);
         }
 
-        public void setRoom(Room room) {
+        public void setRoom(Raum room) {
             this.room = room;
             this.dataView.refreshAll();
         }
+
         public void setDate(LocalDate date) {
             this.date = date;
             this.dataView.refreshAll();
         }
+
         public void setStartZeit(LocalTime startZeit) {
             this.startZeit = startZeit;
             this.dataView.refreshAll();
         }
+
         public void setEndZeit(LocalTime endZeit) {
             this.endZeit = endZeit;
             this.dataView.refreshAll();

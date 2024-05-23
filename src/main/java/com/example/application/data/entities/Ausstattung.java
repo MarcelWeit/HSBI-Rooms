@@ -18,7 +18,7 @@ public class Ausstattung {
     private Long id;
 
     @ManyToMany(mappedBy = "ausstattung")
-    private Set<Room> rooms;
+    private Set<Raum> rooms;
 
     private String bez;
 
@@ -30,11 +30,11 @@ public class Ausstattung {
         this.bez = bez;
     }
 
-    public Set<Room> getRooms() {
+    public Set<Raum> getRooms() {
         return rooms;
     }
 
-    public void setRooms(Set<Room> rooms) {
+    public void setRooms(Set<Raum> rooms) {
         this.rooms = rooms;
     }
 

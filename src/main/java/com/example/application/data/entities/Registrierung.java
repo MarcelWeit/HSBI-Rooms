@@ -1,19 +1,18 @@
 package com.example.application.data.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 
-import java.util.Set;
-
 @Entity
-@Table(name = "application_user")
-public class User {
+public class Registrierung {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "idgenerator", initialValue = 1000)
-    private Long id;
+    private long id;
 
     @Email
     private String username;
@@ -24,27 +23,18 @@ public class User {
     @JsonIgnore
     private String hashedPassword;
 
-    @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<Role> roles;
-
-    //    @Lob
-    //    @Column(length = 1000000)
-    //    private byte[] profilePicture;
+    private Role role;
 
     private Fachbereich fachbereich;
 
-    public User() {
+    public Registrierung() {
     }
 
-    public User(String username, String lastName, String firstName, String hashedPassword, Set<Role> roles, Fachbereich fachbereich) {
-        this.username = username;
-        this.lastName = lastName;
-        this.firstName = firstName;
-        this.hashedPassword = hashedPassword;
-        this.roles = roles;
-        this.fachbereich = fachbereich;
+    public long getId() {
+        return id;
     }
+
+    // auf id setter wird verzichtet, da id automatisch generiert wird
 
     public String getUsername() {
         return username;
@@ -78,20 +68,14 @@ public class User {
         this.hashedPassword = hashedPassword;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
-    //    public byte[] getProfilePicture() {
-    //        return profilePicture;
-    //    }
-    //    public void setProfilePicture(byte[] profilePicture) {
-    //        this.profilePicture = profilePicture;
-    //    }
     public Fachbereich getFachbereich() {
         return fachbereich;
     }
@@ -99,14 +83,4 @@ public class User {
     public void setFachbereich(Fachbereich fachbereich) {
         this.fachbereich = fachbereich;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 }

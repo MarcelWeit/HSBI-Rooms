@@ -1,7 +1,7 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.entities.Room;
+import com.example.application.data.entities.Raum;
 import com.example.application.data.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,19 +13,19 @@ import java.util.Set;
  * @author marcel weithoener
  */
 @Service
-public class RoomService {
+public class RaumService {
 
     private final RoomRepository repository;
 
-    public RoomService(RoomRepository repository) {
+    public RaumService(RoomRepository repository) {
         this.repository = repository;
     }
 
-    public void save(Room entity) {
+    public void save(Raum entity) {
         repository.save(entity);
     }
 
-    public List<Room> findAll() {
+    public List<Raum> findAll() {
         return repository.findAll();
     }
 
@@ -37,15 +37,15 @@ public class RoomService {
         return repository.countByAusstattungContains(entity);
     }
 
-    public Set<Room> findAllByAusstattungContains(Ausstattung entity) {
+    public Set<Raum> findAllByAusstattungContains(Ausstattung entity) {
         return repository.findAllByAusstattungContains(entity);
     }
 
-    public void delete(Room room) {
+    public void delete(Raum room) {
         repository.delete(room);
     }
 
-    public Optional<Room> findByRefNr(String refNr) {
+    public Optional<Raum> findByRefNr(String refNr) {
         return repository.findByRefNr(refNr);
     }
 
