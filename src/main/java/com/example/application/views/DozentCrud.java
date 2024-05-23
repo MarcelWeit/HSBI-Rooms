@@ -113,7 +113,6 @@ public class DozentCrud extends Div {
                 }else {
                     dataProvider.save(dozent);
                     dataProvider.refreshAll();
-                    crud.getGrid().setDataProvider(dataProvider);
                     Notification.show(saveSuccessMessage, 3000, Notification.Position.BOTTOM_CENTER);
                 }
         });
