@@ -101,26 +101,21 @@ public class DozentDataProvider extends AbstractBackEndDataProvider<Dozent, Crud
     }
 
     public void save(Dozent dozent) {
-        if (dozent.getId() == 0 && !dozentService.findByVornameAndNachname(dozent.getVorname(), dozent.getNachname()).isEmpty()) {
-            throw new IllegalArgumentException("Ein Dozent mit diesem Vor- und Nachnamen existiert bereits. Es konnte kein neuer Eintrag erstellt werden");
-        }
-
-        if (dozent.getId() != 0 && dozenten.stream().anyMatch(d -> d.getId() == dozent.getId())) {
-            dozentService.save(dozent);
-            // Aktualisiere den bestehenden Dozent in der Liste
-            for (int i = 0; i < dozenten.size(); i++) {
-                if (dozenten.get(i).getId() == dozent.getId()) {
-                    dozenten.set(i, dozent);
-                    break;
-                }
+        dozentService.save(dozent);
+            if (!(dozent.getId() != 0 && dozenten.stream().anyMatch(d -> d.getId() == dozent.getId()))) {
+                dozenten.add(dozent);
             }
-        } else {
-            dozentService.save(dozent);
-            dozenten.add(dozent);
-        }
+        refreshAll(); // Aktualisiere das Grid nach dem Speichern
     }
 
-    Optional<Dozent> find(Long id) {
+    public Boolean checkDozentExist(Dozent dozent){
+        boolean exists = dozentService.findByVornameAndNachname(dozent.getVorname(), dozent.getNachname())
+                .stream()
+                .anyMatch(existingDozent -> existingDozent.getId() != dozent.getId());
+        return exists;
+    }
+
+    public Optional<Dozent> find(Long id) {
         return Optional.ofNullable(dozentService.findById(id));
     }
 
