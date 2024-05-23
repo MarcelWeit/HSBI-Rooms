@@ -123,5 +123,10 @@ public class Room {
                 .collect(Collectors.joining(", "));
     }
 
+    @Override
+    public String toString() {
+        return typ.toString() + " " + refNr;
+    }
+
 }
 

@@ -1,10 +1,8 @@
 package com.example.application.views;
 
-import com.example.application.data.dataProvider.RoomDataProvider;
 import com.example.application.data.dataProvider.VeranstaltungDataProvider;
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Fachbereich;
-import com.example.application.data.entities.Room;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
