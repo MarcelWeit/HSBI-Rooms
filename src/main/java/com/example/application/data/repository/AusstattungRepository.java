@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AusstattungRepository extends JpaRepository<Ausstattung, Long>, JpaSpecificationExecutor<Ausstattung> {
     boolean existsByBezEqualsIgnoreCase(String bez);
+
+    Ausstattung findByBez(String bez);
 }

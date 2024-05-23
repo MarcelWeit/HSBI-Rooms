@@ -5,11 +5,13 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.internal.RouteUtil;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 
 @AnonymousAllowed
 @PageTitle("Login")
@@ -42,7 +44,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
 
     private void setupFooter() {
         Button registerButton = new Button("Registrieren");
-//        registerButton.addClassName(LumoUtility.TextAlignment.CENTER);
+        //        registerButton.addClassName(LumoUtility.TextAlignment.CENTER);
         registerButton.addClickListener(e -> {
             loginOverlay.setOpened(false);
             getUI().ifPresent(ui -> ui.navigate("register"));
@@ -65,7 +67,8 @@ public class LoginView extends Div implements BeforeEnterObserver {
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("HSBI Rooms");
-        i18n.getHeader().setDescription("Das Raumbuchungstool");
+        //        i18n.getHeader().setDescription("Das Raumbuchungstool");
+        i18n.getHeader().setDescription("ADMIN LOGIN admin@gmail.com / admin");
 
         LoginI18n.Form i18nForm = i18n.getForm();
         i18nForm.setTitle("Einloggen");

@@ -26,6 +26,10 @@ public class Ausstattung {
 
     }
 
+    public Ausstattung(String bez) {
+        this.bez = bez;
+    }
+
     public Set<Room> getRooms() {
         return rooms;
     }
