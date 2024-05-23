@@ -10,10 +10,8 @@ public class Dozent {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private long id;
-
     private String nachname;
     private String vorname;
-
     private Fachbereich fachbereich;
 
     // Konstruktor

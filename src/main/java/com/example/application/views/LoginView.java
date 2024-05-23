@@ -27,7 +27,11 @@ public class LoginView extends Div implements BeforeEnterObserver {
         getElement().getThemeList().add("dark");
 
         loginOverlay.setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
-        loginOverlay.setForgotPasswordButtonVisible(false);
+        loginOverlay.setForgotPasswordButtonVisible(true);
+        loginOverlay.addForgotPasswordListener(event -> {
+            loginOverlay.setOpened(false);
+            getUI().ifPresent(ui -> ui.navigate("forgot-password"));
+        });
 
         setupFooter();
         setupLanguage();
