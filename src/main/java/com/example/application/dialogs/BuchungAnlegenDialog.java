@@ -1,13 +1,14 @@
-package com.example.application.views;
+package com.example.application.dialogs;
 
 import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Room;
+import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
-import com.example.application.services.RoomService;
+import com.example.application.services.RaumService;
 import com.example.application.services.VeranstaltungService;
+import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -31,15 +32,15 @@ import java.util.Optional;
 @Route(value = "create-buchung", layout = MainLayout.class)
 @PageTitle("Buchung anlegen")
 @RolesAllowed({"ADMIN", "DOZENT", "FBPLANUNG"})
-public class BuchungAnlegenView extends Dialog {
+public class BuchungAnlegenDialog extends Dialog {
 
-    private final RoomService roomService;
+    private final RaumService roomService;
     private final DozentService dozentService;
     private final BuchungService buchungService;
     private final VeranstaltungService veranstaltungService;
 
     private final Binder<Buchung> binder = new Binder<>(Buchung.class);
-    private final ComboBox<Room> raum = new ComboBox<>("Raumnummer");
+    private final ComboBox<Raum> raum = new ComboBox<>("Raumnummer");
     private final ComboBox<Veranstaltung> veranstaltung = new ComboBox<>("Veranstaltung");
     private final ComboBox<Dozent> dozent = new ComboBox<>("Dozent");
     private final DatePicker date = new DatePicker("Datum");
@@ -47,11 +48,11 @@ public class BuchungAnlegenView extends Dialog {
     private final TimePicker endZeit = new TimePicker("Endzeit");
     private final Button save = new Button("Speichern");
     private final Button cancel = new Button("Abbrechen");
-//    ComboBox<Wiederholungsintervall> wiederholungsintervall = new ComboBox<>("Wiederholungsintervall");
+    //    ComboBox<Wiederholungsintervall> wiederholungsintervall = new ComboBox<>("Wiederholungsintervall");
 
-    private final Optional<Room> selectedRoom;
+    private final Optional<Raum> selectedRoom;
 
-    public BuchungAnlegenView(Optional<Room> selectedRoom, RoomService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
+    public BuchungAnlegenDialog(Optional<Raum> selectedRoom, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
         this.roomService = roomService;
         this.dozentService = dozentService;
         this.buchungService = buchungService;
@@ -65,7 +66,7 @@ public class BuchungAnlegenView extends Dialog {
         FormLayout dialogLayout = new FormLayout();
 
         raum.setItems(roomService.findAll());
-        raum.setItemLabelGenerator(Room::getRefNr);
+        raum.setItemLabelGenerator(Raum::getRefNr);
         raum.setRequiredIndicatorVisible(true);
         raum.addValueChangeListener((value -> {
             startZeit.setEnabled(true);

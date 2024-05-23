@@ -25,10 +25,9 @@ import java.util.Optional;
  */
 public class MainLayout extends AppLayout {
 
-    private H2 viewTitle;
-
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
+    private H2 viewTitle;
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
@@ -93,9 +92,9 @@ public class MainLayout extends AppLayout {
             verwNav.addItem(
                     new SideNavItem("Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
         }
-        if (accessChecker.hasAccess(RoomCrud.class)) {
+        if (accessChecker.hasAccess(RaumView.class)) {
             verwNav.addItem(
-                    new SideNavItem("Raum", RoomCrud.class, VaadinIcon.TABLE.create()));
+                    new SideNavItem("Raum", RaumView.class, VaadinIcon.TABLE.create()));
         }
         if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
             verwNav.addItem(
@@ -105,9 +104,9 @@ public class MainLayout extends AppLayout {
             verwNav.addItem(
                     new SideNavItem("Dozenten", DozentCrud.class, VaadinIcon.USERS.create()));
         }
-        if (accessChecker.hasAccess(DozentCrud.class)) {
+        if (accessChecker.hasAccess(RaumBuchungenView.class)) {
             verwNav.addItem(
-                    new SideNavItem("Raumbuchungen", RaumBuchungenView.class, VaadinIcon.TABLE.create()));
+                    new SideNavItem("RaumBuchungen", RaumBuchungenView.class, VaadinIcon.TABLE.create()));
         }
 
         verwNav.setExpanded(true);

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Email;
 import java.util.Set;
 
 @Entity
-public class Registration {
+public class Registrierung {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -28,8 +28,14 @@ public class Registration {
 
     private Fachbereich fachbereich;
 
-    public Registration() {
+    public Registrierung() {
     }
+
+    public long getId() {
+        return id;
+    }
+
+    // auf id setter wird verzichtet, da id automatisch generiert wird
 
     public String getUsername() {
         return username;

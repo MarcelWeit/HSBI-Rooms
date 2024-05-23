@@ -1,7 +1,7 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Fachbereich;
-import com.example.application.data.entities.Registration;
+import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.Role;
 import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
@@ -37,7 +37,7 @@ import java.util.Set;
 @Route(value = "register")
 public class RegistrationView extends VerticalLayout {
 
-    private final Binder<Registration> binder = new Binder<>(Registration.class);
+    private final Binder<Registrierung> binder = new Binder<>(Registrierung.class);
     private final UserService userService;
     private final RegistrationService registrationService;
 
@@ -53,14 +53,13 @@ public class RegistrationView extends VerticalLayout {
     private final ComboBox<Role> role = new ComboBox<>("Rolle");
     private final Button backButton = new Button("Zurück");
     private boolean enablePasswordValidation = false;
-    private Set<Role> roles;
 
     /**
      * Konstruktor für die Registrierungsseite
      *
-     * @param userService
-     * @param passwordEncoder
-     * @param registrationService
+     * @param userService         Service für die Benutzer
+     * @param passwordEncoder     Encoder für das Passwort
+     * @param registrationService Service für die Registrierung
      */
     public RegistrationView(UserService userService, PasswordEncoder passwordEncoder, RegistrationService registrationService) {
         this.passwordEncoder = passwordEncoder;
@@ -98,7 +97,7 @@ public class RegistrationView extends VerticalLayout {
      */
     private void setupEventHandler() {
         submitButton.addClickListener(e -> {
-            Registration registration = new Registration();
+            Registrierung registration = new Registrierung();
             if (binder.writeBeanIfValid(registration)) {
                 registration.setRoles(Set.of(role.getValue()));
                 registration.setHashedPassword(passwordEncoder.encode(registration.getHashedPassword()));
@@ -120,8 +119,8 @@ public class RegistrationView extends VerticalLayout {
      * Binder für die Formularfelder erzeugen
      */
     private void setupBinder() {
-        binder.forField(firstName).asRequired().bind(Registration::getFirstName, Registration::setFirstName);
-        binder.forField(lastName).asRequired().bind(Registration::getLastName, Registration::setLastName);
+        binder.forField(firstName).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
+        binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
         binder.forField(email)
                 .withValidator(new EmailValidator("invalid email", false))
                 .withValidator(email -> !userService.emailExists(email) || !registrationService.emailExists(email), "Email already exists")
@@ -130,18 +129,18 @@ public class RegistrationView extends VerticalLayout {
                         email.setErrorMessage("Ungültige E-Mail");
                     }
                 })
-                .bind(Registration::getUsername, Registration::setUsername);
+                .bind(Registrierung::getUsername, Registrierung::setUsername);
         binder.forField(password)
                 .asRequired()
                 .withValidator(this::passwordValidator)
-                .bind(Registration::getHashedPassword, Registration::setHashedPassword);
-        binder.forField(fachbereich).asRequired().bind(Registration::getFachbereich, Registration::setFachbereich);
+                .bind(Registrierung::getHashedPassword, Registrierung::setHashedPassword);
+        binder.forField(fachbereich).asRequired().bind(Registrierung::getFachbereich, Registrierung::setFachbereich);
         binder.forField(confirmPassword).asRequired();
     }
 
     /**
-     * @param password
-     * @param valueContext
+     * @param password     Passwort, das validiert werden soll
+     * @param valueContext Wird nicht verwendet, ist aber nötig in .withValidator Methode
      * @return ValidationResult
      */
     private ValidationResult passwordValidator(String password, ValueContext valueContext) {

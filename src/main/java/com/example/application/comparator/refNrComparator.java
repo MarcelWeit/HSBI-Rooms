@@ -1,13 +1,13 @@
 package com.example.application.comparator;
 
-import com.example.application.data.entities.Room;
+import com.example.application.data.entities.Raum;
 
 import java.util.Comparator;
 
-public class refNrComparator implements Comparator<Room> {
+public class refNrComparator implements Comparator<Raum> {
 
     @Override
-    public int compare(Room ref1, Room ref2) {
+    public int compare(Raum ref1, Raum ref2) {
         char char1 = ref1.getRefNr().charAt(0);
         int int1 = Integer.parseInt(ref1.getRefNr().substring(1, 2));
         char char2 = ref2.getRefNr().charAt(0);
