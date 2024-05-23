@@ -13,7 +13,6 @@ public class RegistrationService {
         this.repository = repository;
     }
 
-
     public void save(Registrierung registration) {
         repository.save(registration);
     }

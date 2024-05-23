@@ -1,10 +1,11 @@
 package com.example.application.data.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
-
-import java.util.Set;
 
 @Entity
 public class Registrierung {
@@ -22,9 +23,7 @@ public class Registrierung {
     @JsonIgnore
     private String hashedPassword;
 
-    @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<Role> roles;
+    private Role role;
 
     private Fachbereich fachbereich;
 
@@ -69,12 +68,12 @@ public class Registrierung {
         this.hashedPassword = hashedPassword;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public Fachbereich getFachbereich() {

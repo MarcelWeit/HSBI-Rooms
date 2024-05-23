@@ -27,8 +27,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Set;
-
 /**
  * @author marcel weithoener
  */
@@ -99,7 +97,6 @@ public class RegistrationView extends VerticalLayout {
         submitButton.addClickListener(e -> {
             Registrierung registration = new Registrierung();
             if (binder.writeBeanIfValid(registration)) {
-                registration.setRoles(Set.of(role.getValue()));
                 registration.setHashedPassword(passwordEncoder.encode(registration.getHashedPassword()));
                 registrationService.save(registration);
                 UI.getCurrent().navigate("login");
@@ -123,12 +120,8 @@ public class RegistrationView extends VerticalLayout {
         binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
         binder.forField(email)
                 .withValidator(new EmailValidator("invalid email", false))
-                .withValidator(email -> !userService.emailExists(email) || !registrationService.emailExists(email), "Email already exists")
-                .withValidationStatusHandler(status -> {
-                    if (status.isError()) {
-                        email.setErrorMessage("Ungültige E-Mail");
-                    }
-                })
+                .withValidator(mail -> !userService.emailExists(mail), "Email already exists")
+                .withValidator(mail -> !registrationService.emailExists(mail), "Email already exists")
                 .bind(Registrierung::getUsername, Registrierung::setUsername);
         binder.forField(password)
                 .asRequired()
@@ -136,6 +129,7 @@ public class RegistrationView extends VerticalLayout {
                 .bind(Registrierung::getHashedPassword, Registrierung::setHashedPassword);
         binder.forField(fachbereich).asRequired().bind(Registrierung::getFachbereich, Registrierung::setFachbereich);
         binder.forField(confirmPassword).asRequired();
+        binder.forField(role).asRequired().bind(Registrierung::getRole, Registrierung::setRole);
     }
 
     /**

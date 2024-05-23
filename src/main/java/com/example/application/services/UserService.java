@@ -39,7 +39,7 @@ public class UserService {
     }
 
     public boolean emailExists(String email) {
-        return repository.findByUsername(email) != null;
+        return repository.existsByUsername(email);
     }
 
 }

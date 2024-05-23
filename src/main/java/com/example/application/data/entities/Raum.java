@@ -15,7 +15,6 @@ public class Raum {
     @Id
     private String refNr;
 
-    @Enumerated(EnumType.STRING)
     private Raumtyp typ;
 
     private int capacity;
@@ -27,7 +26,6 @@ public class Raum {
             inverseJoinColumns = @JoinColumn(name = "ausstattung_id"))
     private Set<Ausstattung> ausstattung = new HashSet<>();
 
-    @Enumerated(EnumType.STRING)
     private Fachbereich fachbereich;
 
     private String position;
