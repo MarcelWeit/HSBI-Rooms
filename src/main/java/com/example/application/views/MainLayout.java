@@ -100,6 +100,10 @@ public class MainLayout extends AppLayout {
             verwNav.addItem(
                     new SideNavItem("BenutzerVerwaltung", BenutzerVerwaltungView.class, VaadinIcon.TABLE.create()));
         }
+        if(accessChecker.hasAccess(FreischaltenView.class)){
+            verwNav.addItem(
+                    new SideNavItem("User Approval", FreischaltenView.class, VaadinIcon.TABLE.create()));
+        }
 
         verwNav.setExpanded(true);
         nav.addItem(verwNav);

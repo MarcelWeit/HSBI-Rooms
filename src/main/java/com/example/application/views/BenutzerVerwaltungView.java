@@ -7,6 +7,7 @@ import com.example.application.data.entities.User;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.crud.Crud;
 import com.vaadin.flow.component.crud.CrudEditor;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -75,7 +77,8 @@ public class BenutzerVerwaltungView extends VerticalLayout {
         ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
         fachbereich.setItems(Fachbereich.values());
         fachbereich.setItemLabelGenerator(Fachbereich::toString);
-        ComboBox<Role> rolle = new ComboBox<>("Rolle");
+        //MultiSelectComboBox For Roles
+        MultiSelectComboBox<Role> rolle = new MultiSelectComboBox<>("Rolle");
         rolle.setItems(Role.values());
         rolle.setItemLabelGenerator(Role::toString);
         Checkbox freigeschaltet = new Checkbox("Freigeschaltet");
@@ -87,7 +90,7 @@ public class BenutzerVerwaltungView extends VerticalLayout {
         binder.forField(nachname).asRequired().bind(User::getLastName, User::setLastName);
         binder.forField(email).asRequired().bind(User::getUsername, User::setUsername);
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
-        //binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles); //Roles?
+        binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles); //Roles?
         binder.forField(freigeschaltet).bind(User::isLocked, User::setLocked);
 
         return new BinderCrudEditor<>(binder, form);
@@ -121,8 +124,13 @@ public class BenutzerVerwaltungView extends VerticalLayout {
             dataProvider.refreshAll();
         });
         crud.addSaveListener(saveEvent -> {
-            dataProvider.save(saveEvent.getItem());
-            dataProvider.refreshAll();
+            try {
+                dataProvider.save(saveEvent.getItem());
+                dataProvider.refreshAll();
+            } catch (IllegalArgumentException e) {
+                Notification.show(e.getMessage(), 3000, Notification.Position.MIDDLE);
+            }
+
         });
     }
 

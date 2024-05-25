@@ -77,7 +77,8 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         int offset = query.getOffset();
         int limit = query.getLimit();
 
-        Stream<User> stream = users.stream();
+        Stream<User> stream = users.stream()
+                .filter(User::isLocked);  // Only fetch approved users
 
         if (query.getFilter().isPresent()) {
             stream = stream.filter(predicate(query.getFilter().get()))
@@ -103,8 +104,25 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
     }
 
     public void save(User user) {
-        userService.save(user);
-        users.add(user);
+        Optional<User> existingUser = users.stream()
+                .filter(u -> u.getId().equals(user.getId()))
+                .findFirst();
+
+        if (existingUser.isPresent()) {
+            // Update existing user
+            User userToUpdate = existingUser.get();
+            userToUpdate.setFirstName(user.getFirstName());
+            userToUpdate.setLastName(user.getLastName());
+            userToUpdate.setUsername(user.getUsername());
+            userToUpdate.setFachbereich(user.getFachbereich());
+            userToUpdate.setRoles(user.getRoles());
+            userToUpdate.setLocked(user.isLocked());
+            userService.update(userToUpdate);
+        } else {
+            // Save new user
+            userService.save(user);
+            users.add(user);
+        }
     }
 
     Optional<User> find(String username) {

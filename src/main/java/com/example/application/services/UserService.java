@@ -53,4 +53,16 @@ public class UserService {
     public boolean emailExists(String email) {
         return repository.findByUsername(email) != null;
     }
+
+    private boolean usernameExists(String username, Long id) {
+        User user = repository.findByUsername(username);
+        return user != null && !user.getId().equals(id);
+    }
+    //approval
+    public List<User> findLockedUsers() {
+        return repository.findByLocked(true);
+    }
+    public List<User> findUnlockedUsers() {
+        return repository.findByLocked(false);
+    }
 }
