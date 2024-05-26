@@ -65,4 +65,5 @@ public class UserService {
     public List<User> findUnlockedUsers() {
         return repository.findByLocked(false);
     }
+
 }

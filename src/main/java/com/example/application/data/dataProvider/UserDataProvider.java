@@ -16,16 +16,16 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-//Tim R.
-
 public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilter> {
 
     private final UserService userService;
     private final List<User> users;
     private Consumer<Long> sizeChangeListener;
+    private final boolean fetchLockedUsers;
 
-    public UserDataProvider(UserService userService) {
+    public UserDataProvider(UserService userService, boolean fetchLockedUsers) {
         this.userService = userService;
+        this.fetchLockedUsers = fetchLockedUsers;
         users = new ArrayList<>(userService.findAll());
     }
 
@@ -47,8 +47,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         return filter.getSortOrders().entrySet().stream().map(sortClause -> {
             try {
                 Comparator<User> comparator = Comparator.comparing(
-                        room -> (Comparable) valueOf(sortClause.getKey(),
-                                room));
+                        room -> (Comparable) valueOf(sortClause.getKey(), room));
 
                 if (sortClause.getValue() == SortDirection.DESCENDING) {
                     comparator = comparator.reversed();
@@ -78,7 +77,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         int limit = query.getLimit();
 
         Stream<User> stream = users.stream()
-                .filter(User::isLocked);  // Only fetch approved users
+                .filter(user -> user.isLocked() == fetchLockedUsers);  // Filter by locked status
 
         if (query.getFilter().isPresent()) {
             stream = stream.filter(predicate(query.getFilter().get()))
@@ -123,6 +122,11 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
             userService.save(user);
             users.add(user);
         }
+    }
+
+    public void approveUser(User user) {
+        user.setLocked(false);
+        save(user);
     }
 
     Optional<User> find(String username) {

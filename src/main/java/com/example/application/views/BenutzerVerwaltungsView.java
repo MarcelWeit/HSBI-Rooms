@@ -8,10 +8,7 @@ import com.example.application.services.UserService;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.crud.BinderCrudEditor;
-import com.vaadin.flow.component.crud.Crud;
-import com.vaadin.flow.component.crud.CrudEditor;
-import com.vaadin.flow.component.crud.CrudI18n;
+import com.vaadin.flow.component.crud.*;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -20,28 +17,22 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
 
-/**
- * @author tim R
- */
-
-@Route(value = "user-crud", layout = MainLayout.class)
-@PageTitle("BenutzerVerwaltung")
+@Route(value = "benutzerverwaltung", layout = MainLayout.class)
 @Secured("ADMIN")
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)
-
-public class BenutzerVerwaltungView extends VerticalLayout {
-
-    private final UserService userService;
+@PageTitle("Benutzerverwaltung")
+public class BenutzerVerwaltungsView extends VerticalLayout {
 
     private final String FACHBEREICH = "fachbereich";
-    private final String VORNAME = "firstNAme";
+    private final String VORNAME = "firstName";
     private final String NACHNAME = "lastName";
     private final String EMAIL = "username";
     private final String FREIGESCHALTEN = "locked";
@@ -49,26 +40,27 @@ public class BenutzerVerwaltungView extends VerticalLayout {
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
     private final Crud<User> crud;
+    private final UserDataProvider userDataProvider;
 
-    /**
-     *
-     * @param userService für Benutzer
+    public BenutzerVerwaltungsView(UserService userService) {
+        this.userDataProvider = new UserDataProvider(userService, false); // Fetch only unlocked users
 
-     */
+        // Creating the Crud component with a custom editor
+        this.crud = new Crud<>(User.class, createEditor());
+        crud.addThemeVariants(CrudVariant.NO_BORDER);
 
-    public BenutzerVerwaltungView(UserService userService) {
-        this.userService = userService;
+        // Setting up the data provider
+        setupDataProvider(userService);
 
-        crud = new Crud<>(User.class, createEditor());
-
+        // Setting up the grid
         setupGrid();
-        setupDataProvider();
+
+        // Setting up localization
         setupLanguage();
 
+        // Adding the Crud component to the layout
         add(crud);
     }
-
-
 
     private CrudEditor<User> createEditor() {
         TextField vorname = new TextField("Vorname");
@@ -77,21 +69,20 @@ public class BenutzerVerwaltungView extends VerticalLayout {
         ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
         fachbereich.setItems(Fachbereich.values());
         fachbereich.setItemLabelGenerator(Fachbereich::toString);
-        //MultiSelectComboBox For Roles
         MultiSelectComboBox<Role> rolle = new MultiSelectComboBox<>("Rolle");
         rolle.setItems(Role.values());
         rolle.setItemLabelGenerator(Role::toString);
-        Checkbox freigeschaltet = new Checkbox("Freigeschaltet");
+        Checkbox gesperrt = new Checkbox("Gesperrt");
 
-        FormLayout form = new FormLayout(vorname, nachname, email, fachbereich, rolle, freigeschaltet);
+        FormLayout form = new FormLayout(vorname, nachname, email, fachbereich, rolle, gesperrt);
 
-        Binder<User> binder = new Binder<>(User.class);
+        Binder<User> binder = new BeanValidationBinder<>(User.class);
         binder.forField(vorname).asRequired().bind(User::getFirstName, User::setFirstName);
         binder.forField(nachname).asRequired().bind(User::getLastName, User::setLastName);
         binder.forField(email).asRequired().bind(User::getUsername, User::setUsername);
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
-        binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles); //Roles?
-        binder.forField(freigeschaltet).bind(User::isLocked, User::setLocked);
+        binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles);
+        binder.forField(gesperrt).bind(User::isLocked, User::setLocked);
 
         return new BinderCrudEditor<>(binder, form);
     }
@@ -99,30 +90,28 @@ public class BenutzerVerwaltungView extends VerticalLayout {
     private void setupGrid() {
         Grid<User> grid = crud.getGrid();
 
-        grid.removeColumn(grid.getColumnByKey("id"));
-
-        grid.removeColumn(grid.getColumnByKey("hashedPassword"));
-
-
-
+        grid.removeColumnByKey("id");
+        grid.removeColumnByKey("hashedPassword");
         grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
 
-//        grid.setColumnOrder(grid.getColumnByKey(VORNAME),
-//                grid.getColumnByKey(NACHNAME),
-//                grid.getColumnByKey(EMAIL),
-//                grid.getColumnByKey(FACHBEREICH),
-//                grid.getColumnByKey(ROLLE),
-//                grid.getColumnByKey(FREIGESCHALTEN),
-//                grid.getColumnByKey(EDIT_COLUMN));
+        // grid.setColumnOrder(grid.getColumnByKey(VORNAME),
+        //         grid.getColumnByKey(NACHNAME),
+        //         grid.getColumnByKey(EMAIL),
+        //         grid.getColumnByKey(FACHBEREICH),
+        //         grid.getColumnByKey(ROLLE),
+        //         grid.getColumnByKey(FREIGESCHALTEN),
+        //         grid.getColumnByKey(EDIT_COLUMN));
     }
 
-    private void setupDataProvider() {
-        UserDataProvider dataProvider = new UserDataProvider(userService);
+    private void setupDataProvider(UserService userService) {
+        UserDataProvider dataProvider = new UserDataProvider(userService, false);
         crud.setDataProvider(dataProvider);
+
         crud.addDeleteListener(deleteEvent -> {
             dataProvider.delete(deleteEvent.getItem());
             dataProvider.refreshAll();
         });
+
         crud.addSaveListener(saveEvent -> {
             try {
                 dataProvider.save(saveEvent.getItem());
@@ -130,10 +119,8 @@ public class BenutzerVerwaltungView extends VerticalLayout {
             } catch (IllegalArgumentException e) {
                 Notification.show(e.getMessage(), 3000, Notification.Position.MIDDLE);
             }
-
         });
     }
-
 
     private void setupLanguage() {
         CrudI18n i18n = CrudI18n.createDefault();

@@ -26,7 +26,7 @@ public class User {
 
     @JsonIgnore
     private String hashedPassword;
-    private boolean locked;
+    private boolean locked = true;
 
 
     @Enumerated(EnumType.STRING)

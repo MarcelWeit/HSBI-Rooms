@@ -101,6 +101,8 @@ public class RegistrationView extends VerticalLayout {
                 user.setRoles(roles);
                 user.setHashedPassword(passwordEncoder.encode(user.getHashedPassword()));
                 userService.save(user);
+                //User locked setzen, damit der Admin den User freischalten muss
+                user.setLocked(true);
                 UI.getCurrent().navigate("login");
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
