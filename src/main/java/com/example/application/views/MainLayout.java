@@ -85,6 +85,11 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Veranstaltungen", VeranstaltungView.class, VaadinIcon.TABLE.create())
             );
         }
+        if (accessChecker.hasAccess(KapaView.class)) {
+            nav.addItem(
+                    new SideNavItem("Auslastung", KapaView.class, VaadinIcon.BAR_CHART_H.create())
+            );
+        }
 
         // Kopf Navigation Verwaltung mit Unterpunkten
         SideNavItem verwNav = new SideNavItem("Verwaltung");

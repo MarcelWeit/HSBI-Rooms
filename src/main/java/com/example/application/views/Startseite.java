@@ -1,8 +1,10 @@
 package com.example.application.views;
 
+import com.example.application.components.StartseiteKPI;
 import com.example.application.data.entities.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
+import com.vaadin.flow.component.board.Board;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
@@ -62,6 +64,12 @@ public class Startseite extends VerticalLayout {
         HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
 
         add(h2, h3, horizontalLayout);
+
+        Board board = new Board();
+        board.addRow(new StartseiteKPI("Anzahl Räume", "42", "+3"),
+                new StartseiteKPI("Anzahl Ausstattungen", "12", "-1"));
+
+        add(board);
     }
 
 }
