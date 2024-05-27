@@ -14,7 +14,6 @@ import java.util.Set;
 
 /**
  * The entry point of the Spring Boot application.
- * <p>
  * Use the @PWA annotation make the application installable on phones, tablets
  * and some desktop browsers.
  */
@@ -56,32 +55,32 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         }
         if (roomRepository.count() == 0) {
             for (int i = 1; i < 5; i++) {
-                Room room = new Room("C" + i, Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 1");
+                Raum room = new Raum("C" + i, Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 1");
                 room.addAusstattung(ausstattungRepository.findByBez("Beamer"));
                 room.addAusstattung(ausstattungRepository.findByBez("Whiteboard"));
                 room.addAusstattung(ausstattungRepository.findByBez("Kamera"));
                 roomRepository.save(room);
             }
             for (int b = 1; b < 5; b++) {
-                Room room = new Room("A" + b, Raumtyp.HOERSAAL, 100, Fachbereich.SOZIALWESEN, "Fachbereich Sozialwesen Etage 1");
+                Raum room = new Raum("A" + b, Raumtyp.HOERSAAL, 100, Fachbereich.SOZIALWESEN, "Fachbereich Sozialwesen Etage 1");
                 room.addAusstattung(ausstattungRepository.findByBez("Pult"));
                 room.addAusstattung(ausstattungRepository.findByBez("Soundanlage"));
                 room.addAusstattung(ausstattungRepository.findByBez("test"));
                 roomRepository.save(room);
             }
-            roomRepository.save(new Room("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
+            roomRepository.save(new Raum("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
         }
         if (userRepository.findByUsername("admin@gmail.com") == null) {
             User user = new User("admin@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
             user.setHashedPassword(passwordEncoder.encode("admin"));
             userRepository.save(user);
         }
-        if(dozentRepository.count() == 0){
+        if (dozentRepository.count() == 0) {
             dozentRepository.save(new Dozent("Wiemann", "Volker", Fachbereich.WIRTSCHAFT));
             dozentRepository.save(new Dozent("Küster", "Jochen", Fachbereich.WIRTSCHAFT));
             dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
         }
-        if(veranstaltungRepository.count() == 0){
+        if (veranstaltungRepository.count() == 0) {
             veranstaltungRepository.save(new Veranstaltung("CFR23", "SoftwareEngineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
             veranstaltungRepository.save(new Veranstaltung("CGRH26", "InternesRechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
         }

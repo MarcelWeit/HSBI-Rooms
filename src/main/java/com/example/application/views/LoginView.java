@@ -22,9 +22,10 @@ public class LoginView extends Div implements BeforeEnterObserver {
     private final LoginOverlay loginOverlay;
 
     public LoginView(AuthenticatedUser authenticatedUser) {
+        this.authenticatedUser = authenticatedUser;
+
         addClassName("login-view");
         loginOverlay = new LoginOverlay();
-        this.authenticatedUser = authenticatedUser;
 
         getElement().getThemeList().add("dark");
 

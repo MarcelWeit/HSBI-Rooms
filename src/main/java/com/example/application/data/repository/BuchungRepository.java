@@ -2,7 +2,7 @@ package com.example.application.data.repository;
 
 import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Room;
+import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -17,11 +17,11 @@ public interface BuchungRepository extends JpaRepository<Buchung, Long>, JpaSpec
 
     Set<Buchung> findAllByDozent(Dozent dozent);
 
-    Set<Buchung> findAllByRoom(Room room);
+    Set<Buchung> findAllByRoom(Raum room);
 
     Set<Buchung> findAllByVeranstaltung(Veranstaltung veranstaltung);
 
     Set<Buchung> findAllByDate(LocalDate date);
 
-    Set<Buchung> findByDateAndRoom(LocalDate date, Room room);
+    Set<Buchung> findByDateAndRoom(LocalDate date, Raum room);
 }

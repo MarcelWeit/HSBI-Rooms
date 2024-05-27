@@ -10,12 +10,9 @@ import java.util.stream.Collectors;
  * @author marcel weithoener
  */
 @Entity
-public class Room {
+public class Raum {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
     private String refNr;
 
     private Raumtyp typ;
@@ -24,8 +21,8 @@ public class Room {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "room_ausstattung",
-            joinColumns = @JoinColumn(name = "room_refNr"),
+            name = "raum_ausstattung",
+            joinColumns = @JoinColumn(name = "raum_refNr"),
             inverseJoinColumns = @JoinColumn(name = "ausstattung_id"))
     private Set<Ausstattung> ausstattung = new HashSet<>();
 
@@ -33,24 +30,16 @@ public class Room {
 
     private String position;
 
-    public Room() {
+    public Raum() {
 
     }
 
-    public Room(String refNr, Raumtyp typ, int capacity, Fachbereich fachbereich, String position) {
+    public Raum(String refNr, Raumtyp typ, int capacity, Fachbereich fachbereich, String position) {
         this.refNr = refNr;
         this.typ = typ;
         this.capacity = capacity;
         this.fachbereich = fachbereich;
         this.position = position;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getRefNr() {

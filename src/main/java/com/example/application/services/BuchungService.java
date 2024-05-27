@@ -2,7 +2,7 @@ package com.example.application.services;
 
 import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Room;
+import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.data.repository.BuchungRepository;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class BuchungService {
         this.buchungRepository = buchungRepository;
     }
 
-    public boolean roomBooked(Room room, LocalTime startZeit, LocalTime endZeit, LocalDate date) {
+    public boolean roomBooked(Raum room, LocalTime startZeit, LocalTime endZeit, LocalDate date) {
         Set<Buchung> buchungenThisDay = buchungRepository.findByDateAndRoom(date, room);
         boolean belegt = false;
         for (Buchung existingBuchung : buchungenThisDay) {
@@ -83,7 +83,7 @@ public class BuchungService {
         return Set.copyOf(buchungRepository.findAllByDozent(dozent));
     }
 
-    public Set<Buchung> findAllByRoom(Room room) {
+    public Set<Buchung> findAllByRoom(Raum room) {
         return Set.copyOf(buchungRepository.findAllByRoom(room));
     }
 
@@ -95,7 +95,7 @@ public class BuchungService {
         return Set.copyOf(buchungRepository.findAllByDate(date));
     }
 
-    public Set<Buchung> findAllbyDateAndRoom(LocalDate date, Room room) {
+    public Set<Buchung> findAllbyDateAndRoom(LocalDate date, Raum room) {
         return Set.copyOf(buchungRepository.findByDateAndRoom(date, room));
     }
 }
