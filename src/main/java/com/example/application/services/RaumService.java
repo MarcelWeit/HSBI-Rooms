@@ -2,10 +2,10 @@ package com.example.application.services;
 
 import com.example.application.data.entities.Ausstattung;
 import com.example.application.data.entities.Raum;
-import com.example.application.data.repository.RoomRepository;
+import com.example.application.data.repository.RaumRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,9 +15,9 @@ import java.util.Set;
 @Service
 public class RaumService {
 
-    private final RoomRepository repository;
+    private final RaumRepository repository;
 
-    public RaumService(RoomRepository repository) {
+    public RaumService(RaumRepository repository) {
         this.repository = repository;
     }
 
@@ -25,8 +25,8 @@ public class RaumService {
         repository.save(entity);
     }
 
-    public List<Raum> findAll() {
-        return repository.findAll();
+    public Set<Raum> findAll() {
+        return new HashSet<>(repository.findAll());
     }
 
     public boolean refNrExists(String refNr) {

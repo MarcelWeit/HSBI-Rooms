@@ -13,7 +13,7 @@ import java.util.Set;
  * @author marcel weithoener
  */
 @Repository
-public interface RoomRepository extends JpaRepository<Raum, String>, JpaSpecificationExecutor<Raum> {
+public interface RaumRepository extends JpaRepository<Raum, String>, JpaSpecificationExecutor<Raum> {
     Set<Raum> findAllByAusstattungContains(Ausstattung entity);
 
     int countByAusstattungContains(Ausstattung entity);

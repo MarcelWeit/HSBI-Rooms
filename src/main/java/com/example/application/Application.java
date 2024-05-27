@@ -25,7 +25,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
     private AusstattungRepository ausstattungRepository;
 
     @Autowired
-    private RoomRepository roomRepository;
+    private RaumRepository roomRepository;
 
     @Autowired
     private UserRepository userRepository;

@@ -80,4 +80,17 @@ public class Buchung {
     public void setDozent(Dozent dozent) {
         this.dozent = dozent;
     }
+
+    @Override
+    public String toString() {
+        return "Buchung{" +
+                "id=" + id +
+                ", date=" + date +
+                ", startZeit=" + startZeit +
+                ", endZeit=" + endZeit +
+                ", room=" + room +
+                ", veranstaltung=" + veranstaltung +
+                ", dozent=" + dozent +
+                '}';
+    }
 }
