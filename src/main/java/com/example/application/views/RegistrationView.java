@@ -37,8 +37,9 @@ import java.util.Set;
 @Route(value = "register")
 public class RegistrationView extends VerticalLayout {
 
-    private final Binder<User> binder = new Binder<>(User.class);
+    private final Binder<Registrierung> binder = new Binder<>(Registrierung.class);
     private final UserService userService;
+    private final RegistrationService registrationService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -49,18 +50,21 @@ public class RegistrationView extends VerticalLayout {
     private final PasswordField password = new PasswordField("Passwort");
     private final Button submitButton = new Button("Registrieren");
     private final ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
+    private final ComboBox<Role> role = new ComboBox<>("Rolle");
     private final Button backButton = new Button("Zurück");
     private boolean enablePasswordValidation = false;
 
     /**
      * Konstruktor für die Registrierungsseite
      *
-     * @param userService
-     * @param passwordEncoder
+     * @param userService         Service für die Benutzer
+     * @param passwordEncoder     Encoder für das Passwort
+     * @param registrationService Service für die Registrierung
      */
-    public RegistrationView(UserService userService, PasswordEncoder passwordEncoder) {
+    public RegistrationView(UserService userService, PasswordEncoder passwordEncoder, RegistrationService registrationService) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.registrationService = registrationService;
         addClassName("registration-view");
         createComponents();
         fillTestData();
@@ -77,15 +81,14 @@ public class RegistrationView extends VerticalLayout {
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         submitButton.addClassName("submit-button");
         fachbereich.setItems(Fachbereich.values());
-        //        ComboBox<Role> role = new ComboBox<>("Rolle");
-        //        role.setItems(Role.values());
+        role.setItems(Role.DOZENT, Role.FBPLANUNG);
         backButton.addClickListener(e -> UI.getCurrent().navigate("login"));
 
         setupEventHandler();
         setupBinder();
 
         form.setMaxWidth("320px");
-        form.add(title, subTitle, firstName, lastName, email, password, confirmPassword, fachbereich, submitButton, backButton);
+        form.add(title, subTitle, firstName, lastName, email, password, confirmPassword, fachbereich, role, submitButton, backButton);
         add(form);
     }
 
@@ -94,15 +97,10 @@ public class RegistrationView extends VerticalLayout {
      */
     private void setupEventHandler() {
         submitButton.addClickListener(e -> {
-            User user = new User();
-            if (binder.writeBeanIfValid(user)) {
-                Set<Role> roles = new HashSet<>();
-                roles.add(Role.ADMIN);
-                user.setRoles(roles);
-                user.setHashedPassword(passwordEncoder.encode(user.getHashedPassword()));
-                userService.save(user);
-                //User locked setzen, damit der Admin den User freischalten muss
-                user.setLocked(true);
+            Registrierung registration = new Registrierung();
+            if (binder.writeBeanIfValid(registration)) {
+                registration.setHashedPassword(passwordEncoder.encode(registration.getHashedPassword()));
+                registrationService.save(registration);
                 UI.getCurrent().navigate("login");
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
@@ -120,28 +118,25 @@ public class RegistrationView extends VerticalLayout {
      * Binder für die Formularfelder erzeugen
      */
     private void setupBinder() {
-        binder.forField(firstName).asRequired().bind(User::getFirstName, User::setFirstName);
-        binder.forField(lastName).asRequired().bind(User::getLastName, User::setLastName);
+        binder.forField(firstName).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
+        binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
         binder.forField(email)
                 .withValidator(new EmailValidator("invalid email", false))
-                .withValidator(email -> !userService.emailExists(email), "Email already exists")
-                .withValidationStatusHandler(status -> {
-                    if (status.isError()) {
-                        email.setErrorMessage("Ungültige E-Mail");
-                    }
-                })
-                .bind(User::getUsername, User::setUsername);
+                .withValidator(mail -> !userService.emailExists(mail), "Email already exists")
+                .withValidator(mail -> !registrationService.emailExists(mail), "Email already exists")
+                .bind(Registrierung::getUsername, Registrierung::setUsername);
         binder.forField(password)
                 .asRequired()
                 .withValidator(this::passwordValidator)
-                .bind(User::getHashedPassword, User::setHashedPassword);
-        binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
+                .bind(Registrierung::getHashedPassword, Registrierung::setHashedPassword);
+        binder.forField(fachbereich).asRequired().bind(Registrierung::getFachbereich, Registrierung::setFachbereich);
         binder.forField(confirmPassword).asRequired();
+        binder.forField(role).asRequired().bind(Registrierung::getRole, Registrierung::setRole);
     }
 
     /**
-     * @param password
-     * @param valueContext
+     * @param password     Passwort, das validiert werden soll
+     * @param valueContext Wird nicht verwendet, ist aber nötig in .withValidator Methode
      * @return ValidationResult
      */
     private ValidationResult passwordValidator(String password, ValueContext valueContext) {

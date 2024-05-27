@@ -13,4 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     User findByUsername(String username);
     List<User> findByLocked(boolean locked);
+
+    boolean existsByUsername(String username);
+
 }

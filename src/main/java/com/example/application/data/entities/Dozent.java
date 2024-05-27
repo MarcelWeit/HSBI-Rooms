@@ -20,6 +20,20 @@ public class Dozent {
     public Dozent() {
     }
 
+    public Dozent(String nachname, String vorname, Fachbereich fachbereich) {
+        this.nachname = nachname;
+        this.vorname = vorname;
+        this.fachbereich = fachbereich;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     // Getters und Setters
     public String getNachname() {
         return nachname;
@@ -43,5 +57,10 @@ public class Dozent {
 
     public void setFachbereich(Fachbereich fachbereich) {
         this.fachbereich = fachbereich;
+    }
+
+    @Override
+    public String toString() {
+        return nachname + ", " + vorname;
     }
 }

@@ -10,7 +10,8 @@ import java.util.List;
 
 public interface DozentRepository extends JpaRepository<Dozent, Long>, JpaSpecificationExecutor<Dozent> {
 
-    List<Dozent> findByNachname(String nachname);
+    List<Dozent> findAllByNachname(String nachname);
+    Dozent findByNachname(String nachname);
 
     List<Dozent> findByVornameAndNachname(String vorname, String nachname);
 

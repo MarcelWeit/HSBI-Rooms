@@ -1,7 +1,7 @@
 package com.example.application.data.dataProvider;
 
-import com.example.application.data.entities.Room;
-import com.example.application.services.RoomService;
+import com.example.application.data.entities.Dozent;
+import com.example.application.services.DozentService;
 import com.vaadin.flow.component.crud.CrudFilter;
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
@@ -16,22 +16,22 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilter> {
+public class DozentDataProvider extends AbstractBackEndDataProvider<Dozent, CrudFilter> {
 
-    private final RoomService roomService;
-    private final List<Room> rooms;
+    private final DozentService dozentService;
+    private final List<Dozent> dozenten;
     private Consumer<Long> sizeChangeListener;
 
-    public RoomDataProvider(RoomService roomService) {
-        this.roomService = roomService;
-        rooms = new ArrayList<>(roomService.findAll());
+    public DozentDataProvider(DozentService dozentService) {
+        this.dozentService = dozentService;
+        dozenten = new ArrayList<>(dozentService.findAll());
     }
 
-    private static Predicate<Room> predicate(CrudFilter filter) {
+    private static Predicate<Dozent> predicate(CrudFilter filter) {
         return filter.getConstraints().entrySet().stream()
-                .map(constraint -> (Predicate<Room>) room -> {
+                .map(constraint -> (Predicate<Dozent>) dozent -> {
                     try {
-                        Object value = valueOf(constraint.getKey(), room);
+                        Object value = valueOf(constraint.getKey(), dozent);
                         return value != null && value.toString().toLowerCase()
                                 .contains(constraint.getValue().toLowerCase());
                     } catch (Exception e) {
@@ -41,12 +41,12 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
                 }).reduce(Predicate::and).orElse(e -> true);
     }
 
-    private static Comparator<Room> comparator(CrudFilter filter) {
+    private static Comparator<Dozent> comparator(CrudFilter filter) {
         return filter.getSortOrders().entrySet().stream().map(sortClause -> {
             try {
-                Comparator<Room> comparator = Comparator.comparing(
-                        room -> (Comparable) valueOf(sortClause.getKey(),
-                                room));
+                Comparator<Dozent> comparator = Comparator.comparing(
+                        dozent -> (Comparable) valueOf(sortClause.getKey(),
+                                dozent));
 
                 if (sortClause.getValue() == SortDirection.DESCENDING) {
                     comparator = comparator.reversed();
@@ -55,27 +55,27 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
                 return comparator;
 
             } catch (Exception ex) {
-                return (Comparator<Room>) (o1, o2) -> 0;
+                return (Comparator<Dozent>) (o1, o2) -> 0;
             }
         }).reduce(Comparator::thenComparing).orElse((o1, o2) -> 0);
     }
 
-    private static Object valueOf(String fieldName, Room room) {
+    private static Object valueOf(String fieldName, Dozent dozent) {
         try {
-            Field field = Room.class.getDeclaredField(fieldName);
+            Field field = Dozent.class.getDeclaredField(fieldName);
             field.setAccessible(true);
-            return field.get(room);
+            return field.get(dozent);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
     @Override
-    protected Stream<Room> fetchFromBackEnd(Query<Room, CrudFilter> query) {
+    protected Stream<Dozent> fetchFromBackEnd(Query<Dozent, CrudFilter> query) {
         int offset = query.getOffset();
         int limit = query.getLimit();
 
-        Stream<Room> stream = rooms.stream();
+        Stream<Dozent> stream = dozenten.stream();
 
         if (query.getFilter().isPresent()) {
             stream = stream.filter(predicate(query.getFilter().get()))
@@ -86,7 +86,7 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
     }
 
     @Override
-    protected int sizeInBackEnd(Query<Room, CrudFilter> query) {
+    protected int sizeInBackEnd(Query<Dozent, CrudFilter> query) {
         long count = fetchFromBackEnd(query).count();
 
         if (sizeChangeListener != null) {
@@ -100,17 +100,27 @@ public class RoomDataProvider extends AbstractBackEndDataProvider<Room, CrudFilt
         sizeChangeListener = listener;
     }
 
-    public void save(Room room) {
-        roomService.save(room);
-        rooms.add(room);
+    public void save(Dozent dozent) {
+        dozentService.save(dozent);
+            if (!(dozent.getId() != 0 && dozenten.stream().anyMatch(d -> d.getId() == dozent.getId()))) {
+                dozenten.add(dozent);
+            }
+        refreshAll(); // Aktualisiere das Grid nach dem Speichern
     }
 
-    Optional<Room> find(String refNr) {
-        return Optional.of(roomService.findByRefNr(refNr));
+    public Boolean checkDozentExist(Dozent dozent){
+        boolean exists = dozentService.findByVornameAndNachname(dozent.getVorname(), dozent.getNachname())
+                .stream()
+                .anyMatch(existingDozent -> existingDozent.getId() != dozent.getId());
+        return exists;
     }
 
-    public void delete(Room room) {
-        roomService.delete(room);
-        rooms.remove(room);
+    public Optional<Dozent> find(Long id) {
+        return Optional.ofNullable(dozentService.findById(id));
+    }
+
+    public void delete(Dozent dozent) {
+        dozentService.delete(dozent);
+        dozenten.remove(dozent);
     }
 }
