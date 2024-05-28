@@ -1,8 +1,9 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Fachbereich;
+import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.Role;
-import com.example.application.data.entities.User;
+import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -25,9 +26,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author marcel weithoener

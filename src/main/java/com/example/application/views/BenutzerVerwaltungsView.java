@@ -5,7 +5,6 @@ import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Role;
 import com.example.application.data.entities.User;
 import com.example.application.services.UserService;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.crud.*;
@@ -72,9 +71,9 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         MultiSelectComboBox<Role> rolle = new MultiSelectComboBox<>("Rolle");
         rolle.setItems(Role.values());
         rolle.setItemLabelGenerator(Role::toString);
-        Checkbox gesperrt = new Checkbox("Gesperrt");
+        //Checkbox gesperrt = new Checkbox("Gesperrt");
 
-        FormLayout form = new FormLayout(vorname, nachname, email, fachbereich, rolle, gesperrt);
+        FormLayout form = new FormLayout(vorname, nachname, email, fachbereich, rolle); //ohne gesperrt
 
         Binder<User> binder = new BeanValidationBinder<>(User.class);
         binder.forField(vorname).asRequired().bind(User::getFirstName, User::setFirstName);
@@ -82,7 +81,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         binder.forField(email).asRequired().bind(User::getUsername, User::setUsername);
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
         binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles);
-        binder.forField(gesperrt).bind(User::isLocked, User::setLocked);
+        //binder.forField(gesperrt).bind(User::isLocked, User::setLocked);
 
         return new BinderCrudEditor<>(binder, form);
     }
@@ -92,6 +91,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         grid.removeColumnByKey("id");
         grid.removeColumnByKey("hashedPassword");
+        grid.removeColumnByKey("locked");
         grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
 
         // grid.setColumnOrder(grid.getColumnByKey(VORNAME),
