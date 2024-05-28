@@ -73,12 +73,7 @@ public class UserService {
         return user != null && !user.getId().equals(id);
     }
     //approval
-    public List<User> findLockedUsers() {
-        return repository.findByLocked(true);
-    }
-    public List<User> findUnlockedUsers() {
-        return repository.findByLocked(false);
-    }
+
 
     // Methods for Registrierung entity
 
@@ -102,7 +97,7 @@ public class UserService {
         user.setHashedPassword(registrierung.getHashedPassword());
         user.setRoles(Set.of(registrierung.getRole()));
         user.setFachbereich(registrierung.getFachbereich());
-        user.setLocked(false);
+        //user.setLocked(false);
 
         // Save the new user and delete the registration
         repository.save(user);

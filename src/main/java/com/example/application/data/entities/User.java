@@ -26,7 +26,7 @@ public class User {
 
     @JsonIgnore
     private String hashedPassword;
-    private boolean locked;
+   // private boolean locked;
 
 
     @Enumerated(EnumType.STRING)
@@ -94,8 +94,8 @@ public class User {
         this.roles = roles;
     }
     //approval
-    public boolean isLocked() {return locked;}
-    public void setLocked(boolean locked) {this.locked = locked;}
+   // public boolean isLocked() {return locked;}
+    //public void setLocked(boolean locked) {this.locked = locked;}
 
 
 

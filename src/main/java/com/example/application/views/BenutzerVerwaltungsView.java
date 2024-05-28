@@ -34,7 +34,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     private final String VORNAME = "firstName";
     private final String NACHNAME = "lastName";
     private final String EMAIL = "username";
-    private final String FREIGESCHALTEN = "locked";
+    //private final String FREIGESCHALTEN = "locked";
     private final String ROLLE = "roles";
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
@@ -91,7 +91,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         grid.removeColumnByKey("id");
         grid.removeColumnByKey("hashedPassword");
-        grid.removeColumnByKey("locked");
+        //grid.removeColumnByKey("locked");
         grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
 
         // grid.setColumnOrder(grid.getColumnByKey(VORNAME),
