@@ -87,6 +87,11 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Veranstaltungen", VeranstaltungView.class, VaadinIcon.TABLE.create())
             );
         }
+        if (accessChecker.hasAccess(KapaView.class)) {
+            nav.addItem(
+                    new SideNavItem("Auslastung", KapaView.class, VaadinIcon.BAR_CHART_H.create())
+            );
+        }
 
         // Kopf Navigation Verwaltung mit Unterpunkten
         SideNavItem verwNav = new SideNavItem("Verwaltung");
@@ -113,10 +118,6 @@ public class MainLayout extends AppLayout {
         if (accessChecker.hasAccess(DozentCrud.class)) {
             verwNav.addItem(
                     new SideNavItem("Dozenten", DozentCrud.class, VaadinIcon.USERS.create()));
-        }
-        if (accessChecker.hasAccess(RaumBuchungenView.class)) {
-            verwNav.addItem(
-                    new SideNavItem("RaumBuchungen", RaumBuchungenView.class, VaadinIcon.TABLE.create()));
         }
 
         verwNav.setExpanded(true);

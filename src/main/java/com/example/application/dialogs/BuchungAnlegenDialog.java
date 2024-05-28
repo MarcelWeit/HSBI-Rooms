@@ -50,14 +50,20 @@ public class BuchungAnlegenDialog extends Dialog {
     private final Button cancel = new Button("Abbrechen");
     //    ComboBox<Wiederholungsintervall> wiederholungsintervall = new ComboBox<>("Wiederholungsintervall");
 
+    private final Optional<Buchung> selectedBuchung;
     private final Optional<Raum> selectedRoom;
+    private final Optional<Veranstaltung> selectedVeranstaltung;
+    private final Optional<Dozent> selectedDozent;
 
-    public BuchungAnlegenDialog(Optional<Raum> selectedRoom, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
+    public BuchungAnlegenDialog(Optional<Buchung> selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, Optional<Dozent> selectedDozent, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
         this.roomService = roomService;
         this.dozentService = dozentService;
         this.buchungService = buchungService;
         this.veranstaltungService = veranstaltungService;
+        this.selectedBuchung = selectedBuchung;
         this.selectedRoom = selectedRoom;
+        this.selectedVeranstaltung = selectedVeranstaltung;
+        this.selectedDozent = selectedDozent;
         add(createInputLayout());
         createButtonLayout();
     }
@@ -93,8 +99,10 @@ public class BuchungAnlegenDialog extends Dialog {
             if (startZeit.getValue() != null) {
                 endZeit.setMin(startZeit.getValue().plus(Duration.ofMinutes(15)));
             }
-            if (endZeit.getValue() != null) {
-                checkIfBelegt();
+            if (endZeit.getValue() != null && startZeit.getValue() != null) {
+                if (!(selectedBuchung.isPresent() && startZeit.getValue().equals(selectedBuchung.get().getStartZeit()) && endZeit.getValue().equals(selectedBuchung.get().getEndZeit()))) {
+                    checkIfBelegt();
+                }
             }
         });
         startZeit.setEnabled(false);
@@ -104,8 +112,10 @@ public class BuchungAnlegenDialog extends Dialog {
         endZeit.setMin(LocalTime.of(8, 15));
         endZeit.setStep(Duration.ofMinutes(15));
         endZeit.addValueChangeListener(e -> {
-            if (startZeit.getValue() != null) {
-                checkIfBelegt();
+            if (startZeit.getValue() != null && endZeit.getValue() != null) {
+                if (!(selectedBuchung.isPresent() && startZeit.getValue().equals(selectedBuchung.get().getStartZeit()) && endZeit.getValue().equals(selectedBuchung.get().getEndZeit()))) {
+                    checkIfBelegt();
+                }
             }
         });
         endZeit.setEnabled(false);
@@ -117,11 +127,22 @@ public class BuchungAnlegenDialog extends Dialog {
         binder.forField(startZeit).asRequired().bind(Buchung::getStartZeit, Buchung::setStartZeit);
         binder.forField(endZeit).asRequired().bind(Buchung::getEndZeit, Buchung::setEndZeit);
 
+        if (selectedBuchung.isPresent()) {
+            binder.readBean(selectedBuchung.get());
+        }
         if (selectedRoom.isPresent()) {
             raum.setValue(selectedRoom.get());
             raum.setEnabled(false);
             startZeit.setEnabled(true);
             endZeit.setEnabled(true);
+        }
+        if (selectedVeranstaltung.isPresent()) {
+            veranstaltung.setValue(selectedVeranstaltung.get());
+            veranstaltung.setEnabled(false);
+        }
+        if (selectedDozent.isPresent()) {
+            dozent.setValue(selectedDozent.get());
+            dozent.setEnabled(false);
         }
 
         dialogLayout.add(raum, date, veranstaltung, dozent, startZeit, endZeit);
@@ -162,8 +183,8 @@ public class BuchungAnlegenDialog extends Dialog {
     }
 
     private boolean validateAndSave() {
-        Buchung newBuchung = new Buchung();
-        if (binder.writeBeanIfValid(newBuchung)) {
+        Buchung newBuchung = selectedBuchung.orElseGet(Buchung::new);
+        if (binder.writeBeanIfValid(newBuchung) || selectedBuchung.isPresent()) {
             buchungService.save(newBuchung);
             Notification sucessNotification = Notification.show("Erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
             sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
