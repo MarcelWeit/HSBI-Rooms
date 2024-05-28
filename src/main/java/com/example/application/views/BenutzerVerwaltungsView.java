@@ -34,7 +34,6 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     private final String VORNAME = "firstName";
     private final String NACHNAME = "lastName";
     private final String EMAIL = "username";
-    private final String FREIGESCHALTEN = "locked";
     private final String ROLLE = "roles";
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
@@ -42,7 +41,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     private final UserDataProvider userDataProvider;
 
     public BenutzerVerwaltungsView(UserService userService) {
-        this.userDataProvider = new UserDataProvider(userService, false); // Fetch only unlocked users
+        this.userDataProvider = new UserDataProvider(userService); // Fetch only unlocked users
 
         // Creating the Crud component with a custom editor
         this.crud = new Crud<>(User.class, createEditor());
@@ -71,7 +70,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         MultiSelectComboBox<Role> rolle = new MultiSelectComboBox<>("Rolle");
         rolle.setItems(Role.values());
         rolle.setItemLabelGenerator(Role::toString);
-        //Checkbox gesperrt = new Checkbox("Gesperrt");
+
 
         FormLayout form = new FormLayout(vorname, nachname, email, fachbereich, rolle); //ohne gesperrt
 
@@ -81,7 +80,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         binder.forField(email).asRequired().bind(User::getUsername, User::setUsername);
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
         binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles);
-        //binder.forField(gesperrt).bind(User::isLocked, User::setLocked);
+
 
         return new BinderCrudEditor<>(binder, form);
     }
@@ -91,7 +90,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         grid.removeColumnByKey("id");
         grid.removeColumnByKey("hashedPassword");
-        grid.removeColumnByKey("locked");
+
         grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
 
         // grid.setColumnOrder(grid.getColumnByKey(VORNAME),
@@ -99,12 +98,11 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         //         grid.getColumnByKey(EMAIL),
         //         grid.getColumnByKey(FACHBEREICH),
         //         grid.getColumnByKey(ROLLE),
-        //         grid.getColumnByKey(FREIGESCHALTEN),
         //         grid.getColumnByKey(EDIT_COLUMN));
     }
 
     private void setupDataProvider(UserService userService) {
-        UserDataProvider dataProvider = new UserDataProvider(userService, false);
+        UserDataProvider dataProvider = new UserDataProvider(userService);
         crud.setDataProvider(dataProvider);
 
         crud.addDeleteListener(deleteEvent -> {

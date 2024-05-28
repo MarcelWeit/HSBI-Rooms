@@ -21,11 +21,11 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
     private final UserService userService;
     private final List<User> users;
     private Consumer<Long> sizeChangeListener;
-    private final boolean fetchLockedUsers;
 
-    public UserDataProvider(UserService userService, boolean fetchLockedUsers) {
+
+    public UserDataProvider(UserService userService) {
         this.userService = userService;
-        this.fetchLockedUsers = fetchLockedUsers;
+
         users = new ArrayList<>(userService.findAll());
     }
 
@@ -76,8 +76,8 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         int offset = query.getOffset();
         int limit = query.getLimit();
 
-        Stream<User> stream = users.stream()
-                .filter(user -> user.isLocked() == fetchLockedUsers);  // Filter by locked status
+        Stream<User> stream = users.stream();
+//                .filter(user -> user.isLocked() == fetchLockedUsers);  // Filter by locked status
 
         if (query.getFilter().isPresent()) {
             stream = stream.filter(predicate(query.getFilter().get()))
@@ -115,7 +115,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
             userToUpdate.setUsername(user.getUsername());
             userToUpdate.setFachbereich(user.getFachbereich());
             userToUpdate.setRoles(user.getRoles());
-            userToUpdate.setLocked(user.isLocked());
+            //userToUpdate.setLocked(user.isLocked());
             userService.update(userToUpdate);
         } else {
             // Save new user
@@ -124,10 +124,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         }
     }
 
-    public void approveUser(User user) {
-        user.setLocked(false);
-        save(user);
-    }
+
 
     Optional<User> find(String username) {
         return Optional.of(userService.findByUsername(username));
@@ -137,4 +134,11 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         userService.delete(user);
         users.remove(user);
     }
+
+
+    public Optional<User> find(Long id) {
+        return Optional.ofNullable(userService.findById(id));
+    }
+
+
 }

@@ -47,6 +47,11 @@ public class UserService {
     public Page<User> list(Pageable pageable, Specification<User> filter) {
         return repository.findAll(filter, pageable);
     }
+
+    public User findById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
     public void delete(User user) {
         repository.delete(user);
     }
@@ -60,17 +65,8 @@ public class UserService {
     }
 
 
-    private boolean usernameExists(String username, Long id) {
-        User user = repository.findByUsername(username);
-        return user != null && !user.getId().equals(id);
-    }
-    //approval
-    public List<User> findLockedUsers() {
-        return repository.findByLocked(true);
-    }
-    public List<User> findUnlockedUsers() {
-        return repository.findByLocked(false);
-    }
+
+
 
     // Methods for Registrierung entity
 
@@ -85,7 +81,7 @@ public class UserService {
     public void delete(Registrierung registrierung) {
         registrierungRepository.delete(registrierung);
     }
-
+    //Nutzer wird in die User Tabelle übertragen und kann sich einloggen
     public void approveRegistration(Registrierung registrierung) {
         User user = new User();
         user.setUsername(registrierung.getUsername());
@@ -94,9 +90,9 @@ public class UserService {
         user.setHashedPassword(registrierung.getHashedPassword());
         user.setRoles(Set.of(registrierung.getRole()));
         user.setFachbereich(registrierung.getFachbereich());
-        user.setLocked(false);
 
-        // Save the new user and delete the registration
+
+        //User wird aus der Registrierungstabelle gelöscht
         repository.save(user);
         registrierungRepository.delete(registrierung);
     }
