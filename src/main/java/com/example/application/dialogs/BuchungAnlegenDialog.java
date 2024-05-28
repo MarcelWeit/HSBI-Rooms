@@ -24,6 +24,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -49,7 +50,7 @@ public class BuchungAnlegenDialog extends Dialog {
     private final Button save = new Button("Speichern");
     private final Button cancel = new Button("Abbrechen");
     private final RadioButtonGroup<Wiederholungsintervall> wiederholungsintervall = new RadioButtonGroup<>("Wiederholungsintervall");
-    private final DatePicker endDatum = new DatePicker("Buchen bis");
+    private final DatePicker endDatum = new DatePicker("Letzter Buchungstag");
 
     private final Optional<Buchung> selectedBuchung;
     private final Optional<Raum> selectedRoom;
@@ -202,7 +203,42 @@ public class BuchungAnlegenDialog extends Dialog {
 
     private boolean validateAndSave() {
         if (selectedBuchung.isEmpty()) {
-            if (wiederholungsintervall.getValue() == Wiederholungsintervall.WOECHENTLICH) {
+            if(wiederholungsintervall.getValue() == Wiederholungsintervall.EINMALIG) {
+                Buchung buchung = new Buchung();
+                if (binder.writeBeanIfValid(buchung)) {
+                    buchungService.save(buchung);
+                    Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);
+                    sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                    return true;
+                } else {
+                    Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
+                }
+            }
+            else if (wiederholungsintervall.getValue() == Wiederholungsintervall.TAEGLICH){
+                Buchung startBuchung = new Buchung();
+                if (binder.writeBeanIfValid(startBuchung)) {
+                    buchungService.save(startBuchung);
+                    LocalDate currentDate = startBuchung.getDate();
+                    LocalDate endDate = endDatum.getValue();
+                    while (currentDate.plusDays(1).isBefore(endDate) || currentDate.isEqual(endDate)) {
+                        DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+
+                        // Wochenende wird nicht gebucht
+                        if(dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+                            Buchung nextBuchung = new Buchung(startBuchung);
+                            nextBuchung.setDate(currentDate);
+                            buchungService.save(nextBuchung);
+                        }
+                        currentDate = currentDate.plusDays(1);
+                    }
+                    Notification sucessNotification = Notification.show("Buchungen erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
+                    sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                    return true;
+                } else {
+                    Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
+                }
+            }
+            else if (wiederholungsintervall.getValue() == Wiederholungsintervall.WOECHENTLICH) {
                 Buchung startBuchung = new Buchung();
                 if (binder.writeBeanIfValid(startBuchung)) {
                     buchungService.save(startBuchung);
@@ -214,6 +250,8 @@ public class BuchungAnlegenDialog extends Dialog {
                         nextBuchung.setDate(currentDate);
                         buchungService.save(nextBuchung);
                     }
+                    Notification sucessNotification = Notification.show("Buchungen erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
+                    sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     return true;
                 } else {
                     Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
@@ -224,7 +262,7 @@ public class BuchungAnlegenDialog extends Dialog {
             Buchung newBuchung = selectedBuchung.get();
             if (binder.writeBeanIfValid(newBuchung)) {
                 buchungService.save(newBuchung);
-                Notification sucessNotification = Notification.show("Erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
+                Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);
                 sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 binder.getFields().forEach(HasValue::clear);
                 startZeit.setEnabled(false);
