@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -13,9 +14,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository repository;
+    private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<User> get(Long id) {
@@ -24,6 +27,11 @@ public class UserService {
 
     public User update(User entity) {
         return repository.save(entity);
+    }
+
+    public void updatePassword(User user, String newPassword) {
+        user.setHashedPassword(passwordEncoder.encode(newPassword));
+        update(user);
     }
 
     public Page<User> list(Pageable pageable) {
@@ -40,5 +48,9 @@ public class UserService {
 
     public boolean emailExists(String email) {
         return repository.findByUsername(email) != null;
+    }
+
+    public User findByUsername(String email) {
+        return repository.findByUsername(email); // Oder repository.findByEmail(email), je nach Feldname
     }
 }

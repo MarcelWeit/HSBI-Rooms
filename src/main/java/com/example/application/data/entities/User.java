@@ -28,6 +28,9 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
+    @Version
+    @Column(nullable = false)
+    private Long version;
     //    @Lob
     //    @Column(length = 1000000)
     //    private byte[] profilePicture;
@@ -108,4 +111,11 @@ public class User {
         this.id = id;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 }
