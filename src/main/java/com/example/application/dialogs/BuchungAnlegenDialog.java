@@ -161,7 +161,7 @@ public class BuchungAnlegenDialog extends Dialog {
 
         dialogLayout.add(raum, date, veranstaltung, dozent, startZeit, endZeit);
         // Kein Wiederholungsintervall bei Buchung bearbeiten
-        if(selectedBuchung.isEmpty()){
+        if (selectedBuchung.isEmpty()) {
             dialogLayout.add(wiederholungsintervall, endDatum);
         }
 
@@ -202,78 +202,52 @@ public class BuchungAnlegenDialog extends Dialog {
     }
 
     private boolean validateAndSave() {
-        if (selectedBuchung.isEmpty()) {
-            if(wiederholungsintervall.getValue() == Wiederholungsintervall.EINMALIG) {
-                Buchung buchung = new Buchung();
-                if (binder.writeBeanIfValid(buchung)) {
-                    buchungService.save(buchung);
-                    Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);
-                    sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                    return true;
-                } else {
-                    Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
-                }
-            }
-            else if (wiederholungsintervall.getValue() == Wiederholungsintervall.TAEGLICH){
-                Buchung startBuchung = new Buchung();
-                if (binder.writeBeanIfValid(startBuchung)) {
-                    buchungService.save(startBuchung);
-                    LocalDate currentDate = startBuchung.getDate();
-                    LocalDate endDate = endDatum.getValue();
-                    while (currentDate.plusDays(1).isBefore(endDate) || currentDate.isEqual(endDate)) {
-                        DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
-
-                        // Wochenende wird nicht gebucht
-                        if(dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
-                            Buchung nextBuchung = new Buchung(startBuchung);
-                            nextBuchung.setDate(currentDate);
-                            buchungService.save(nextBuchung);
-                        }
-                        currentDate = currentDate.plusDays(1);
-                    }
-                    Notification sucessNotification = Notification.show("Buchungen erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
-                    sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                    return true;
-                } else {
-                    Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
-                }
-            }
-            else if (wiederholungsintervall.getValue() == Wiederholungsintervall.WOECHENTLICH) {
-                Buchung startBuchung = new Buchung();
-                if (binder.writeBeanIfValid(startBuchung)) {
-                    buchungService.save(startBuchung);
-                    LocalDate currentDate = startBuchung.getDate();
-                    LocalDate endDate = endDatum.getValue();
-                    while (currentDate.plusDays(7).isBefore(endDate)) {
-                        currentDate = currentDate.plusDays(7);
-                        Buchung nextBuchung = new Buchung(startBuchung);
-                        nextBuchung.setDate(currentDate);
-                        buchungService.save(nextBuchung);
-                    }
-                    Notification sucessNotification = Notification.show("Buchungen erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
-                    sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                    return true;
-                } else {
-                    Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
-                }
-
-            }
-        } else if (selectedBuchung.isPresent()) {
-            Buchung newBuchung = selectedBuchung.get();
-            if (binder.writeBeanIfValid(newBuchung)) {
-                buchungService.save(newBuchung);
-                Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);
-                sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        Buchung firstBuchung = selectedBuchung.orElseGet(Buchung::new);
+        // Erste Buchung wird immer gespeichert, wenn alle Binder erfolgreich
+        if (binder.writeBeanIfValid(firstBuchung)) {
+            buchungService.save(firstBuchung);
+            if(selectedBuchung.isPresent()){
                 binder.getFields().forEach(HasValue::clear);
                 startZeit.setEnabled(false);
                 endZeit.setEnabled(false);
-                return true;
-            } else {
-                Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
-                return false;
             }
+            if (wiederholungsintervall.getValue() == Wiederholungsintervall.EINMALIG) {
+                Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);
+                sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                return true;
+            }
+        } else {
+            Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
+            return false;
+        }
+        if (selectedBuchung.isEmpty()) {
+            if (wiederholungsintervall.getValue() == Wiederholungsintervall.TAEGLICH) {
+                LocalDate currentDate = firstBuchung.getDate();
+                LocalDate endDate = endDatum.getValue();
+                while (currentDate.plusDays(1).isBefore(endDate) || currentDate.plusDays(1).isEqual(endDate)) {
+                    DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+                    // Wochenende wird nicht gebucht
+                    if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+                        Buchung nextBuchung = new Buchung(firstBuchung);
+                        nextBuchung.setDate(currentDate);
+                        buchungService.save(nextBuchung);
+                    }
+                    currentDate = currentDate.plusDays(1);
+                }
+            } else if (wiederholungsintervall.getValue() == Wiederholungsintervall.WOECHENTLICH) {
+                LocalDate currentDate = firstBuchung.getDate();
+                LocalDate endDate = endDatum.getValue();
+                while (currentDate.plusDays(7).isBefore(endDate) || currentDate.plusDays(7).isEqual(endDate)) {
+                    currentDate = currentDate.plusDays(7);
+                    Buchung nextBuchung = new Buchung(firstBuchung);
+                    nextBuchung.setDate(currentDate);
+                    buchungService.save(nextBuchung);
+                }
+            }
+            Notification sucessNotification = Notification.show("Buchungen erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
+            sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            return true;
         }
         return false;
     }
-
 }
