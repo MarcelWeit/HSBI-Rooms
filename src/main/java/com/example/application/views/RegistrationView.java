@@ -3,6 +3,7 @@ package com.example.application.views;
 import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.Role;
+import com.example.application.services.EmailService;
 import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.Key;
@@ -38,7 +39,7 @@ public class RegistrationView extends VerticalLayout {
     private final Binder<Registrierung> binder = new Binder<>(Registrierung.class);
     private final UserService userService;
     private final RegistrationService registrationService;
-
+    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
     private final PasswordField confirmPassword = new PasswordField("Passwort bestätigen");
@@ -59,10 +60,11 @@ public class RegistrationView extends VerticalLayout {
      * @param passwordEncoder     Encoder für das Passwort
      * @param registrationService Service für die Registrierung
      */
-    public RegistrationView(UserService userService, PasswordEncoder passwordEncoder, RegistrationService registrationService) {
+    public RegistrationView(UserService userService, PasswordEncoder passwordEncoder, RegistrationService registrationService, EmailService emailService) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.registrationService = registrationService;
+        this.emailService = emailService;
         addClassName("registration-view");
         createComponents();
         fillTestData();
@@ -99,6 +101,7 @@ public class RegistrationView extends VerticalLayout {
             if (binder.writeBeanIfValid(registration)) {
                 registration.setHashedPassword(passwordEncoder.encode(registration.getHashedPassword()));
                 registrationService.save(registration);
+                emailService.sendWelcomeEmail(registration.getUsername());
                 UI.getCurrent().navigate("login");
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);

@@ -22,5 +22,11 @@ public class EmailService {
         message.setText(text);
         mailSender.send(message);
     }
+
+    public void sendWelcomeEmail(String email) {
+        String subject = "Willkommen bei HSBI Rooms!";
+        String text = "Vielen Dank für Ihre Registrierung bei HSBI Rooms. Ihr Konto wird überprüft und nach der Freischaltung erhalten Sie eine Benachrichtigung. Anschließend können Sie sich einloggen.";
+        sendSimpleMessage(email, subject, text);
+    }
 }
 
