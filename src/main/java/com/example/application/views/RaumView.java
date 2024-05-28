@@ -6,7 +6,7 @@ import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Raumtyp;
 import com.example.application.dialogs.BuchungAnlegenDialog;
-import com.example.application.dialogs.RaumBuchungenDialog;
+import com.example.application.dialogs.RaumBuchungenOverviewDialog;
 import com.example.application.services.*;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -295,7 +295,7 @@ public class RaumView extends VerticalLayout {
     private void openShowBookingsDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog showBookingsDialog = new RaumBuchungenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService);
+            Dialog showBookingsDialog = new RaumBuchungenOverviewDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService);
             showBookingsDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);

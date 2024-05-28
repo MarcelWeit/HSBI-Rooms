@@ -4,9 +4,9 @@ public enum Wiederholungsintervall {
     EINMALIG("Einmalig"),
     TAEGLICH("Täglich"),
     WOECHENTLICH("Wöchentlich"),
-    JAEHRLICH("Jährlich"),
-    JEDENMOBISFR("Jeden Mo bis Fr"),
-    MONATLICHAMERSTENTAGX("Monatlich am ersten Tag X");
+    JAEHRLICH("Jährlich");
+//    JEDENMOBISFR("Jeden Mo bis Fr"),
+//    MONATLICHAMERSTENTAGX("Monatlich am ersten Tag X");
 
     private final String anzeigeName;
 

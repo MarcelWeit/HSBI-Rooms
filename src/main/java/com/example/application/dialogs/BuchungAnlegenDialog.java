@@ -1,9 +1,6 @@
 package com.example.application.dialogs;
 
-import com.example.application.data.entities.Buchung;
-import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Raum;
-import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.entities.*;
 import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
 import com.example.application.services.RaumService;
@@ -19,6 +16,8 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
@@ -26,6 +25,7 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -48,7 +48,8 @@ public class BuchungAnlegenDialog extends Dialog {
     private final TimePicker endZeit = new TimePicker("Endzeit");
     private final Button save = new Button("Speichern");
     private final Button cancel = new Button("Abbrechen");
-    //    ComboBox<Wiederholungsintervall> wiederholungsintervall = new ComboBox<>("Wiederholungsintervall");
+    private final RadioButtonGroup<Wiederholungsintervall> wiederholungsintervall = new RadioButtonGroup<>("Wiederholungsintervall");
+    private final DatePicker endDatum = new DatePicker("Buchen bis");
 
     private final Optional<Buchung> selectedBuchung;
     private final Optional<Raum> selectedRoom;
@@ -84,7 +85,6 @@ public class BuchungAnlegenDialog extends Dialog {
         veranstaltung.setRequiredIndicatorVisible(true);
 
         dozent.setItems(dozentService.findAll());
-        dozent.setItemLabelGenerator(Dozent::getNachname);
         dozent.setRequiredIndicatorVisible(true);
 
         date.setLabel("Datum");
@@ -120,6 +120,19 @@ public class BuchungAnlegenDialog extends Dialog {
         });
         endZeit.setEnabled(false);
 
+        wiederholungsintervall.setItems(Wiederholungsintervall.values());
+        wiederholungsintervall.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
+        wiederholungsintervall.setValue(Wiederholungsintervall.EINMALIG);
+        endDatum.setVisible(false);
+        wiederholungsintervall.addValueChangeListener(e -> {
+            if (e.getValue().equals(Wiederholungsintervall.EINMALIG)) {
+                endDatum.setVisible(false);
+            } else {
+                endDatum.setVisible(true);
+                binder.forField(endDatum).asRequired();
+            }
+        });
+
         binder.forField(raum).asRequired("Bitte wählen Sie einem Raum aus").bind(Buchung::getRoom, Buchung::setRoom);
         binder.forField(veranstaltung).asRequired().bind(Buchung::getVeranstaltung, Buchung::setVeranstaltung);
         binder.forField(dozent).asRequired().bind(Buchung::getDozent, Buchung::setDozent);
@@ -146,6 +159,11 @@ public class BuchungAnlegenDialog extends Dialog {
         }
 
         dialogLayout.add(raum, date, veranstaltung, dozent, startZeit, endZeit);
+        // Kein Wiederholungsintervall bei Buchung bearbeiten
+        if(selectedBuchung.isEmpty()){
+            dialogLayout.add(wiederholungsintervall, endDatum);
+        }
+
         dialogLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 2));
         dialogLayout.setColspan(veranstaltung, 2);
@@ -183,19 +201,41 @@ public class BuchungAnlegenDialog extends Dialog {
     }
 
     private boolean validateAndSave() {
-        Buchung newBuchung = selectedBuchung.orElseGet(Buchung::new);
-        if (binder.writeBeanIfValid(newBuchung) || selectedBuchung.isPresent()) {
-            buchungService.save(newBuchung);
-            Notification sucessNotification = Notification.show("Erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
-            sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            binder.getFields().forEach(HasValue::clear);
-            startZeit.setEnabled(false);
-            endZeit.setEnabled(false);
-            return true;
-        } else {
-            Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
-            return false;
-        }
+        if (selectedBuchung.isEmpty()) {
+            if (wiederholungsintervall.getValue() == Wiederholungsintervall.WOECHENTLICH) {
+                Buchung startBuchung = new Buchung();
+                if (binder.writeBeanIfValid(startBuchung)) {
+                    buchungService.save(startBuchung);
+                    LocalDate currentDate = startBuchung.getDate();
+                    LocalDate endDate = endDatum.getValue();
+                    while (currentDate.plusDays(7).isBefore(endDate)) {
+                        currentDate = currentDate.plusDays(7);
+                        Buchung nextBuchung = new Buchung(startBuchung);
+                        nextBuchung.setDate(currentDate);
+                        buchungService.save(nextBuchung);
+                    }
+                    return true;
+                } else {
+                    Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
+                }
 
+            }
+        } else if (selectedBuchung.isPresent()) {
+            Buchung newBuchung = selectedBuchung.get();
+            if (binder.writeBeanIfValid(newBuchung)) {
+                buchungService.save(newBuchung);
+                Notification sucessNotification = Notification.show("Erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
+                sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                binder.getFields().forEach(HasValue::clear);
+                startZeit.setEnabled(false);
+                endZeit.setEnabled(false);
+                return true;
+            } else {
+                Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
+                return false;
+            }
+        }
+        return false;
     }
+
 }

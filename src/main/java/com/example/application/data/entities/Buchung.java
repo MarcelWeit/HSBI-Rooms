@@ -25,6 +25,18 @@ public class Buchung {
     @ManyToOne(fetch = FetchType.EAGER)
     private Dozent dozent;
 
+    public Buchung() {
+    }
+
+    public Buchung(Buchung buchung){
+        this.date = buchung.getDate();
+        this.startZeit = buchung.getStartZeit();
+        this.endZeit = buchung.getEndZeit();
+        this.room = buchung.getRoom();
+        this.veranstaltung = buchung.getVeranstaltung();
+        this.dozent = buchung.getDozent();
+    }
+
     public long getId() {
         return id;
     }
