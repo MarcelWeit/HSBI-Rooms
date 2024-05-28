@@ -2,15 +2,15 @@ package com.example.application.data.entities;
 
 public enum Wiederholungsintervall {
     EINMALIG("Einmalig"),
-    TÄGLICH("Täglich"),
-    WÖCHENTLICH("Wöchentlich"),
-    JÄHRLICH("Jährlich"),
+    TAEGLICH("Täglich"),
+    WOECHENTLICH("Wöchentlich"),
+    JAEHRLICH("Jährlich"),
     JEDENMOBISFR("Jeden Mo bis Fr"),
     MONATLICHAMERSTENTAGX("Monatlich am ersten Tag X");
 
     private final String anzeigeName;
 
-    private Wiederholungsintervall(String anzeigeName) {
+    Wiederholungsintervall(String anzeigeName) {
         this.anzeigeName = anzeigeName;
     }
 

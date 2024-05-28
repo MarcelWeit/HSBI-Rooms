@@ -2,7 +2,7 @@ package com.example.application.data.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Veranstaltung {
@@ -11,9 +11,12 @@ public class Veranstaltung {
     private String id;
 
     private String bezeichnung;
-    @OneToOne
+
+    @ManyToOne
     private Dozent dozent;
+
     private int teilnehmerzahl;
+
     private Fachbereich fachbereich;
 
     public Veranstaltung() {

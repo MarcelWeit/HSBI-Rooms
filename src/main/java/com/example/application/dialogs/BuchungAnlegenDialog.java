@@ -1,13 +1,14 @@
-package com.example.application.views;
+package com.example.application.dialogs;
 
 import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Room;
+import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
-import com.example.application.services.RoomService;
+import com.example.application.services.RaumService;
 import com.example.application.services.VeranstaltungService;
+import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -31,15 +32,15 @@ import java.util.Optional;
 @Route(value = "create-buchung", layout = MainLayout.class)
 @PageTitle("Buchung anlegen")
 @RolesAllowed({"ADMIN", "DOZENT", "FBPLANUNG"})
-public class BuchungAnlegenView extends Dialog {
+public class BuchungAnlegenDialog extends Dialog {
 
-    private final RoomService roomService;
+    private final RaumService roomService;
     private final DozentService dozentService;
     private final BuchungService buchungService;
     private final VeranstaltungService veranstaltungService;
 
     private final Binder<Buchung> binder = new Binder<>(Buchung.class);
-    private final ComboBox<Room> raum = new ComboBox<>("Raumnummer");
+    private final ComboBox<Raum> raum = new ComboBox<>("Raumnummer");
     private final ComboBox<Veranstaltung> veranstaltung = new ComboBox<>("Veranstaltung");
     private final ComboBox<Dozent> dozent = new ComboBox<>("Dozent");
     private final DatePicker date = new DatePicker("Datum");
@@ -47,16 +48,22 @@ public class BuchungAnlegenView extends Dialog {
     private final TimePicker endZeit = new TimePicker("Endzeit");
     private final Button save = new Button("Speichern");
     private final Button cancel = new Button("Abbrechen");
-//    ComboBox<Wiederholungsintervall> wiederholungsintervall = new ComboBox<>("Wiederholungsintervall");
+    //    ComboBox<Wiederholungsintervall> wiederholungsintervall = new ComboBox<>("Wiederholungsintervall");
 
-    private final Optional<Room> selectedRoom;
+    private final Optional<Buchung> selectedBuchung;
+    private final Optional<Raum> selectedRoom;
+    private final Optional<Veranstaltung> selectedVeranstaltung;
+    private final Optional<Dozent> selectedDozent;
 
-    public BuchungAnlegenView(Optional<Room> selectedRoom, RoomService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
+    public BuchungAnlegenDialog(Optional<Buchung> selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, Optional<Dozent> selectedDozent, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
         this.roomService = roomService;
         this.dozentService = dozentService;
         this.buchungService = buchungService;
         this.veranstaltungService = veranstaltungService;
+        this.selectedBuchung = selectedBuchung;
         this.selectedRoom = selectedRoom;
+        this.selectedVeranstaltung = selectedVeranstaltung;
+        this.selectedDozent = selectedDozent;
         add(createInputLayout());
         createButtonLayout();
     }
@@ -65,7 +72,7 @@ public class BuchungAnlegenView extends Dialog {
         FormLayout dialogLayout = new FormLayout();
 
         raum.setItems(roomService.findAll());
-        raum.setItemLabelGenerator(Room::getRefNr);
+        raum.setItemLabelGenerator(Raum::getRefNr);
         raum.setRequiredIndicatorVisible(true);
         raum.addValueChangeListener((value -> {
             startZeit.setEnabled(true);
@@ -92,8 +99,10 @@ public class BuchungAnlegenView extends Dialog {
             if (startZeit.getValue() != null) {
                 endZeit.setMin(startZeit.getValue().plus(Duration.ofMinutes(15)));
             }
-            if (endZeit.getValue() != null) {
-                checkIfBelegt();
+            if (endZeit.getValue() != null && startZeit.getValue() != null) {
+                if (!(selectedBuchung.isPresent() && startZeit.getValue().equals(selectedBuchung.get().getStartZeit()) && endZeit.getValue().equals(selectedBuchung.get().getEndZeit()))) {
+                    checkIfBelegt();
+                }
             }
         });
         startZeit.setEnabled(false);
@@ -103,8 +112,10 @@ public class BuchungAnlegenView extends Dialog {
         endZeit.setMin(LocalTime.of(8, 15));
         endZeit.setStep(Duration.ofMinutes(15));
         endZeit.addValueChangeListener(e -> {
-            if (startZeit.getValue() != null) {
-                checkIfBelegt();
+            if (startZeit.getValue() != null && endZeit.getValue() != null) {
+                if (!(selectedBuchung.isPresent() && startZeit.getValue().equals(selectedBuchung.get().getStartZeit()) && endZeit.getValue().equals(selectedBuchung.get().getEndZeit()))) {
+                    checkIfBelegt();
+                }
             }
         });
         endZeit.setEnabled(false);
@@ -116,11 +127,22 @@ public class BuchungAnlegenView extends Dialog {
         binder.forField(startZeit).asRequired().bind(Buchung::getStartZeit, Buchung::setStartZeit);
         binder.forField(endZeit).asRequired().bind(Buchung::getEndZeit, Buchung::setEndZeit);
 
+        if (selectedBuchung.isPresent()) {
+            binder.readBean(selectedBuchung.get());
+        }
         if (selectedRoom.isPresent()) {
             raum.setValue(selectedRoom.get());
             raum.setEnabled(false);
             startZeit.setEnabled(true);
             endZeit.setEnabled(true);
+        }
+        if (selectedVeranstaltung.isPresent()) {
+            veranstaltung.setValue(selectedVeranstaltung.get());
+            veranstaltung.setEnabled(false);
+        }
+        if (selectedDozent.isPresent()) {
+            dozent.setValue(selectedDozent.get());
+            dozent.setEnabled(false);
         }
 
         dialogLayout.add(raum, date, veranstaltung, dozent, startZeit, endZeit);
@@ -161,8 +183,8 @@ public class BuchungAnlegenView extends Dialog {
     }
 
     private boolean validateAndSave() {
-        Buchung newBuchung = new Buchung();
-        if (binder.writeBeanIfValid(newBuchung)) {
+        Buchung newBuchung = selectedBuchung.orElseGet(Buchung::new);
+        if (binder.writeBeanIfValid(newBuchung) || selectedBuchung.isPresent()) {
             buchungService.save(newBuchung);
             Notification sucessNotification = Notification.show("Erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
             sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);

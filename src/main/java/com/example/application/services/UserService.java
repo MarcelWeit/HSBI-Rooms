@@ -16,7 +16,7 @@ public class UserService {
     private final UserRepository repository;
     private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
     }

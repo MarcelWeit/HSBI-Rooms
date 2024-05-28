@@ -1,11 +1,11 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.entities.Room;
-import com.example.application.data.repository.RoomRepository;
+import com.example.application.data.entities.Raum;
+import com.example.application.data.repository.RaumRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -13,20 +13,20 @@ import java.util.Set;
  * @author marcel weithoener
  */
 @Service
-public class RoomService {
+public class RaumService {
 
-    private final RoomRepository repository;
+    private final RaumRepository repository;
 
-    public RoomService(RoomRepository repository) {
+    public RaumService(RaumRepository repository) {
         this.repository = repository;
     }
 
-    public void save(Room entity) {
+    public void save(Raum entity) {
         repository.save(entity);
     }
 
-    public List<Room> findAll() {
-        return repository.findAll();
+    public Set<Raum> findAll() {
+        return new HashSet<>(repository.findAll());
     }
 
     public boolean refNrExists(String refNr) {
@@ -37,15 +37,15 @@ public class RoomService {
         return repository.countByAusstattungContains(entity);
     }
 
-    public Set<Room> findAllByAusstattungContains(Ausstattung entity) {
+    public Set<Raum> findAllByAusstattungContains(Ausstattung entity) {
         return repository.findAllByAusstattungContains(entity);
     }
 
-    public void delete(Room room) {
+    public void delete(Raum room) {
         repository.delete(room);
     }
 
-    public Optional<Room> findByRefNr(String refNr) {
+    public Optional<Raum> findByRefNr(String refNr) {
         return repository.findByRefNr(refNr);
     }
 

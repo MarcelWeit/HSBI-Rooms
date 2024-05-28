@@ -32,11 +32,11 @@ public class MainLayout extends AppLayout {
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
+        getElement().getThemeList().add("dark");
 
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
-        getElement().getThemeList().add("dark");
     }
 
     private void addHeaderContent() {
@@ -85,6 +85,11 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Veranstaltungen", VeranstaltungView.class, VaadinIcon.TABLE.create())
             );
         }
+        if (accessChecker.hasAccess(KapaView.class)) {
+            nav.addItem(
+                    new SideNavItem("Auslastung", KapaView.class, VaadinIcon.BAR_CHART_H.create())
+            );
+        }
 
         // Kopf Navigation Verwaltung mit Unterpunkten
         SideNavItem verwNav = new SideNavItem("Verwaltung");
@@ -92,9 +97,9 @@ public class MainLayout extends AppLayout {
             verwNav.addItem(
                     new SideNavItem("Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
         }
-        if (accessChecker.hasAccess(RoomCrud.class)) {
+        if (accessChecker.hasAccess(RaumView.class)) {
             verwNav.addItem(
-                    new SideNavItem("Raum", RoomCrud.class, VaadinIcon.TABLE.create()));
+                    new SideNavItem("Raum", RaumView.class, VaadinIcon.TABLE.create()));
         }
         if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
             verwNav.addItem(
@@ -103,10 +108,6 @@ public class MainLayout extends AppLayout {
         if (accessChecker.hasAccess(DozentCrud.class)) {
             verwNav.addItem(
                     new SideNavItem("Dozenten", DozentCrud.class, VaadinIcon.USERS.create()));
-        }
-        if (accessChecker.hasAccess(DozentCrud.class)) {
-            verwNav.addItem(
-                    new SideNavItem("Raumbuchungen", RaumBuchungenView.class, VaadinIcon.TABLE.create()));
         }
 
         verwNav.setExpanded(true);
@@ -124,7 +125,7 @@ public class MainLayout extends AppLayout {
 
             Avatar avatar = new Avatar(user.getFirstName());
             //            StreamResource resource = new StreamResource("profile-pic",
-            //            () -> new ByteArrayInputStream(user.getProfilePicture()));
+            //                    () -> new ByteArrayInputStream(user.getProfilePicture()));
             //            avatar.setImageResource(resource);
             avatar.setThemeName("xsmall");
             avatar.getElement().setAttribute("tabindex", "-1");
