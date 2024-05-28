@@ -7,7 +7,9 @@ import jakarta.validation.constraints.Email;
 import java.util.Set;
 
 @Entity
-@Table(name = "application_user")
+@Table(name = "application_user", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username")
+})
 public class User {
 
     @Id
@@ -16,6 +18,7 @@ public class User {
     private Long id;
 
     @Email
+    @Column(unique = true)
     private String username;
 
     private String lastName;
@@ -23,6 +26,8 @@ public class User {
 
     @JsonIgnore
     private String hashedPassword;
+    private boolean locked;
+
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -88,6 +93,20 @@ public class User {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+    //approval
+    public boolean isLocked() {return locked;}
+    public void setLocked(boolean locked) {this.locked = locked;}
+
+
+
+
+
+//    public byte[] getProfilePicture() {
+//        return profilePicture;
+//    }
+//    public void setProfilePicture(byte[] profilePicture) {
+//        this.profilePicture = profilePicture;
+//    }
 
     //    public byte[] getProfilePicture() {
     //        return profilePicture;
