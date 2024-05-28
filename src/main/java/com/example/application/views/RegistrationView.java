@@ -102,6 +102,7 @@ public class RegistrationView extends VerticalLayout {
                 registration.setHashedPassword(passwordEncoder.encode(registration.getHashedPassword()));
                 registrationService.save(registration);
                 emailService.sendWelcomeEmail(registration.getUsername());
+
                 UI.getCurrent().navigate("login");
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);

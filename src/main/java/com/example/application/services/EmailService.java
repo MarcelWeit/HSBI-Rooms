@@ -28,5 +28,11 @@ public class EmailService {
         String text = "Vielen Dank für Ihre Registrierung bei HSBI Rooms. Ihr Konto wird überprüft und nach der Freischaltung erhalten Sie eine Benachrichtigung. Anschließend können Sie sich einloggen.";
         sendSimpleMessage(email, subject, text);
     }
+
+    public void sendAprovedMail(String email){
+        String subject = "Account freigeschaltet";
+        String text = "Ihr Account wurde freigeschaltet. Sie können sich nun bei HSBI Rooms anmelden.";
+        sendSimpleMessage(email, subject, text);
+    }
 }
 
