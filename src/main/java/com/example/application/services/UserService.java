@@ -22,10 +22,6 @@ public class UserService {
         return repository.findById(id);
     }
 
-    public User update(User entity) {
-        return repository.save(entity);
-    }
-
     public Page<User> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
