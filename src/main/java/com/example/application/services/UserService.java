@@ -1,25 +1,35 @@
 package com.example.application.services;
 
+import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.User;
+import com.example.application.data.repository.RegistrationRepository;
 import com.example.application.data.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
 
     private final UserRepository repository;
+    private final RegistrationRepository registrierungRepository;
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, RegistrationRepository registrierungRepository) {
         this.repository = repository;
+        this.registrierungRepository  = registrierungRepository;
     }
 
     public Optional<User> get(Long id) {
         return repository.findById(id);
+    }
+
+    public List<User> findAll() {
+        return repository.findAll();
     }
 
     public User update(User entity) {
@@ -38,8 +48,53 @@ public class UserService {
         return repository.findAll(filter, pageable);
     }
 
+    public User findById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    public void delete(User user) {
+        repository.delete(user);
+    }
+
+    public User findByUsername(String username) {
+        return repository.findByUsername(username);
+    }
+
     public boolean emailExists(String email) {
         return repository.existsByUsername(email);
+    }
+
+
+
+
+
+    // Methods for Registrierung entity
+
+    public List<Registrierung> findAllRegistrierungen() {
+        return registrierungRepository.findAll();
+    }
+
+    public void save(Registrierung registrierung) {
+        registrierungRepository.save(registrierung);
+    }
+
+    public void delete(Registrierung registrierung) {
+        registrierungRepository.delete(registrierung);
+    }
+    //Nutzer wird in die User Tabelle übertragen und kann sich einloggen
+    public void approveRegistration(Registrierung registrierung) {
+        User user = new User();
+        user.setUsername(registrierung.getUsername());
+        user.setFirstName(registrierung.getFirstName());
+        user.setLastName(registrierung.getLastName());
+        user.setHashedPassword(registrierung.getHashedPassword());
+        user.setRoles(Set.of(registrierung.getRole()));
+        user.setFachbereich(registrierung.getFachbereich());
+
+
+        //User wird aus der Registrierungstabelle gelöscht
+        repository.save(user);
+        registrierungRepository.delete(registrierung);
     }
 
 }

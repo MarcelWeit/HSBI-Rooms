@@ -7,7 +7,9 @@ import jakarta.validation.constraints.Email;
 import java.util.Set;
 
 @Entity
-@Table(name = "application_user")
+@Table(name = "application_user", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username")
+})
 public class User {
 
     @Id
@@ -16,6 +18,7 @@ public class User {
     private Long id;
 
     @Email
+    @Column(unique = true)
     private String username;
 
     private String lastName;
@@ -23,6 +26,8 @@ public class User {
 
     @JsonIgnore
     private String hashedPassword;
+
+
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -52,6 +57,14 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void getID(Long id) {
+        this.id = id;
+    }
+
+    public void setID(Long id) {
+        this.id = id;
     }
 
     public String getLastName() {
@@ -86,6 +99,8 @@ public class User {
         this.roles = roles;
     }
 
+
+
     //    public byte[] getProfilePicture() {
     //        return profilePicture;
     //    }
@@ -107,6 +122,7 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
+
 
 
 }
