@@ -22,10 +22,8 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
     private final List<User> users;
     private Consumer<Long> sizeChangeListener;
 
-
     public UserDataProvider(UserService userService) {
         this.userService = userService;
-
         users = new ArrayList<>(userService.findAll());
     }
 
@@ -77,7 +75,6 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         int limit = query.getLimit();
 
         Stream<User> stream = users.stream();
-//                .filter(user -> user.isLocked() == fetchLockedUsers);  // Filter by locked status
 
         if (query.getFilter().isPresent()) {
             stream = stream.filter(predicate(query.getFilter().get()))
@@ -115,7 +112,6 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
             userToUpdate.setUsername(user.getUsername());
             userToUpdate.setFachbereich(user.getFachbereich());
             userToUpdate.setRoles(user.getRoles());
-            //userToUpdate.setLocked(user.isLocked());
             userService.update(userToUpdate);
         } else {
             // Save new user
@@ -123,8 +119,6 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
             users.add(user);
         }
     }
-
-
 
     Optional<User> find(String username) {
         return Optional.of(userService.findByUsername(username));
@@ -134,11 +128,4 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         userService.delete(user);
         users.remove(user);
     }
-
-
-    public Optional<User> find(Long id) {
-        return Optional.ofNullable(userService.findById(id));
-    }
-
-
 }

@@ -34,6 +34,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     private final String VORNAME = "firstName";
     private final String NACHNAME = "lastName";
     private final String EMAIL = "username";
+    //private final String FREIGESCHALTEN = "locked";
     private final String ROLLE = "roles";
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
@@ -71,7 +72,6 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         rolle.setItems(Role.values());
         rolle.setItemLabelGenerator(Role::toString);
 
-
         FormLayout form = new FormLayout(vorname, nachname, email, fachbereich, rolle); //ohne gesperrt
 
         Binder<User> binder = new BeanValidationBinder<>(User.class);
@@ -81,7 +81,6 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         binder.forField(fachbereich).asRequired().bind(User::getFachbereich, User::setFachbereich);
         binder.forField(rolle).asRequired().bind(User::getRoles, User::setRoles);
 
-
         return new BinderCrudEditor<>(binder, form);
     }
 
@@ -90,7 +89,6 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         grid.removeColumnByKey("id");
         grid.removeColumnByKey("hashedPassword");
-
         grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
 
         // grid.setColumnOrder(grid.getColumnByKey(VORNAME),

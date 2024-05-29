@@ -1,9 +1,12 @@
 package com.example.application.views;
 
 import com.example.application.data.dataProvider.RegistrierungDataProvider;
+import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.Role;
+import com.example.application.services.DozentService;
+import com.example.application.services.EmailService;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -34,11 +37,13 @@ public class FreischaltenView extends VerticalLayout {
     private final Crud<Registrierung> crud;
     private final RegistrierungDataProvider registrierungDataProvider;
     private final UserService userService;
+    private final EmailService emailService;
+    private final DozentService dozentService;
 
-    public FreischaltenView(UserService userService) {
+    public FreischaltenView(UserService userService, EmailService emailService, DozentService dozentService) {
         this.userService = userService;
         this.registrierungDataProvider = new RegistrierungDataProvider(userService);
-
+        this.emailService = emailService;
 
         this.crud = new Crud<>(Registrierung.class, createEditor());
         crud.addThemeVariants(CrudVariant.NO_BORDER);
@@ -57,6 +62,7 @@ public class FreischaltenView extends VerticalLayout {
 
 
         add(crud);
+        this.dozentService = dozentService;
     }
 
     private CrudEditor<Registrierung> createEditor() {
@@ -124,6 +130,14 @@ public class FreischaltenView extends VerticalLayout {
             userService.approveRegistration(registrierung);
             registrierungDataProvider.refreshAll();
             Notification.show("User approved and moved to Benutzerverwaltung", 3000, Notification.Position.MIDDLE);
+            emailService.sendAprovedMail(registrierung.getUsername());
+            if ("DOZENT" == String.valueOf(registrierung.getRole())){
+                Dozent newDozent = new Dozent();
+                newDozent.setFachbereich(registrierung.getFachbereich());
+                newDozent.setNachname(registrierung.getLastName());
+                newDozent.setVorname(registrierung.getFirstName());
+                dozentService.save(newDozent);
+            }
         } catch (Exception e) {
             Notification.show("Error approving user: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
         }

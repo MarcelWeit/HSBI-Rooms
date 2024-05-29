@@ -27,15 +27,9 @@ public class User {
     @JsonIgnore
     private String hashedPassword;
 
-
-
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-
-    //    @Lob
-    //    @Column(length = 1000000)
-    //    private byte[] profilePicture;
 
     private Fachbereich fachbereich;
 
@@ -60,10 +54,6 @@ public class User {
     }
 
     public void getID(Long id) {
-        this.id = id;
-    }
-
-    public void setID(Long id) {
         this.id = id;
     }
 
@@ -98,15 +88,6 @@ public class User {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-
-
-
-    //    public byte[] getProfilePicture() {
-    //        return profilePicture;
-    //    }
-    //    public void setProfilePicture(byte[] profilePicture) {
-    //        this.profilePicture = profilePicture;
-    //    }
     public Fachbereich getFachbereich() {
         return fachbereich;
     }
@@ -122,7 +103,6 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
-
 
 
 }
