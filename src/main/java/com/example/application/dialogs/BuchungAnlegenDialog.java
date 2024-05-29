@@ -1,6 +1,11 @@
 package com.example.application.dialogs;
 
-import com.example.application.data.entities.*;
+import com.example.application.data.entities.Buchung;
+import com.example.application.data.entities.Dozent;
+import com.example.application.data.entities.Raum;
+import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.enums.Wiederholungsintervall;
+import com.example.application.data.enums.Zeitslot;
 import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
 import com.example.application.services.RaumService;
@@ -18,16 +23,13 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
-import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Optional;
 
 @Route(value = "create-buchung", layout = MainLayout.class)
@@ -45,12 +47,11 @@ public class BuchungAnlegenDialog extends Dialog {
     private final ComboBox<Veranstaltung> veranstaltung = new ComboBox<>("Veranstaltung");
     private final ComboBox<Dozent> dozent = new ComboBox<>("Dozent");
     private final DatePicker date = new DatePicker("Datum");
-    private final TimePicker startZeit = new TimePicker("Startzeit");
-    private final TimePicker endZeit = new TimePicker("Endzeit");
     private final Button save = new Button("Speichern");
     private final Button cancel = new Button("Abbrechen");
     private final RadioButtonGroup<Wiederholungsintervall> wiederholungsintervall = new RadioButtonGroup<>("Wiederholungsintervall");
     private final DatePicker endDatum = new DatePicker("Letzter Buchungstag");
+    private final ComboBox<Zeitslot> zeitslot = new ComboBox<>("Zeitslot");
 
     private final Optional<Buchung> selectedBuchung;
     private final Optional<Raum> selectedRoom;
@@ -76,10 +77,7 @@ public class BuchungAnlegenDialog extends Dialog {
         raum.setItems(roomService.findAll());
         raum.setItemLabelGenerator(Raum::getRefNr);
         raum.setRequiredIndicatorVisible(true);
-        raum.addValueChangeListener((value -> {
-            startZeit.setEnabled(true);
-            endZeit.setEnabled(true);
-        }));
+        raum.addValueChangeListener((value -> zeitslot.setEnabled(true)));
 
         veranstaltung.setItems(veranstaltungService.findAll());
         veranstaltung.setItemLabelGenerator(Veranstaltung::getBezeichnung);
@@ -91,35 +89,13 @@ public class BuchungAnlegenDialog extends Dialog {
         date.setLabel("Datum");
         date.setRequiredIndicatorVisible(true);
 
-        startZeit.setLabel("Startzeit");
-        startZeit.setRequiredIndicatorVisible(true);
-        startZeit.setMin(LocalTime.of(8, 0));
-        startZeit.setMax(LocalTime.of(22, 0));
-        startZeit.setStep(Duration.ofMinutes(15));
-        startZeit.addValueChangeListener(e -> {
-            if (startZeit.getValue() != null) {
-                endZeit.setMin(startZeit.getValue().plus(Duration.ofMinutes(15)));
-            }
-            if (endZeit.getValue() != null && startZeit.getValue() != null) {
-                if (!(selectedBuchung.isPresent() && startZeit.getValue().equals(selectedBuchung.get().getStartZeit()) && endZeit.getValue().equals(selectedBuchung.get().getEndZeit()))) {
-                    checkIfBelegt();
-                }
+        zeitslot.setItems(Zeitslot.values());
+        zeitslot.setEnabled(false);
+        zeitslot.addValueChangeListener(e -> {
+            if (zeitslot.getValue() != null) {
+                checkIfBelegt();
             }
         });
-        startZeit.setEnabled(false);
-
-        endZeit.setLabel("Endzeit");
-        endZeit.setRequiredIndicatorVisible(true);
-        endZeit.setMin(LocalTime.of(8, 15));
-        endZeit.setStep(Duration.ofMinutes(15));
-        endZeit.addValueChangeListener(e -> {
-            if (startZeit.getValue() != null && endZeit.getValue() != null) {
-                if (!(selectedBuchung.isPresent() && startZeit.getValue().equals(selectedBuchung.get().getStartZeit()) && endZeit.getValue().equals(selectedBuchung.get().getEndZeit()))) {
-                    checkIfBelegt();
-                }
-            }
-        });
-        endZeit.setEnabled(false);
 
         wiederholungsintervall.setItems(Wiederholungsintervall.values());
         wiederholungsintervall.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
@@ -138,8 +114,9 @@ public class BuchungAnlegenDialog extends Dialog {
         binder.forField(veranstaltung).asRequired().bind(Buchung::getVeranstaltung, Buchung::setVeranstaltung);
         binder.forField(dozent).asRequired().bind(Buchung::getDozent, Buchung::setDozent);
         binder.forField(date).asRequired().bind(Buchung::getDate, Buchung::setDate);
-        binder.forField(startZeit).asRequired().bind(Buchung::getStartZeit, Buchung::setStartZeit);
-        binder.forField(endZeit).asRequired().bind(Buchung::getEndZeit, Buchung::setEndZeit);
+        binder.forField(zeitslot).asRequired()
+                .withValidator(event -> !buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue()), "Raum bereits belegt")
+                .bind(Buchung::getZeitslot, Buchung::setZeitslot);
 
         if (selectedBuchung.isPresent()) {
             binder.readBean(selectedBuchung.get());
@@ -147,8 +124,9 @@ public class BuchungAnlegenDialog extends Dialog {
         if (selectedRoom.isPresent()) {
             raum.setValue(selectedRoom.get());
             raum.setEnabled(false);
-            startZeit.setEnabled(true);
-            endZeit.setEnabled(true);
+            //            startZeit.setEnabled(true);
+            //            endZeit.setEnabled(true);
+            zeitslot.setEnabled(true);
         }
         if (selectedVeranstaltung.isPresent()) {
             veranstaltung.setValue(selectedVeranstaltung.get());
@@ -159,7 +137,7 @@ public class BuchungAnlegenDialog extends Dialog {
             dozent.setEnabled(false);
         }
 
-        dialogLayout.add(raum, date, veranstaltung, dozent, startZeit, endZeit);
+        dialogLayout.add(raum, date, veranstaltung, dozent, zeitslot);
         // Kein Wiederholungsintervall bei Buchung bearbeiten
         if (selectedBuchung.isEmpty()) {
             dialogLayout.add(wiederholungsintervall, endDatum);
@@ -169,7 +147,7 @@ public class BuchungAnlegenDialog extends Dialog {
                 new FormLayout.ResponsiveStep("0", 2));
         dialogLayout.setColspan(veranstaltung, 2);
         dialogLayout.setColspan(dozent, 2);
-        // @ToDo nötig?
+        dialogLayout.setColspan(zeitslot, 2);
         dialogLayout.setMaxWidth("25vw");
 
         return dialogLayout;
@@ -177,8 +155,8 @@ public class BuchungAnlegenDialog extends Dialog {
     }
 
     private void checkIfBelegt() {
-        if (startZeit.getValue() != null && raum.getValue() != null && date.getValue() != null && endZeit.getValue() != null) {
-            if (buchungService.roomBooked(raum.getValue(), startZeit.getValue(), endZeit.getValue(), date.getValue())) {
+        if (zeitslot.getValue() != null && raum.getValue() != null && date.getValue() != null) {
+            if (buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue())) {
                 Notification.show("Raum bereits belegt", 4000, Notification.Position.MIDDLE);
                 save.setEnabled(false);
             } else {
@@ -206,10 +184,9 @@ public class BuchungAnlegenDialog extends Dialog {
         // Erste Buchung wird immer gespeichert, wenn alle Binder erfolgreich
         if (binder.writeBeanIfValid(firstBuchung)) {
             buchungService.save(firstBuchung);
-            if(selectedBuchung.isPresent()){
+            if (selectedBuchung.isPresent()) {
                 binder.getFields().forEach(HasValue::clear);
-                startZeit.setEnabled(false);
-                endZeit.setEnabled(false);
+                zeitslot.setEnabled(false);
             }
             if (wiederholungsintervall.getValue() == Wiederholungsintervall.EINMALIG) {
                 Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);

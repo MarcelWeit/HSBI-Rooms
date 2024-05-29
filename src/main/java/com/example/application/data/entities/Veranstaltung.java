@@ -1,5 +1,6 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -72,6 +73,6 @@ public class Veranstaltung {
 
     @Override
     public String toString() {
-        return id + ", " + bezeichnung;
+        return id + " - " + bezeichnung;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Raumtyp;
 import jakarta.persistence.*;
 
 import java.util.HashSet;

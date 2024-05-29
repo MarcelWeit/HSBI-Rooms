@@ -1,10 +1,12 @@
 package com.example.application;
 
 import com.example.application.data.entities.*;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Raumtyp;
+import com.example.application.data.enums.Role;
 import com.example.application.data.repository.*;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,31 +15,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Set;
 
 /**
- * The entry point of the Spring Boot application.
- * Use the @PWA annotation make the application installable on phones, tablets
- * and some desktop browsers.
+ * @author marcel weithoener
+ * wird bei Start der Anwendung ausgeführt und initialisiert die Datenbank mit Testdaten.
  */
 @SpringBootApplication
 @Theme(value = "raumbuchung")
 public class Application implements AppShellConfigurator, CommandLineRunner {
 
-    @Autowired
-    private AusstattungRepository ausstattungRepository;
+    private final AusstattungRepository ausstattungRepository;
+    private final RaumRepository roomRepository;
+    private final UserRepository userRepository;
+    private final VeranstaltungRepository veranstaltungRepository;
+    private final DozentRepository dozentRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RaumRepository roomRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private VeranstaltungRepository veranstaltungRepository;
-
-    @Autowired
-    private DozentRepository dozentRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public Application(AusstattungRepository ausstattungRepository, RaumRepository roomRepository, UserRepository userRepository, VeranstaltungRepository veranstaltungRepository, DozentRepository dozentRepository, PasswordEncoder passwordEncoder) {
+        this.ausstattungRepository = ausstattungRepository;
+        this.roomRepository = roomRepository;
+        this.userRepository = userRepository;
+        this.veranstaltungRepository = veranstaltungRepository;
+        this.dozentRepository = dozentRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -81,8 +80,8 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
         }
         if (veranstaltungRepository.count() == 0) {
-            veranstaltungRepository.save(new Veranstaltung("CFR23", "SoftwareEngineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
-            veranstaltungRepository.save(new Veranstaltung("CGRH26", "InternesRechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
         }
     }
 }

@@ -1,9 +1,9 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Zeitslot;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
 public class Buchung {
@@ -13,8 +13,9 @@ public class Buchung {
     private long id;
 
     private LocalDate date;
-    private LocalTime startZeit;
-    private LocalTime endZeit;
+    //    private LocalTime startZeit;
+    //    private LocalTime endZeit;
+    private Zeitslot zeitslot;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Raum room;
@@ -28,10 +29,11 @@ public class Buchung {
     public Buchung() {
     }
 
-    public Buchung(Buchung buchung){
+    public Buchung(Buchung buchung) {
         this.date = buchung.getDate();
-        this.startZeit = buchung.getStartZeit();
-        this.endZeit = buchung.getEndZeit();
+        //        this.startZeit = buchung.getStartZeit();
+        //        this.endZeit = buchung.getEndZeit();
+        this.zeitslot = buchung.getZeitslot();
         this.room = buchung.getRoom();
         this.veranstaltung = buchung.getVeranstaltung();
         this.dozent = buchung.getDozent();
@@ -39,10 +41,6 @@ public class Buchung {
 
     public long getId() {
         return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public LocalDate getDate() {
@@ -53,20 +51,12 @@ public class Buchung {
         this.date = date;
     }
 
-    public LocalTime getStartZeit() {
-        return startZeit;
+    public Zeitslot getZeitslot() {
+        return zeitslot;
     }
 
-    public void setStartZeit(LocalTime startZeit) {
-        this.startZeit = startZeit;
-    }
-
-    public LocalTime getEndZeit() {
-        return endZeit;
-    }
-
-    public void setEndZeit(LocalTime endZeit) {
-        this.endZeit = endZeit;
+    public void setZeitslot(Zeitslot zeitslot) {
+        this.zeitslot = zeitslot;
     }
 
     public Raum getRoom() {
@@ -96,10 +86,8 @@ public class Buchung {
     @Override
     public String toString() {
         return "Buchung{" +
-                "id=" + id +
-                ", date=" + date +
-                ", startZeit=" + startZeit +
-                ", endZeit=" + endZeit +
+                "date=" + date +
+                ", zeitslot=" + zeitslot +
                 ", room=" + room +
                 ", veranstaltung=" + veranstaltung +
                 ", dozent=" + dozent +

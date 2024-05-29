@@ -1,8 +1,8 @@
 package com.example.application.views;
 
-import com.example.application.data.entities.Fachbereich;
+import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.entities.Registrierung;
-import com.example.application.data.entities.Role;
+import com.example.application.data.enums.Role;
 import com.example.application.services.EmailService;
 import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;

@@ -15,8 +15,6 @@ import jakarta.annotation.security.RolesAllowed;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +23,10 @@ import java.util.Set;
  * @author marcel weithoener
  */
 @Route(value = "kapa", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
 @PageTitle("Kapazitäten")
-public class KapaView extends VerticalLayout {
+public class AuslastungView extends VerticalLayout {
 
-    private static final double bookableHours = 15.75;
     private final BuchungService buchungService;
     private final RaumService raumService;
     private final DatePicker endDatePicker = new DatePicker("EndDatum");
@@ -43,7 +40,7 @@ public class KapaView extends VerticalLayout {
      * @param buchungService Service für Buchungen
      * @param raumService    Service für Räume
      */
-    public KapaView(BuchungService buchungService, RaumService raumService) {
+    public AuslastungView(BuchungService buchungService, RaumService raumService) {
         this.raumService = raumService;
         this.buchungService = buchungService;
 
@@ -159,14 +156,7 @@ public class KapaView extends VerticalLayout {
         }
 
         private double calculateAuslastung(Set<Buchung> buchungen) {
-            long time = 0;
-            for (Buchung buchung : buchungen) {
-                LocalTime startZeit = buchung.getStartZeit();
-                LocalTime endZeit = buchung.getEndZeit();
-                long diff = ChronoUnit.MINUTES.between(startZeit, endZeit);
-                time = time + diff;
-            }
-            return (double) time / (60 * bookableHours) * 100;
+            return buchungen.size() / 7.0 * 100;
         }
     }
 }

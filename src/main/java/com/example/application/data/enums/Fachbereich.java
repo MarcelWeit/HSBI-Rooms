@@ -1,4 +1,4 @@
-package com.example.application.data.entities;
+package com.example.application.data.enums;
 
 /**
  * @author marcel weithoener

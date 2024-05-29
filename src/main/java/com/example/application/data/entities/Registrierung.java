@@ -1,5 +1,7 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
