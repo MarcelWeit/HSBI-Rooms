@@ -1,6 +1,5 @@
 package com.example.application.views;
 
-import com.example.application.data.dataProvider.VeranstaltungDataProvider;
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Veranstaltung;
@@ -11,10 +10,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.flow.component.crud.BinderCrudEditor;
-import com.vaadin.flow.component.crud.Crud;
-import com.vaadin.flow.component.crud.CrudEditor;
-import com.vaadin.flow.component.crud.CrudI18n;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -41,8 +36,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @Route(value = "veranstaltungVerwaltung-crud", layout = MainLayout.class)
-@Secured({"ADMIN", "FBPlanung"})
-@RolesAllowed({"ADMIN", "FBPlanung"})
+@Secured({"ADMIN", "FBPLANUNG"})
+@RolesAllowed({"ADMIN", "FBPLANUNG"})
 @Uses(Icon.class)
 @PageTitle("Veranstaltungen")
 public class VeranstaltungVerwaltungView extends VerticalLayout {
@@ -50,9 +45,9 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
     private final VeranstaltungService veranstaltungService;
     private final DozentService dozentService;
 
-    private Grid<Veranstaltung> grid = new Grid<>(Veranstaltung.class, false);
+    private final Grid<Veranstaltung> grid = new Grid<>(Veranstaltung.class, false);
 
-    private HorizontalLayout buttonLayout = new HorizontalLayout();
+    private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
     //private final Crud<Veranstaltung> crud;
 
@@ -69,6 +64,17 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         add(grid);
 
     }
+
+    private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
+        TextField textField = new TextField();
+        textField.setValueChangeMode(ValueChangeMode.EAGER);
+        textField.setClearButtonVisible(true);
+        textField.addValueChangeListener(
+                e -> filterChangeConsumer.accept(e.getValue()));
+
+        return textField;
+    }
+
     /*
     private CrudEditor<Veranstaltung> createEditor() {
 
@@ -166,6 +172,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
         buttonLayout.add(create, edit, delete);
     }
+
     private void setupGrid() {
         GridListDataView<Veranstaltung> gridDataView = grid.setItems(veranstaltungService.findAll());
 
@@ -177,6 +184,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
         setupFilters(gridDataView);
     }
+
     private void setupFilters(GridListDataView<Veranstaltung> gridDataView) {
         VeranstaltungFilter vFilter = new VeranstaltungFilter(gridDataView);
         grid.getHeaderRows().clear();
@@ -212,90 +220,16 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         headerRow.getCell(grid.getColumnByKey("bezeichnung")).setComponent(createStringFilterHeader(vFilter::setBezeichnung));
     }
 
-    private static class VeranstaltungFilter {
-        private final GridListDataView<Veranstaltung> gridDataView;
-
-        private String id;
-        private String bezeichnung;
-        private Set<Fachbereich> fachbereich;
-        private int teilnehmerzahl;
-        private Set<Dozent> dozent;
-
-        public VeranstaltungFilter(GridListDataView<Veranstaltung> gridDataView) {
-            this.gridDataView = gridDataView;
-            this.gridDataView.addFilter(this::createFilter);
-        }
-
-        public void setFachbereich(Set<Fachbereich> fachbereich) {
-            this.fachbereich = fachbereich;
-            this.gridDataView.refreshAll();
-        }
-        public void setTeilnehmerzahl(int teilnehmerzahl) {
-            this.teilnehmerzahl = teilnehmerzahl;
-            this.gridDataView.refreshAll();
-        }
-        public void setDozent(Set<Dozent> dozent) {
-            this.dozent = dozent;
-            this.gridDataView.refreshAll();
-        }
-        public void setId(String id) {
-            this.id = id;
-            this.gridDataView.refreshAll();
-        }
-        public void setBezeichnung(String bezeichnung) {
-            this.bezeichnung = bezeichnung;
-            this.gridDataView.refreshAll();
-        }
-        private boolean createFilter(Veranstaltung v) {
-            boolean matchesID = true;
-            boolean matchesBez = true;
-            boolean matchesFB = true;
-            boolean matchesTeiln = true;
-            boolean matchesDoz = true;
-
-            matchesID = compare(v.getId(), id);
-            matchesBez = compare(v.getBezeichnung(), bezeichnung);
-            if(fachbereich != null) {
-                matchesFB = compareSet(v.getFachbereich().toString(), fachbereich);
-            }
-            matchesTeiln = v.getTeilnehmerzahl() >= teilnehmerzahl;
-            if(dozent != null) {
-                matchesDoz = compareSet(v.getDozent().toString(), dozent);
-            }
-
-
-
-
-            return matchesID && matchesBez && matchesFB && matchesTeiln && matchesDoz;
-        }
-        private boolean compare(String value, String searchTerm) {
-            return searchTerm == null || searchTerm.isEmpty()
-                    || value.toLowerCase().contains(searchTerm.toLowerCase());
-        }
-        private boolean compareSet(String value, Set<?> searchTerm) {
-            if(searchTerm.isEmpty()) {
-                return true;
-            }
-
-            Iterator<?> iter = searchTerm.iterator();
-            boolean result = false;
-            while(iter.hasNext()) {
-                if(value.equalsIgnoreCase(iter.next().toString())) {
-                    result = true;
-                }
-            }
-            return result;
-        }
-    }
     private void checkEditDialog() {
         Optional<Veranstaltung> selectedEntry = grid.getSelectionModel().getFirstSelectedItem();
 
-        if(selectedEntry.isPresent()) {
+        if (selectedEntry.isPresent()) {
             createDialog(selectedEntry);
         } else {
             Notification.show("Bitte wählen sie einen Eintrag aus!", 2000, Notification.Position.BOTTOM_CENTER);
         }
     }
+
     private void createDialog(Optional<Veranstaltung> selectedEntry) {
         Dialog dialog = new Dialog();
         FormLayout form = new FormLayout();
@@ -330,24 +264,25 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
         Button saveButton = new Button("Speichern", e -> {
             Veranstaltung veranstaltung = new Veranstaltung();
-            if(binder.writeBeanIfValid(veranstaltung)) {
+            if (binder.writeBeanIfValid(veranstaltung)) {
                 veranstaltungService.save(veranstaltung);
                 grid.setItems(veranstaltungService.findAll());
                 dialog.close();
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen!", 2000, Notification.Position.BOTTOM_CENTER);
             }
-        } );
+        });
         Button cancelButton = new Button("Abbrechen", e -> dialog.close());
 
         dialog.getFooter().add(cancelButton, saveButton);
         dialog.open();
 
     }
+
     private void openDeleteDialog() {
         Optional<Veranstaltung> selected = grid.getSelectionModel().getFirstSelectedItem();
 
-        if(selected.isPresent()) {
+        if (selected.isPresent()) {
             ConfirmDialog confirmDelete = new ConfirmDialog();
 
             confirmDelete.setHeader("Veranstaltung " + selected.get().getId() + " - " + selected.get().getBezeichnung() + " löschen?");
@@ -355,7 +290,9 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
             confirmDelete.setCancelable(true);
 
-            confirmDelete.setCancelButton("Abbrechen", e -> {confirmDelete.close();});
+            confirmDelete.setCancelButton("Abbrechen", e -> {
+                confirmDelete.close();
+            });
 
             confirmDelete.setConfirmButton("Bestätigen", e -> {
                 veranstaltungService.delete(selected.get());
@@ -369,14 +306,86 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
             Notification.show("Bitte wählen sie einen Eintrag aus!", 2000, Notification.Position.BOTTOM_CENTER);
         }
     }
-    private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
-        TextField textField = new TextField();
-        textField.setValueChangeMode(ValueChangeMode.EAGER);
-        textField.setClearButtonVisible(true);
-        textField.addValueChangeListener(
-                e -> filterChangeConsumer.accept(e.getValue()));
 
-        return textField;
+    private static class VeranstaltungFilter {
+        private final GridListDataView<Veranstaltung> gridDataView;
+
+        private String id;
+        private String bezeichnung;
+        private Set<Fachbereich> fachbereich;
+        private int teilnehmerzahl;
+        private Set<Dozent> dozent;
+
+        public VeranstaltungFilter(GridListDataView<Veranstaltung> gridDataView) {
+            this.gridDataView = gridDataView;
+            this.gridDataView.addFilter(this::createFilter);
+        }
+
+        public void setFachbereich(Set<Fachbereich> fachbereich) {
+            this.fachbereich = fachbereich;
+            this.gridDataView.refreshAll();
+        }
+
+        public void setTeilnehmerzahl(int teilnehmerzahl) {
+            this.teilnehmerzahl = teilnehmerzahl;
+            this.gridDataView.refreshAll();
+        }
+
+        public void setDozent(Set<Dozent> dozent) {
+            this.dozent = dozent;
+            this.gridDataView.refreshAll();
+        }
+
+        public void setId(String id) {
+            this.id = id;
+            this.gridDataView.refreshAll();
+        }
+
+        public void setBezeichnung(String bezeichnung) {
+            this.bezeichnung = bezeichnung;
+            this.gridDataView.refreshAll();
+        }
+
+        private boolean createFilter(Veranstaltung v) {
+            boolean matchesID = true;
+            boolean matchesBez = true;
+            boolean matchesFB = true;
+            boolean matchesTeiln = true;
+            boolean matchesDoz = true;
+
+            matchesID = compare(v.getId(), id);
+            matchesBez = compare(v.getBezeichnung(), bezeichnung);
+            if (fachbereich != null) {
+                matchesFB = compareSet(v.getFachbereich().toString(), fachbereich);
+            }
+            matchesTeiln = v.getTeilnehmerzahl() >= teilnehmerzahl;
+            if (dozent != null) {
+                matchesDoz = compareSet(v.getDozent().toString(), dozent);
+            }
+
+
+            return matchesID && matchesBez && matchesFB && matchesTeiln && matchesDoz;
+        }
+
+        private boolean compare(String value, String searchTerm) {
+            return searchTerm == null || searchTerm.isEmpty()
+                    || value.toLowerCase().contains(searchTerm.toLowerCase());
+        }
+
+        private boolean compareSet(String value, Set<?> searchTerm) {
+            if (searchTerm.isEmpty()) {
+                return true;
+            }
+
+            Iterator<?> iter = searchTerm.iterator();
+            boolean result = false;
+            while (iter.hasNext()) {
+                if (value.equalsIgnoreCase(iter.next().toString())) {
+                    result = true;
+                }
+            }
+            return result;
+        }
     }
 
 
