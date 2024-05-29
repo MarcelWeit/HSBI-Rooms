@@ -33,8 +33,6 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     private final String FACHBEREICH = "fachbereich";
     private final String VORNAME = "firstName";
     private final String NACHNAME = "lastName";
-    private final String EMAIL = "username";
-    //private final String FREIGESCHALTEN = "locked";
     private final String ROLLE = "roles";
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
 
@@ -47,6 +45,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         // Creating the Crud component with a custom editor
         this.crud = new Crud<>(User.class, createEditor());
         crud.addThemeVariants(CrudVariant.NO_BORDER);
+        crud.setToolbarVisible(false);
 
         // Setting up the data provider
         setupDataProvider(userService);
@@ -90,6 +89,11 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         grid.removeColumnByKey("id");
         grid.removeColumnByKey("hashedPassword");
         grid.getColumnByKey(EDIT_COLUMN).setFrozenToEnd(true);
+
+        grid.getColumnByKey(VORNAME).setHeader("Vorname");
+        grid.getColumnByKey(NACHNAME).setHeader("Nachname");
+        grid.getColumnByKey(FACHBEREICH).setHeader("Fachbereich");
+        grid.getColumnByKey(ROLLE).setHeader("Rolle");
 
         // grid.setColumnOrder(grid.getColumnByKey(VORNAME),
         //         grid.getColumnByKey(NACHNAME),

@@ -2,33 +2,30 @@ package com.example.application.views;
 
 import com.example.application.data.dataProvider.RegistrierungDataProvider;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.Role;
 import com.example.application.services.DozentService;
 import com.example.application.services.EmailService;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.crud.*;
+import com.vaadin.flow.component.crud.BinderCrudEditor;
+import com.vaadin.flow.component.crud.Crud;
+import com.vaadin.flow.component.crud.CrudI18n;
+import com.vaadin.flow.component.crud.CrudVariant;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
 
 @Route(value = "freischalten", layout = MainLayout.class)
-@PageTitle("User Approval")
+@PageTitle("User freischalten")
 @Secured("ADMIN")
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)
@@ -45,47 +42,15 @@ public class FreischaltenView extends VerticalLayout {
         this.registrierungDataProvider = new RegistrierungDataProvider(userService);
         this.emailService = emailService;
 
-        this.crud = new Crud<>(Registrierung.class, createEditor());
+        this.crud = new Crud<>(Registrierung.class, new BinderCrudEditor<>(new BeanValidationBinder<>(Registrierung.class), new FormLayout()));
         crud.addThemeVariants(CrudVariant.NO_BORDER);
-
         //ohne "New Item" button
         crud.setToolbarVisible(false);
-
-
-        setupDataProvider();
-
-
+        crud.setDataProvider(registrierungDataProvider);
         setupGrid();
-
-
         setupLanguage();
-
-
         add(crud);
         this.dozentService = dozentService;
-    }
-
-    private CrudEditor<Registrierung> createEditor() {
-        TextField vorname = new TextField("Vorname");
-        TextField nachname = new TextField("Nachname");
-        EmailField email = new EmailField("Email");
-        ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
-        fachbereich.setItems(Fachbereich.values());
-        fachbereich.setItemLabelGenerator(Fachbereich::toString);
-        MultiSelectComboBox<Role> rolle = new MultiSelectComboBox<>("Rolle");
-        rolle.setItems(Role.values());
-        rolle.setItemLabelGenerator(Role::toString);
-
-        FormLayout form = new FormLayout(vorname, nachname, email, fachbereich, rolle);
-
-        Binder<Registrierung> binder = new BeanValidationBinder<>(Registrierung.class);
-        binder.forField(vorname).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
-        binder.forField(nachname).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
-        binder.forField(email).asRequired().bind(Registrierung::getUsername, Registrierung::setUsername);
-        binder.forField(fachbereich).asRequired().bind(Registrierung::getFachbereich, Registrierung::setFachbereich);
-        //binder.forField(rolle).asRequired().bind(Registrierung::getRole, Registrierung::setRole);
-
-        return new BinderCrudEditor<>(binder, form);
     }
 
     private void setupGrid() {
@@ -97,41 +62,31 @@ public class FreischaltenView extends VerticalLayout {
         // ohne "Edit" button
         grid.removeColumnByKey("vaadin-crud-edit-column");
 
+        grid.getColumnByKey("username").setHeader("Benutzername");
+        grid.getColumnByKey("firstName").setHeader("Vorname");
+        grid.getColumnByKey("lastName").setHeader("Nachname");
+        grid.getColumnByKey("role").setHeader("Rolle");
+        grid.getColumnByKey("fachbereich").setHeader("Fachbereich");
+
+
         grid.addComponentColumn(registrierung -> {
-            Button approveButton = new Button("Approve");
+            Button approveButton = new Button("Freischalten");
             approveButton.addClickListener(event -> approveRegistration(registrierung));
             return approveButton;
-        }).setHeader("Actions");
+        }).setHeader("Freischalten");
 
         // Make the new "Actions" column fixed at the end
         grid.getColumns().forEach(column -> column.setAutoWidth(true));
-    }
-
-    private void setupDataProvider() {
-        crud.setDataProvider(registrierungDataProvider);
-
-        crud.addDeleteListener(deleteEvent -> {
-            registrierungDataProvider.delete(deleteEvent.getItem());
-            registrierungDataProvider.refreshAll();
-        });
-
-        crud.addSaveListener(saveEvent -> {
-            try {
-                registrierungDataProvider.save(saveEvent.getItem());
-                registrierungDataProvider.refreshAll();
-            } catch (IllegalArgumentException e) {
-                Notification.show(e.getMessage(), 3000, Notification.Position.MIDDLE);
-            }
-        });
     }
 
     private void approveRegistration(Registrierung registrierung) {
         try {
             userService.approveRegistration(registrierung);
             registrierungDataProvider.refreshAll();
-            Notification.show("User approved and moved to Benutzerverwaltung", 3000, Notification.Position.MIDDLE);
+            Notification.show("User wurde freigeschaltet", 3000, Notification.Position.MIDDLE);
             emailService.sendAprovedMail(registrierung.getUsername());
-            if ("DOZENT" == String.valueOf(registrierung.getRole())){
+            registrierungDataProvider.update();
+            if (registrierung.getRole() == Role.DOZENT) {
                 Dozent newDozent = new Dozent();
                 newDozent.setFachbereich(registrierung.getFachbereich());
                 newDozent.setNachname(registrierung.getLastName());
@@ -139,7 +94,7 @@ public class FreischaltenView extends VerticalLayout {
                 dozentService.save(newDozent);
             }
         } catch (Exception e) {
-            Notification.show("Error approving user: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
+            Notification.show("Error bei der Freischaltung: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
         }
     }
 

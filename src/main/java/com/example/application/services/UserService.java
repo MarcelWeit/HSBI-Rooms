@@ -7,8 +7,8 @@ import com.example.application.data.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +19,12 @@ public class UserService {
 
     private final UserRepository repository;
     private final RegistrationRepository registrierungRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository repository, RegistrationRepository registrierungRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
-        this.registrierungRepository  = registrierungRepository;
+        this.registrierungRepository = registrierungRepository;
     }
 
     public Optional<User> get(Long id) {
@@ -81,6 +81,7 @@ public class UserService {
     public void delete(Registrierung registrierung) {
         registrierungRepository.delete(registrierung);
     }
+
     //Nutzer wird in die User Tabelle übertragen und kann sich einloggen
     public void approveRegistration(Registrierung registrierung) {
         User user = new User();

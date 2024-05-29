@@ -1,12 +1,10 @@
 package com.example.application.views;
 
 import com.example.application.comparator.refNrComparator;
-import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.entities.Fachbereich;
-import com.example.application.data.entities.Raum;
-import com.example.application.data.entities.Raumtyp;
+import com.example.application.data.entities.*;
 import com.example.application.dialogs.BuchungAnlegenDialog;
 import com.example.application.dialogs.RaumBuchungenDialog;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -33,7 +31,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.security.access.annotation.Secured;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -41,12 +38,12 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @Route(value = "raumverwaltung", layout = MainLayout.class)
-@Secured("ADMIN")
-@RolesAllowed("ADMIN")
+@RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
 @Uses(Icon.class)
 @PageTitle("Räume verwalten")
 public class RaumView extends VerticalLayout {
 
+    private final AuthenticatedUser currentUser;
     private final AusstattungService ausstattungService;
     private final RaumService roomService;
 
@@ -59,10 +56,10 @@ public class RaumView extends VerticalLayout {
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
     public RaumView(AusstattungService ausstattungService, RaumService roomService, DozentService dozentService,
-                    VeranstaltungService veranstaltungService, BuchungService buchungService) {
+                    VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser currentUser) {
         this.ausstattungService = ausstattungService;
         this.roomService = roomService;
-
+        this.currentUser = currentUser;
         this.dozentService = dozentService;
         this.veranstaltungService = veranstaltungService;
         this.buchungService = buchungService;
@@ -137,7 +134,13 @@ public class RaumView extends VerticalLayout {
         Button showBookingsButton = new Button("Buchungen anzeigen", new Icon(VaadinIcon.CALENDAR));
         showBookingsButton.addClickListener(click -> openShowBookingsDialog());
 
-        buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton);
+        if (currentUser.get().isPresent()) {
+            if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
+                buttonLayout.add(bookRoomButton, showBookingsButton);
+            } else {
+                buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton);
+            }
+        }
     }
 
     private void setupFilter(GridListDataView<Raum> dataView) {

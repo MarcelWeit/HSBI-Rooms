@@ -25,7 +25,7 @@ import java.util.Set;
  * @author marcel weithoener
  */
 @Route(value = "kapa", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
 @PageTitle("Kapazitäten")
 public class KapaView extends VerticalLayout {
 

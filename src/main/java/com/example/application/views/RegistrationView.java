@@ -67,7 +67,7 @@ public class RegistrationView extends VerticalLayout {
         this.emailService = emailService;
         addClassName("registration-view");
         createComponents();
-        fillTestData();
+        //        fillTestData();
     }
 
     /**
@@ -101,9 +101,8 @@ public class RegistrationView extends VerticalLayout {
             if (binder.writeBeanIfValid(registration)) {
                 registration.setHashedPassword(passwordEncoder.encode(registration.getHashedPassword()));
                 registrationService.save(registration);
-                emailService.sendWelcomeEmail(registration.getUsername());
-
                 UI.getCurrent().navigate("login");
+                emailService.sendWelcomeEmail(registration.getUsername());
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
             }
@@ -123,9 +122,10 @@ public class RegistrationView extends VerticalLayout {
         binder.forField(firstName).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
         binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
         binder.forField(email)
-                .withValidator(new EmailValidator("invalid email", false))
-                .withValidator(mail -> !userService.emailExists(mail), "Email already exists")
-                .withValidator(mail -> !registrationService.emailExists(mail), "Email already exists")
+                .asRequired()
+                .withValidator(new EmailValidator("ungültige E-Mail", false))
+                .withValidator(mail -> !userService.emailExists(mail), "Email existiert bereits")
+                .withValidator(mail -> !registrationService.emailExists(mail), "Email existiert bereits")
                 .bind(Registrierung::getUsername, Registrierung::setUsername);
         binder.forField(password)
                 .asRequired()
@@ -143,7 +143,7 @@ public class RegistrationView extends VerticalLayout {
      */
     private ValidationResult passwordValidator(String password, ValueContext valueContext) {
         if (password == null || password.length() < 8) {
-            return ValidationResult.error("Password should be at least 8 characters long");
+            return ValidationResult.error("Passwort muss mindestens 8 Zeichen lang sein");
         }
 
         // erst validieren, wenn ein zweites passwort eingegeben wurde
@@ -158,10 +158,10 @@ public class RegistrationView extends VerticalLayout {
             return ValidationResult.ok();
         }
 
-        return ValidationResult.error("Passwords do not match");
+        return ValidationResult.error("Passwörter stimmen nicht überein");
     }
 
-    // TEMPORARY
+    // @todo TEMPORARY
     private void fillTestData() {
         firstName.setValue("Max");
         lastName.setValue("Mustermann");

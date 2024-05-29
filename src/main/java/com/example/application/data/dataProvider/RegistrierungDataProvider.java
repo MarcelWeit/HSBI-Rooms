@@ -13,10 +13,24 @@ import java.util.stream.Stream;
 public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Registrierung, CrudFilter> {
 
     private final UserService userService;
-    private final List<Registrierung> registrations;
+    private List<Registrierung> registrations;
 
     public RegistrierungDataProvider(UserService userService) {
         this.userService = userService;
+        this.registrations = userService.findAllRegistrierungen();
+    }
+
+    private static Object valueOf(String fieldName, Registrierung registration) {
+        try {
+            var field = Registrierung.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(registration);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void update() {
         this.registrations = userService.findAllRegistrierungen();
     }
 
@@ -49,16 +63,6 @@ public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Regis
                         return false;
                     }
                 }).reduce(Predicate::and).orElse(e -> true);
-    }
-
-    private static Object valueOf(String fieldName, Registrierung registration) {
-        try {
-            var field = Registrierung.class.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(registration);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
     public void save(Registrierung registration) {
