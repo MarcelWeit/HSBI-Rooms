@@ -116,7 +116,6 @@ public class DozentCrud extends Div {
                     Notification.show(saveSuccessMessage, 3000, Notification.Position.BOTTOM_CENTER);
                 }
         });
-
     }
 
     private void setupLanguage() {
