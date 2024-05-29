@@ -90,8 +90,6 @@ public class UserService {
         user.setHashedPassword(registrierung.getHashedPassword());
         user.setRoles(Set.of(registrierung.getRole()));
         user.setFachbereich(registrierung.getFachbereich());
-
-
         //User wird aus der Registrierungstabelle gelöscht
         repository.save(user);
         registrierungRepository.delete(registrierung);

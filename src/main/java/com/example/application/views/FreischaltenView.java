@@ -19,6 +19,7 @@ import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -39,22 +40,15 @@ public class FreischaltenView extends VerticalLayout {
         this.userService = userService;
         this.registrierungDataProvider = new RegistrierungDataProvider(userService);
 
-
         this.crud = new Crud<>(Registrierung.class, createEditor());
         crud.addThemeVariants(CrudVariant.NO_BORDER);
 
         //ohne "New Item" button
         crud.setToolbarVisible(false);
 
-
         setupDataProvider();
-
-
         setupGrid();
-
-
         setupLanguage();
-
 
         add(crud);
     }
