@@ -1,8 +1,8 @@
-package com.example.application.data.repository;
+package com.example.application.repository;
 
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.enums.Fachbereich;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

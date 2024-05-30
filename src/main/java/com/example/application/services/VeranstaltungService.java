@@ -1,9 +1,9 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.entities.Veranstaltung;
-import com.example.application.data.repository.VeranstaltungRepository;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.repository.VeranstaltungRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;

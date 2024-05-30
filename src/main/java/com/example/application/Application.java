@@ -4,7 +4,7 @@ import com.example.application.data.entities.*;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.enums.Raumtyp;
 import com.example.application.data.enums.Role;
-import com.example.application.data.repository.*;
+import com.example.application.repository.*;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
 import org.springframework.boot.CommandLineRunner;

@@ -2,7 +2,7 @@ package com.example.application.services;
 
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.enums.Fachbereich;
-import com.example.application.data.repository.DozentRepository;
+import com.example.application.repository.DozentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

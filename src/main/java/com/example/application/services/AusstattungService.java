@@ -1,7 +1,7 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.repository.AusstattungRepository;
+import com.example.application.repository.AusstattungRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -22,8 +22,8 @@ public class AusstattungService {
         return Set.copyOf(repository.findAll());
     }
 
-    public void update(Ausstattung entity) {
-        repository.save(entity);
+    public Ausstattung save(Ausstattung entity) {
+        return repository.save(entity);
     }
 
     public boolean existsByBezEqualsIgnoreCase(String bez) {

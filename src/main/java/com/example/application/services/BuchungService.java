@@ -5,7 +5,7 @@ import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.data.enums.Zeitslot;
-import com.example.application.data.repository.BuchungRepository;
+import com.example.application.repository.BuchungRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

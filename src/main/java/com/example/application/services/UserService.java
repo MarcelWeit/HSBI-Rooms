@@ -2,13 +2,13 @@ package com.example.application.services;
 
 import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.User;
-import com.example.application.data.repository.RegistrationRepository;
-import com.example.application.data.repository.UserRepository;
+import com.example.application.repository.RegistrationRepository;
+import com.example.application.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,12 +19,12 @@ public class UserService {
 
     private final UserRepository repository;
     private final RegistrationRepository registrierungRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository repository, RegistrationRepository registrierungRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
-        this.registrierungRepository  = registrierungRepository;
+        this.registrierungRepository = registrierungRepository;
     }
 
     public Optional<User> get(Long id) {
@@ -55,6 +55,7 @@ public class UserService {
     public Page<User> list(Pageable pageable, Specification<User> filter) {
         return repository.findAll(filter, pageable);
     }
+
     public void delete(User user) {
         repository.delete(user);
     }
