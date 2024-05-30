@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 @Route(value = "buchungen-raum", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "DOZENT", "FBPLANUNG"})
 @PageTitle("Raumbuchungen")
-public class RaumBuchungenOverviewDialog extends Dialog {
+public class RaumBuchungenDialog extends Dialog {
 
     private final BuchungService buchungService;
     private final Grid<Buchung> raumBuchungGrid = new Grid<>(Buchung.class, false);
@@ -46,7 +46,7 @@ public class RaumBuchungenOverviewDialog extends Dialog {
     private final Optional<Raum> selectedRoom;
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
-    public RaumBuchungenOverviewDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
+    public RaumBuchungenDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
         this.buchungService = buchungService;
         this.roomService = roomService;
         this.selectedRoom = raum;

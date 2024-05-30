@@ -124,8 +124,6 @@ public class BuchungAnlegenDialog extends Dialog {
         if (selectedRoom.isPresent()) {
             raum.setValue(selectedRoom.get());
             raum.setEnabled(false);
-            //            startZeit.setEnabled(true);
-            //            endZeit.setEnabled(true);
             zeitslot.setEnabled(true);
         }
         if (selectedVeranstaltung.isPresent()) {

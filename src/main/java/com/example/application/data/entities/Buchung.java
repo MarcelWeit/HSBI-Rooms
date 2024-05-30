@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
+/**
+ * Diese Klasse repräsentiert eine Buchung in der Datenbank.
+ *
+ * @author Mike Wiebe
+ */
 @Entity
 public class Buchung {
 
@@ -13,8 +18,6 @@ public class Buchung {
     private long id;
 
     private LocalDate date;
-    //    private LocalTime startZeit;
-    //    private LocalTime endZeit;
     private Zeitslot zeitslot;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -29,10 +32,9 @@ public class Buchung {
     public Buchung() {
     }
 
+    // Copy Konstruktor ohne ID
     public Buchung(Buchung buchung) {
         this.date = buchung.getDate();
-        //        this.startZeit = buchung.getStartZeit();
-        //        this.endZeit = buchung.getEndZeit();
         this.zeitslot = buchung.getZeitslot();
         this.room = buchung.getRoom();
         this.veranstaltung = buchung.getVeranstaltung();
