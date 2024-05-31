@@ -9,7 +9,6 @@ import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
 import com.example.application.services.RaumService;
 import com.example.application.services.VeranstaltungService;
-import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -24,18 +23,12 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.provider.SortDirection;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.RolesAllowed;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-@Route(value = "buchungen-raum", layout = MainLayout.class)
-@RolesAllowed({"ADMIN", "DOZENT", "FBPLANUNG"})
-@PageTitle("Raumbuchungen")
 public class RaumBuchungenDialog extends Dialog {
 
     private final BuchungService buchungService;
@@ -140,7 +133,8 @@ public class RaumBuchungenDialog extends Dialog {
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBuchung.isPresent()) {
-            Dialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), Optional.empty(), roomService, dozentService, buchungService, veranstaltungService);
+            Dialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), Optional.empty(), roomService, dozentService,
+                    buchungService, veranstaltungService, Optional.of(this));
             editBookingDialog.open();
         } else {
             Notification.show("Bitte eine Buchung auswählen", 4000, Notification.Position.MIDDLE);
@@ -168,6 +162,10 @@ public class RaumBuchungenDialog extends Dialog {
             confirmDeleteDialog.open();
 
         }
+    }
+
+    public void updateGrid() {
+        raumBuchungGrid.setItems(buchungService.findAll());
     }
 
     private static class BuchungFilter {

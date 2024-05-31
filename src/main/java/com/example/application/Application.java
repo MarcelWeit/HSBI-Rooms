@@ -69,10 +69,16 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             }
             roomRepository.save(new Raum("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
         }
-        if (userRepository.findByUsername("admin@gmail.com") == null) {
-            User user = new User("admin@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
-            user.setHashedPassword(passwordEncoder.encode("admin"));
-            userRepository.save(user);
+        if (userRepository.count() == 0) {
+            User admin = new User("admin@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
+            admin.setHashedPassword(passwordEncoder.encode("admin"));
+            userRepository.save(admin);
+            User dozent = new User("dozent@gmail.com", "Mustermann", "Max", "", Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT);
+            dozent.setHashedPassword(passwordEncoder.encode("dozent"));
+            userRepository.save(dozent);
+            User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", "", Set.of(Role.FBPLANUNG), Fachbereich.WIRTSCHAFT);
+            fbplan.setHashedPassword(passwordEncoder.encode("fbplanung"));
+            userRepository.save(fbplan);
         }
         if (dozentRepository.count() == 0) {
             dozentRepository.save(new Dozent("Wiemann", "Volker", Fachbereich.WIRTSCHAFT));
