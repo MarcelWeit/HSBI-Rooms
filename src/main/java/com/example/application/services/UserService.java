@@ -7,7 +7,6 @@ import com.example.application.data.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,12 +18,10 @@ public class UserService {
 
     private final UserRepository repository;
     private final RegistrationRepository registrierungRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repository, RegistrationRepository registrierungRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, RegistrationRepository registrierungRepository) {
         this.repository = repository;
-        this.passwordEncoder = passwordEncoder;
-        this.registrierungRepository = registrierungRepository;
+        this.registrierungRepository  = registrierungRepository;
     }
 
     public Optional<User> get(Long id) {
@@ -39,11 +36,6 @@ public class UserService {
         return repository.save(entity);
     }
 
-    public void updatePassword(User user, String newPassword) {
-        user.setHashedPassword(passwordEncoder.encode(newPassword));
-        update(user);
-    }
-
     public Page<User> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
@@ -54,6 +46,10 @@ public class UserService {
 
     public Page<User> list(Pageable pageable, Specification<User> filter) {
         return repository.findAll(filter, pageable);
+    }
+
+    public User findById(Long id) {
+        return repository.findById(id).orElse(null);
     }
 
     public void delete(User user) {
@@ -69,7 +65,11 @@ public class UserService {
     }
 
 
+
+
+
     // Methods for Registrierung entity
+
     public List<Registrierung> findAllRegistrierungen() {
         return registrierungRepository.findAll();
     }
@@ -81,7 +81,6 @@ public class UserService {
     public void delete(Registrierung registrierung) {
         registrierungRepository.delete(registrierung);
     }
-
     //Nutzer wird in die User Tabelle übertragen und kann sich einloggen
     public void approveRegistration(Registrierung registrierung) {
         User user = new User();
@@ -91,6 +90,7 @@ public class UserService {
         user.setHashedPassword(registrierung.getHashedPassword());
         user.setRoles(Set.of(registrierung.getRole()));
         user.setFachbereich(registrierung.getFachbereich());
+
 
         //User wird aus der Registrierungstabelle gelöscht
         repository.save(user);

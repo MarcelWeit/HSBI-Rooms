@@ -81,8 +81,8 @@ public class User {
         this.hashedPassword = hashedPassword;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public String getRoles() {
+        return roles.toString();
     }
 
     public void setRoles(Set<Role> roles) {
@@ -103,6 +103,7 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
+
 
 
 }
