@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 /**
  * Testet alle Methoden der RaumService Klasse
  *
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @ExtendWith(MockitoExtension.class)
 public class RaumServiceTest {

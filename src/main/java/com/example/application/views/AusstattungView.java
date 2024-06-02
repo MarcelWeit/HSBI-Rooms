@@ -26,7 +26,7 @@ import org.springframework.security.access.annotation.Secured;
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 
 @Route(value = "show-ausstattung", layout = MainLayout.class)

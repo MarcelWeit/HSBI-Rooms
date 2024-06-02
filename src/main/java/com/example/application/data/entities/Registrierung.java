@@ -32,6 +32,15 @@ public class Registrierung {
     public Registrierung() {
     }
 
+    public Registrierung(String username, String lastName, String firstName, String hashedPassword, Role role, Fachbereich fachbereich) {
+        this.username = username;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.hashedPassword = hashedPassword;
+        this.role = role;
+        this.fachbereich = fachbereich;
+    }
+
     public long getId() {
         return id;
     }

@@ -1,7 +1,7 @@
 package com.example.application.data.enums;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 public enum Raumtyp {
     SEMINARRAUM("Seminarraum"),

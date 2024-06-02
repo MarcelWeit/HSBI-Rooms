@@ -73,7 +73,7 @@ public class BuchungService {
         return Set.copyOf(buchungRepository.findAllByDate(date));
     }
 
-    public Set<Buchung> findAllbyDateAndRoom(LocalDate date, Raum room) {
+    public Set<Buchung> findAllByDateAndRoom(LocalDate date, Raum room) {
         return Set.copyOf(buchungRepository.findByDateAndRoom(date, room));
     }
 }

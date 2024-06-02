@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @Repository
 public interface RaumRepository extends JpaRepository<Raum, String>, JpaSpecificationExecutor<Raum> {

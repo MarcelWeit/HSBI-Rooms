@@ -6,6 +6,7 @@ import com.example.application.data.entities.Raum;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.enums.Raumtyp;
 import com.example.application.data.enums.Role;
+import com.example.application.dialogs.BelegungWocheDialog;
 import com.example.application.dialogs.BuchungAnlegenDialog;
 import com.example.application.dialogs.RaumBuchungenDialog;
 import com.example.application.security.AuthenticatedUser;
@@ -42,9 +43,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * @author marcel weithoener
  * View, um Räume zu verwalten (hinzufügen, bearbeiten, löschen)
  * Räume können gebucht und Buchungen, gelöscht und bearbeitet werden
+ *
+ * @author Marcel Weithoener
  */
 @Route(value = "raumverwaltung", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "DOZENT", "FBPLANUNG"})
@@ -144,12 +146,22 @@ public class RaumView extends VerticalLayout {
         Button showBookingsButton = new Button("Buchungen anzeigen", new Icon(VaadinIcon.CALENDAR));
         showBookingsButton.addClickListener(click -> openShowBookingsDialog());
 
-        if (authenticatedUser.get().isPresent()) {
-            // Dozent kann keine Räume hinzufügen, bearbeiten oder löschen
-            if (authenticatedUser.get().get().getRoles().contains(Role.DOZENT)) {
-                buttonLayout.add(bookRoomButton, showBookingsButton);
+        Button showWeekBookingButton = new Button("KW Verfügbarkeit", new Icon(VaadinIcon.CALENDAR));
+        showWeekBookingButton.addClickListener(click -> {
+            Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
+            if (selectedRoom.isEmpty()) {
+                Notification.show("Bitte wählen Sie einen Raum aus", 2000, Notification.Position.MIDDLE);
             } else {
-                buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton);
+                BelegungWocheDialog belegungWocheDialog = new BelegungWocheDialog(selectedRoom.get(), buchungService);
+                belegungWocheDialog.open();
+            }
+        });
+
+        if (authenticatedUser.get().isPresent()) {
+            buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton, showWeekBookingButton);
+            // Dozent, FBPlanung kann keine Räume hinzufügen, bearbeiten oder löschen
+            if (authenticatedUser.get().get().getRoles().contains(Role.DOZENT) || authenticatedUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+                buttonLayout.remove(addRoomButton, editRoomButton, deleteRoomButton);
             }
         }
     }

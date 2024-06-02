@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @Route(value = "kapa", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
@@ -148,7 +148,7 @@ public class AuslastungView extends VerticalLayout {
                     currentDate = currentDate.plusDays(1);
                     continue;
                 }
-                auslastung += calculateAuslastung(buchungService.findAllbyDateAndRoom(currentDate, raum));
+                auslastung += calculateAuslastung(buchungService.findAllByDateAndRoom(currentDate, raum));
                 currentDate = currentDate.plusDays(1);
                 daycount++;
             }

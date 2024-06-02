@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  * wird bei Start der Anwendung ausgeführt und initialisiert die Datenbank mit Testdaten.
  */
 @SpringBootApplication
@@ -28,14 +28,16 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
     private final VeranstaltungRepository veranstaltungRepository;
     private final DozentRepository dozentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RegistrationRepository registrationRepository;
 
-    public Application(AusstattungRepository ausstattungRepository, RaumRepository roomRepository, UserRepository userRepository, VeranstaltungRepository veranstaltungRepository, DozentRepository dozentRepository, PasswordEncoder passwordEncoder) {
+    public Application(AusstattungRepository ausstattungRepository, RaumRepository roomRepository, UserRepository userRepository, VeranstaltungRepository veranstaltungRepository, DozentRepository dozentRepository, PasswordEncoder passwordEncoder, RegistrationRepository registrationRepository) {
         this.ausstattungRepository = ausstattungRepository;
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
         this.veranstaltungRepository = veranstaltungRepository;
         this.dozentRepository = dozentRepository;
         this.passwordEncoder = passwordEncoder;
+        this.registrationRepository = registrationRepository;
     }
 
     public static void main(String[] args) {
@@ -88,6 +90,11 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         if (veranstaltungRepository.count() == 0) {
             veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
             veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
+        }
+        if (registrationRepository.count() == 0) {
+            Registrierung r = new Registrierung("register@gmail.com", "Meyer", "Sabine", "", Role.DOZENT, Fachbereich.WIRTSCHAFT);
+            r.setHashedPassword(passwordEncoder.encode("register"));
+            registrationRepository.save(r);
         }
     }
 }
