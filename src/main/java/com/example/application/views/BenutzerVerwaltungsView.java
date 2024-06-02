@@ -1,5 +1,8 @@
 package com.example.application.views;
 
+import com.example.application.comparator.LastNameComparator;
+import com.example.application.data.entities.Fachbereich;
+import com.example.application.data.entities.Role;
 import com.example.application.data.entities.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
@@ -11,23 +14,32 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+@Route(value = "Benutzerverwaltung", layout = MainLayout.class)
+@RolesAllowed({"ADMIN"})
+@Uses(Icon.class)
+@PageTitle("Benutzer verwalten")
 public class BenutzerVerwaltungsView extends VerticalLayout {
 
     private final AuthenticatedUser currentUser;
@@ -58,15 +70,29 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     private void setupGrid() {
         GridListDataView<User> dataView = userGrid.setItems(userService.findAll());
 
-        userGrid.addColumn(User::getId).setHeader("ID").setKey("id");
-        userGrid.addColumn(User::getUsername).setHeader("Username").setKey("username");
+        userGrid.addColumn(User::getLastName).setHeader("Nachname")
+                .setComparator(new LastNameComparator())
+                .setKey("nachname");
+        userGrid.addColumn(User::getFirstName).setHeader("Vorname").setKey("vorname");
+        userGrid.addColumn(User::getFachbereich).setHeader("Fachbereich").setKey("fachbereich");
+        userGrid.addColumn(User::getRoles).setHeader("Rolle").setKey("role");
+        userGrid.addColumn(User::getUsername).setHeader("Benutzername").setKey("benutzername");
 
-        userGrid.addColumn(User::getRoles).setHeader("Role").setKey("role");
 
-        userGrid.getColumnByKey("id").setAutoWidth(true).setFlexGrow(0);
-        userGrid.getColumnByKey("username").setAutoWidth(true).setFlexGrow(0);
-        userGrid.getColumnByKey("email").setAutoWidth(true).setFlexGrow(0);
+        userGrid.getColumnByKey("nachname")
+                .setAutoWidth(true).setFlexGrow(0)
+                .setHeader("Nachname");
+        userGrid.getColumnByKey("vorname").setAutoWidth(true).setFlexGrow(0);
+        userGrid.getColumnByKey("fachbereich").setAutoWidth(true).setFlexGrow(0);
         userGrid.getColumnByKey("role").setAutoWidth(true).setFlexGrow(0);
+        userGrid.getColumnByKey("benutzername").setAutoWidth(true).setFlexGrow(0);
+
+
+        // Sort by reference number by default
+        GridSortOrder<User> sortOrder = new GridSortOrder<>(userGrid.getColumnByKey("nachname"), SortDirection.ASCENDING);
+        ArrayList<GridSortOrder<User>> sortOrders = new ArrayList<>();
+        sortOrders.add(sortOrder);
+        userGrid.sort(sortOrders);
 
         userGrid.setMinHeight("80vh");
 
@@ -74,42 +100,24 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     }
 
     private void setupButtons() {
-        Button addUserButton = new Button("Add User", new Icon(VaadinIcon.PLUS));
-        addUserButton.addClickListener(e -> openEditCreateDialog(Optional.empty()));
 
-        Button editUserButton = new Button("Edit User", new Icon(VaadinIcon.EDIT));
+
+        Button editUserButton = new Button("Benutzer bearbeiten", new Icon(VaadinIcon.EDIT));
         editUserButton.addClickListener(e -> {
             Optional<User> selectedUser = userGrid.getSelectionModel().getFirstSelectedItem();
             if (selectedUser.isEmpty()) {
-                Notification.show("Please select a user", 2000, Notification.Position.MIDDLE);
+                Notification.show("Bitte wählen Sie einen Benutzer aus", 2000, Notification.Position.MIDDLE);
             } else {
                 openEditCreateDialog(selectedUser);
             }
         });
 
-        Button deleteUserButton = new Button("Delete User", new Icon(VaadinIcon.TRASH));
+        Button deleteUserButton = new Button("Benutzer Löschen", new Icon(VaadinIcon.TRASH));
         deleteUserButton.addClickListener(e -> openDeleteDialog());
 
-        buttonLayout.add(addUserButton, editUserButton, deleteUserButton);
+        buttonLayout.add( editUserButton, deleteUserButton);
     }
 
-    private void setupFilter(GridListDataView<User> dataView) {
-        UserFilter userFilter = new UserFilter(dataView);
-
-        userGrid.getHeaderRows().clear();
-        HeaderRow headerRow = userGrid.appendHeaderRow();
-
-        headerRow.getCell(userGrid.getColumnByKey("username")).setComponent(createStringFilterHeader(userFilter::setUsername));
-        headerRow.getCell(userGrid.getColumnByKey("email")).setComponent(createStringFilterHeader(userFilter::setEmail));
-
-        Consumer<String> roleFilterChangeConsumer = userFilter::setRole;
-        ComboBox<String> roleComboBox = new ComboBox<>();
-        roleComboBox.setWidthFull();
-        roleComboBox.setItems("ADMIN", "USER");
-        roleComboBox.setClearButtonVisible(true);
-        roleComboBox.addValueChangeListener(e -> roleFilterChangeConsumer.accept(e.getValue()));
-        headerRow.getCell(userGrid.getColumnByKey("role")).setComponent(roleComboBox);
-    }
 
     private void openEditCreateDialog(Optional<User> selectedUser) {
         Dialog dialog = new Dialog();
@@ -117,17 +125,28 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         dialog.setMinWidth("200px");
         FormLayout form = new FormLayout();
 
+        TextField nachname = new TextField("Nachname");
+        TextField vorname = new TextField("Vorname");
+        ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
+        fachbereich.setItems(Fachbereich.values());
         TextField username = new TextField("Username");
-        TextField email = new TextField("Email");
-        ComboBox<String> role = new ComboBox<>("Role");
-        role.setItems("ADMIN", "USER");
+        MultiSelectListBox<String> role = new MultiSelectListBox<>();
+        role.setItems("ADMIN", "DOZENT", "FBPLANUNG");
 
-        form.add(username, email, role);
+        form.add(nachname, vorname, fachbereich, username, role);
         dialog.add(form);
 
+        userBinder.forField(nachname).asRequired("Nachname required").bind(User::getLastName, User::setLastName);
+        userBinder.forField(vorname).asRequired("Vorname required").bind(User::getFirstName, User::setFirstName);
+        userBinder.forField(fachbereich).asRequired("Fachbereich required").bind(User::getFachbereich, User::setFachbereich);
         userBinder.forField(username).asRequired("Username required").bind(User::getUsername, User::setUsername);
-
-        userBinder.forField(role).asRequired("Role required").bind(User::getRoles, User::setRoles);
+        userBinder.forField(role)
+                .bind(
+                        user -> user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()),
+                        (user, rolesString) -> user.setRoles(rolesString.stream()
+                                .map(Role::valueOf)
+                                .collect(Collectors.toSet()))
+                );
 
         if (selectedUser.isPresent()) {
             userBinder.readBean(selectedUser.get());
@@ -137,11 +156,15 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         Button cancelButton = new Button("Cancel", event -> dialog.close());
         Button saveButton = new Button("Save");
         saveButton.addClickListener(event -> {
-            User user = selectedUser.orElseGet(User::new);
-            if (userBinder.writeBeanIfValid(user) || selectedUser.isPresent()) {
-                userService.save(user);
-                userGrid.setItems(userService.findAll());
-                dialog.close();
+            if (role.isEmpty()) {
+                Notification.show("Role required", 2000, Notification.Position.MIDDLE);
+            } else {
+                User user = selectedUser.orElseGet(User::new);
+                if (userBinder.writeBeanIfValid(user) || selectedUser.isPresent()) {
+                    userService.save(user);
+                    userGrid.setItems(userService.findAll());
+                    dialog.close();
+                }
             }
         });
 
@@ -174,25 +197,46 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         }
     }
 
+    private void setupFilter(GridListDataView<User> dataView) {
+        UserFilter userFilter = new UserFilter(dataView);
+
+        userGrid.getHeaderRows().clear();
+        HeaderRow headerRow = userGrid.appendHeaderRow();
+
+        headerRow.getCell(userGrid.getColumnByKey("nachname")).setComponent(createStringFilterHeader(userFilter::setLastName));
+        headerRow.getCell(userGrid.getColumnByKey("vorname")).setComponent(createStringFilterHeader(userFilter::setFirstName));
+        headerRow.getCell(userGrid.getColumnByKey("fachbereich")).setComponent(createStringFilterHeader(userFilter::setFachbereich));
+        headerRow.getCell(userGrid.getColumnByKey("role")).setComponent(createStringFilterHeader(userFilter::setRole));
+        headerRow.getCell(userGrid.getColumnByKey("benutzername")).setComponent(createStringFilterHeader(userFilter::setUsername));
+    }
+
+
     private static class UserFilter {
         private final GridListDataView<User> dataView;
 
-        private String username;
-        private String email;
+        private String lastName;
+        private String firstName;
+        private String fachbereich;
         private String role;
+        private String username;
 
         public UserFilter(GridListDataView<User> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
         }
 
-        public void setUsername(String username) {
-            this.username = username;
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
             this.dataView.refreshAll();
         }
 
-        public void setEmail(String email) {
-            this.email = email;
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+            this.dataView.refreshAll();
+        }
+
+        public void setFachbereich(String fachbereich) {
+            this.fachbereich = fachbereich;
             this.dataView.refreshAll();
         }
 
@@ -201,12 +245,17 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
             this.dataView.refreshAll();
         }
 
+        public void setUsername(String username) {
+            this.username = username;
+            this.dataView.refreshAll();
+        }
+
         public boolean test(User user) {
-            boolean matchesUsername = matches(user.getUsername(), username);
-
-            boolean matchesRole = matches(user.getRoles(), role);
-
-            return matchesUsername && matchesRole;
+            return matches(user.getLastName(), lastName)
+                    && matches(user.getFirstName(), firstName)
+                    && matches(user.getFachbereich().toString(), fachbereich)
+                    && matches(user.getRoles().stream().map(Enum::name).collect(Collectors.joining(",")), role)
+                    && matches(user.getUsername(), username);
         }
 
         private boolean matches(String value, String searchTerm) {

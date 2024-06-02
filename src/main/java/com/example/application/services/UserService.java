@@ -97,4 +97,6 @@ public class UserService {
         registrierungRepository.delete(registrierung);
     }
 
+    public void updatePassword(User user, String newPassword) {
+    }
 }

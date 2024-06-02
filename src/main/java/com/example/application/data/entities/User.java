@@ -81,8 +81,8 @@ public class User {
         this.hashedPassword = hashedPassword;
     }
 
-    public String getRoles() {
-        return roles.toString();
+    public Set<Role> getRoles() {
+        return roles;
     }
 
     public void setRoles(Set<Role> roles) {
