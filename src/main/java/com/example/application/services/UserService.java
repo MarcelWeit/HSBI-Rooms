@@ -68,7 +68,6 @@ public class UserService {
         return repository.existsByUsername(email);
     }
 
-
     private boolean usernameExists(String username, Long id) {
         User user = repository.findByUsername(username);
         return user != null && !user.getId().equals(id);

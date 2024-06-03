@@ -119,6 +119,7 @@ public class RegistrationView extends VerticalLayout {
     /**
      * Binder für die Formularfelder erzeugen
      */
+    //@todo email lower case
     private void setupBinder() {
         binder.forField(firstName).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
         binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
