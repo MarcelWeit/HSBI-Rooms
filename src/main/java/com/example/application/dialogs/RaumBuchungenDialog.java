@@ -1,9 +1,7 @@
 package com.example.application.dialogs;
 
-import com.example.application.data.entities.Buchung;
-import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Raum;
-import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.entities.*;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
 import com.example.application.services.RaumService;
@@ -46,13 +44,15 @@ public class RaumBuchungenDialog extends Dialog {
     private final VeranstaltungService veranstaltungService;
     private final Optional<Raum> selectedRoom;
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
+    private final AuthenticatedUser currentUser;
 
-    public RaumBuchungenDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
+    public RaumBuchungenDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.buchungService = buchungService;
         this.roomService = roomService;
         this.selectedRoom = raum;
         this.dozentService = dozentService;
         this.veranstaltungService = veranstaltungService;
+        this.currentUser = currentUser;
         setupButtons();
         setupGrid();
         add(buttonLayout, raumBuchungGrid);
@@ -85,11 +85,9 @@ public class RaumBuchungenDialog extends Dialog {
         raumBuchungGrid.getColumnByKey("startZeit").setAutoWidth(true).setFlexGrow(0);
         raumBuchungGrid.getColumnByKey("endZeit").setAutoWidth(true).setFlexGrow(0);
 
-        GridSortOrder<Buchung> sortOrderDate = new GridSortOrder<>(raumBuchungGrid.getColumnByKey("date"), SortDirection.ASCENDING);
-        GridSortOrder<Buchung> sortOrderTime = new GridSortOrder<>(raumBuchungGrid.getColumnByKey("startZeit"), SortDirection.ASCENDING);
+        GridSortOrder<Buchung> sortOrder = new GridSortOrder<>(raumBuchungGrid.getColumnByKey("veranstaltung"), SortDirection.ASCENDING);
         ArrayList<GridSortOrder<Buchung>> sortOrders = new ArrayList<>();
-        sortOrders.add(sortOrderDate);
-        sortOrders.add(sortOrderTime);
+        sortOrders.add(sortOrder);
         raumBuchungGrid.sort(sortOrders);
 
         raumBuchungGrid.setMinHeight("80vh");
@@ -130,6 +128,15 @@ public class RaumBuchungenDialog extends Dialog {
         dozentComboBox.setItems(dozentService.findAll());
         dozentComboBox.setClearButtonVisible(true);
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
+        if (currentUser.get().isPresent()) {
+            if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
+                dozentComboBox.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
+                if(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
+                    dozentComboBox.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
+                    dozentComboBox.setEnabled(false);
+                }
+            }
+        }
         headerRow.getCell(raumBuchungGrid.getColumnByKey("dozent")).setComponent(dozentComboBox);
 
         Consumer<LocalDate> dateFilterChangeConsumer = buchungFilter::setDate;
@@ -157,8 +164,9 @@ public class RaumBuchungenDialog extends Dialog {
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBuchung.isPresent()) {
-            Dialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), Optional.empty(), roomService, dozentService, buchungService, veranstaltungService);
+            Dialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), roomService, dozentService, buchungService, veranstaltungService, currentUser);
             editBookingDialog.open();
+            this.close();
         } else {
             Notification.show("Bitte eine Buchung auswählen", 4000, Notification.Position.MIDDLE);
         }
@@ -177,8 +185,8 @@ public class RaumBuchungenDialog extends Dialog {
 
             confirmDeleteDialog.setConfirmButton("Löschen", event -> {
                 buchungService.delete(selectedBooking.get());
-                raumBuchungGrid.setItems(buchungService.findAll());
                 confirmDeleteDialog.close();
+                this.close();
             });
 
             confirmDeleteDialog.setCancelButton("Abbrechen", event -> confirmDeleteDialog.close());
