@@ -65,7 +65,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("HSBI Rooms");
         //        i18n.getHeader().setDescription("Das Raumbuchungstool");
-        i18n.getHeader().setDescription("ADMIN LOGIN admin@gmail.com / admin");
+        i18n.getHeader().setDescription("Das Raumbuchungstool der HSBI");
 
         LoginI18n.Form i18nForm = i18n.getForm();
         i18nForm.setTitle("Einloggen");

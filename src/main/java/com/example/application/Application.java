@@ -81,8 +81,8 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
         }
         if (veranstaltungRepository.count() == 0) {
-            veranstaltungRepository.save(new Veranstaltung("CFR23", "SoftwareEngineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
-            veranstaltungRepository.save(new Veranstaltung("CGRH26", "InternesRechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
         }
     }
 }
