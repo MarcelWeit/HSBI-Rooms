@@ -132,8 +132,10 @@ public class RaumBuchungenDialog extends Dialog {
 
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
+        Optional<Raum> selectedRaum = raumBuchungGrid.getSelectionModel().getFirstSelectedItem().map(Buchung::getRoom);
         if (selectedBuchung.isPresent()) {
-            Dialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), Optional.empty(), roomService, dozentService,
+            Dialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, selectedRaum, Optional.empty(), Optional.empty(), roomService,
+                    dozentService,
                     buchungService, veranstaltungService, Optional.of(this));
             editBookingDialog.open();
         } else {
@@ -164,8 +166,8 @@ public class RaumBuchungenDialog extends Dialog {
         }
     }
 
-    public void updateGrid() {
-        raumBuchungGrid.setItems(buchungService.findAll());
+    public void updateGrid(Raum raum) {
+        raumBuchungGrid.setItems(buchungService.findAllByRoom(raum));
     }
 
     private static class BuchungFilter {

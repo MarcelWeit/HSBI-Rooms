@@ -72,10 +72,6 @@ public class UserService {
         User user = repository.findByUsername(username);
         return user != null && !user.getId().equals(id);
     }
-    //approval
-
-
-    // Methods for Registrierung entity
 
     public List<Registrierung> findAllRegistrierungen() {
         return registrierungRepository.findAll();

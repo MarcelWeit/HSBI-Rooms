@@ -160,8 +160,10 @@ public class RaumView extends VerticalLayout {
         if (authenticatedUser.get().isPresent()) {
             buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton, showWeekBookingButton);
             // Dozent, FBPlanung kann keine Räume hinzufügen, bearbeiten oder löschen
-            if (authenticatedUser.get().get().getRoles().contains(Role.DOZENT) || authenticatedUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+            if (authenticatedUser.get().get().getRoles().contains(Role.DOZENT)) {
                 buttonLayout.remove(addRoomButton, editRoomButton, deleteRoomButton);
+            } else if (authenticatedUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+                buttonLayout.remove(addRoomButton, deleteRoomButton);
             }
         }
     }

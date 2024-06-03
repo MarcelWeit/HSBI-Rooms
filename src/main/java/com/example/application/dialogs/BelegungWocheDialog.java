@@ -23,7 +23,7 @@ public class BelegungWocheDialog extends Dialog {
 
     private final BuchungService buchungService;
     private final Raum selectedRaum;
-    private final H3 kwtitle = new H3();
+    private final H3 kwTitle = new H3();
     private final VerticalLayout verticalLayout;
     private int kw;
 
@@ -43,7 +43,7 @@ public class BelegungWocheDialog extends Dialog {
         Button nextKWButton = new Button("Nächste KW");
         header.setAlignItems(FlexComponent.Alignment.BASELINE);
         updateHeader();
-        header.add(previousKWButton, kwtitle, nextKWButton);
+        header.add(previousKWButton, kwTitle, nextKWButton);
 
         verticalLayout.add(header, createGrid());
         add(verticalLayout);
@@ -65,7 +65,7 @@ public class BelegungWocheDialog extends Dialog {
         LocalDate lastDate = firstDate.plusDays(6);
         String firstDateFormatted = firstDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         String lastDateFormatted = lastDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        kwtitle.setText("KW " + kw + " (" + firstDateFormatted + " - " + lastDateFormatted + ")");
+        kwTitle.setText("KW " + kw + " (" + firstDateFormatted + " - " + lastDateFormatted + ")");
     }
 
     private void updateGrid() {

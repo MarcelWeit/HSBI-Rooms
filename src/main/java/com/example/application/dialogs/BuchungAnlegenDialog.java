@@ -110,7 +110,6 @@ public class BuchungAnlegenDialog extends Dialog {
         binder.forField(dozent).asRequired().bind(Buchung::getDozent, Buchung::setDozent);
         binder.forField(date).asRequired().bind(Buchung::getDate, Buchung::setDate);
 
-
         if (selectedBuchung.isPresent()) {
             binder.forField(zeitslot).asRequired()
                     .bind(Buchung::getZeitslot, Buchung::setZeitslot);
@@ -151,24 +150,15 @@ public class BuchungAnlegenDialog extends Dialog {
 
     }
 
-    //    private void checkIfBelegt() {
-    //        if (zeitslot.getValue() != null && raum.getValue() != null && date.getValue() != null) {
-    //            if (buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue())) {
-    //                Notification.show("Raum bereits belegt", 4000, Notification.Position.MIDDLE);
-    //                save.setEnabled(false);
-    //            } else {
-    //                save.setEnabled(true);
-    //            }
-    //        }
-    //    }
-
     private void createButtonLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
         save.addClickListener(event -> {
             if (validateAndSave()) {
                 if (previousDialog.isPresent()) {
-                    previousDialog.get().updateGrid();
+                    if (selectedRoom.isPresent()) {
+                        previousDialog.get().updateGrid(selectedRoom.get());
+                    }
                 }
                 close();
             }
