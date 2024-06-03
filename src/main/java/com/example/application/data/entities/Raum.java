@@ -1,13 +1,17 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Raumtyp;
 import jakarta.persistence.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @Entity
 public class Raum {
@@ -115,5 +119,22 @@ public class Raum {
         return typ.toString() + " " + refNr;
     }
 
+    // equals und hashCode von JPABuddy generiert
+    // durch andere Implementationen können Probleme bei der Verwendung von Hibernate / SpringBoot entstehen
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Raum raum = (Raum) o;
+        return getRefNr() != null && Objects.equals(getRefNr(), raum.getRefNr());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }
 

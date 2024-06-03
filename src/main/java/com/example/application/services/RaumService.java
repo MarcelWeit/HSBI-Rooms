@@ -2,7 +2,7 @@ package com.example.application.services;
 
 import com.example.application.data.entities.Ausstattung;
 import com.example.application.data.entities.Raum;
-import com.example.application.data.repository.RaumRepository;
+import com.example.application.repository.RaumRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @Service
 public class RaumService {
@@ -21,8 +21,8 @@ public class RaumService {
         this.repository = repository;
     }
 
-    public void save(Raum entity) {
-        repository.save(entity);
+    public Raum save(Raum entity) {
+        return repository.save(entity);
     }
 
     public Set<Raum> findAll() {

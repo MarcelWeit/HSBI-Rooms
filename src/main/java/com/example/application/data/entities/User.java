@@ -1,5 +1,7 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -27,15 +29,9 @@ public class User {
     @JsonIgnore
     private String hashedPassword;
 
-
-
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-
-    //    @Lob
-    //    @Column(length = 1000000)
-    //    private byte[] profilePicture;
 
     private Fachbereich fachbereich;
 
@@ -57,14 +53,6 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public void getID(Long id) {
-        this.id = id;
-    }
-
-    public void setID(Long id) {
-        this.id = id;
     }
 
     public String getLastName() {
@@ -99,14 +87,6 @@ public class User {
         this.roles = roles;
     }
 
-
-
-    //    public byte[] getProfilePicture() {
-    //        return profilePicture;
-    //    }
-    //    public void setProfilePicture(byte[] profilePicture) {
-    //        this.profilePicture = profilePicture;
-    //    }
     public Fachbereich getFachbereich() {
         return fachbereich;
     }
@@ -118,11 +98,5 @@ public class User {
     public Long getId() {
         return id;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
 
 }

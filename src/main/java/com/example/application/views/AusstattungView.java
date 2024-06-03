@@ -26,7 +26,7 @@ import org.springframework.security.access.annotation.Secured;
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 
 @Route(value = "show-ausstattung", layout = MainLayout.class)
@@ -66,7 +66,7 @@ public class AusstattungView extends VerticalLayout {
             } else {
                 Ausstattung newAusstattung = new Ausstattung();
                 newAusstattung.setBez(bez.getValue());
-                ausstattungService.update(newAusstattung);
+                ausstattungService.save(newAusstattung);
                 grid.setItems(ausstattungService.findAll());
                 bez.clear();
             }

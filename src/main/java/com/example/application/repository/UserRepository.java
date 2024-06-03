@@ -1,4 +1,4 @@
-package com.example.application.data.repository;
+package com.example.application.repository;
 
 
 import com.example.application.data.entities.User;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     User findByUsername(String username);
-
 
     boolean existsByUsername(String username);
 

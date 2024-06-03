@@ -20,7 +20,7 @@ import java.time.temporal.WeekFields;
 import java.util.Locale;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @Route(value = "startseite", layout = MainLayout.class)
 @Secured({"DOZENT", "FBPLANUNG", "ADMIN"})

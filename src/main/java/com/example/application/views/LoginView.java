@@ -2,6 +2,7 @@ package com.example.application.views;
 
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
@@ -41,12 +42,26 @@ public class LoginView extends Div implements BeforeEnterObserver {
 
     private void setupFooter() {
         Button registerButton = new Button("Registrieren");
-        //        registerButton.addClassName(LumoUtility.TextAlignment.CENTER);
         registerButton.addClickListener(e -> {
             loginOverlay.setOpened(false);
             getUI().ifPresent(ui -> ui.navigate("register"));
         });
-        loginOverlay.getFooter().add(registerButton);
+
+        Anchor forgotPasswordLink = new Anchor("forgot-password", "Passwort vergessen?");
+        forgotPasswordLink.getElement().addEventListener("click", e -> {
+            loginOverlay.setOpened(false);
+            getUI().ifPresent(ui -> ui.navigate("forgot-password"));
+        });
+
+        Div footer = new Div();
+        footer.add(registerButton, forgotPasswordLink);
+        footer.getStyle().set("display", "flex");
+        footer.getStyle().set("flexDirection", "column");
+        footer.getStyle().set("alignItems", "center");
+        footer.getStyle().set("width", "100%");
+        footer.getStyle().set("gap", "10px"); // Add space between elements
+
+        loginOverlay.getFooter().add(footer);
     }
 
     @Override
@@ -64,7 +79,6 @@ public class LoginView extends Div implements BeforeEnterObserver {
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("HSBI Rooms");
-        //        i18n.getHeader().setDescription("Das Raumbuchungstool");
         i18n.getHeader().setDescription("Das Raumbuchungstool der HSBI");
 
         LoginI18n.Form i18nForm = i18n.getForm();
@@ -72,7 +86,7 @@ public class LoginView extends Div implements BeforeEnterObserver {
         i18nForm.setUsername("E-Mail");
         i18nForm.setPassword("Passwort");
         i18nForm.setSubmit("Einloggen");
-        i18nForm.setForgotPassword("Passwort vergessen?");
+        i18nForm.setForgotPassword("");
         i18n.setForm(i18nForm);
 
         LoginI18n.ErrorMessage i18nErrorMessage = i18n.getErrorMessage();

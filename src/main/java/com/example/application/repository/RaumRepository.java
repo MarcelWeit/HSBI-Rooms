@@ -1,4 +1,4 @@
-package com.example.application.data.repository;
+package com.example.application.repository;
 
 import com.example.application.data.entities.Ausstattung;
 import com.example.application.data.entities.Raum;
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @Repository
 public interface RaumRepository extends JpaRepository<Raum, String>, JpaSpecificationExecutor<Raum> {
