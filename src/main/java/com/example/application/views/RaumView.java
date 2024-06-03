@@ -64,17 +64,17 @@ public class RaumView extends VerticalLayout {
     private final Binder<Raum> roomBinder = new Binder<>(Raum.class);
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
-    private final AuthenticatedUser authenticatedUser;
+    private final AuthenticatedUser currentUser;
 
     public RaumView(AusstattungService ausstattungService, RaumService roomService, DozentService dozentService,
-                    VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser authenticatedUser) {
+                    VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser currentUser) {
         this.ausstattungService = ausstattungService;
         this.roomService = roomService;
         this.dozentService = dozentService;
         this.veranstaltungService = veranstaltungService;
         this.buchungService = buchungService;
 
-        this.authenticatedUser = authenticatedUser;
+        this.currentUser = currentUser;
 
         setupButtons();
         setupGrid();
@@ -157,12 +157,12 @@ public class RaumView extends VerticalLayout {
             }
         });
 
-        if (authenticatedUser.get().isPresent()) {
+        if (currentUser.get().isPresent()) {
             buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton, showWeekBookingButton);
             // Dozent, FBPlanung kann keine Räume hinzufügen, bearbeiten oder löschen
-            if (authenticatedUser.get().get().getRoles().contains(Role.DOZENT)) {
+            if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
                 buttonLayout.remove(addRoomButton, editRoomButton, deleteRoomButton);
-            } else if (authenticatedUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+            } else if (currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
                 buttonLayout.remove(addRoomButton, deleteRoomButton);
             }
         }
@@ -312,8 +312,7 @@ public class RaumView extends VerticalLayout {
     private void openRoomBookDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog roomBookDialog = new BuchungAnlegenDialog(Optional.empty(), selectedRoom, Optional.empty(), Optional.empty(), roomService, dozentService,
-                    buchungService, veranstaltungService, Optional.empty());
+            Dialog roomBookDialog = new BuchungAnlegenDialog(Optional.empty(), selectedRoom, Optional.empty(), roomService, dozentService, buchungService, veranstaltungService, currentUser);
             roomBookDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);
@@ -324,7 +323,7 @@ public class RaumView extends VerticalLayout {
     private void openShowBookingsDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog showBookingsDialog = new RaumBuchungenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService);
+            Dialog showBookingsDialog = new RaumBuchungenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService, currentUser);
             showBookingsDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);

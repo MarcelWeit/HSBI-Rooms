@@ -29,7 +29,6 @@ public class MainLayout extends AppLayout {
     private final AccessAnnotationChecker accessChecker;
     private H2 viewTitle;
 
-
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;

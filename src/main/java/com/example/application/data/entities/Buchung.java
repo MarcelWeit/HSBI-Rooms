@@ -29,6 +29,9 @@ public class Buchung {
     @ManyToOne(fetch = FetchType.EAGER)
     private Dozent dozent;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User user;
+
     public Buchung() {
     }
 
@@ -84,6 +87,10 @@ public class Buchung {
     public void setDozent(Dozent dozent) {
         this.dozent = dozent;
     }
+
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
 
     @Override
     public String toString() {

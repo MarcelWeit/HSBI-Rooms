@@ -1,6 +1,7 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Ausstattung;
+import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Raum;
 import com.example.application.repository.RaumRepository;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ public class RaumService {
     public Set<Raum> findAll() {
         return new HashSet<>(repository.findAll());
     }
+
+    public Set<Raum> findAllByFachbereich(Fachbereich entity) { return new HashSet<>(repository.findAllByFachbereich(entity)); }
 
     public boolean refNrExists(String refNr) {
         return repository.findByRefNr(refNr).isPresent();
