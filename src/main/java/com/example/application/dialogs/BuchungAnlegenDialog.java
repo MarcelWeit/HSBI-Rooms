@@ -83,7 +83,6 @@ public class BuchungAnlegenDialog extends Dialog {
         }
         raum.setItemLabelGenerator(Raum::getRefNr);
         raum.setRequiredIndicatorVisible(true);
-        raum.addValueChangeListener((value -> zeitslot.setEnabled(true)));
 
         veranstaltung.setItems(veranstaltungService.findAll());
         veranstaltung.setItemLabelGenerator(Veranstaltung::getBezeichnung);
@@ -105,7 +104,6 @@ public class BuchungAnlegenDialog extends Dialog {
         date.setRequiredIndicatorVisible(true);
 
         zeitslot.setItems(Zeitslot.values());
-        zeitslot.setEnabled(false);
 
         wiederholungsintervall.setItems(Wiederholungsintervall.values());
         wiederholungsintervall.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);

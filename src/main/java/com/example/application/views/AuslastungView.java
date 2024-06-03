@@ -64,7 +64,7 @@ public class AuslastungView extends VerticalLayout {
                 .setFlexGrow(0)
                 .setAutoWidth(true)
                 .setSortable(true)
-                .setFooter("Anzahl Räume " + (long) raumService.findAll().size());
+                .setFooter("Anzahl Räume: " + raumService.count());
         grid.addColumn(RaumAuslastung::getAuslastungAsString)
                 .setKey("Auslastung")
                 .setHeader("Auslastung")

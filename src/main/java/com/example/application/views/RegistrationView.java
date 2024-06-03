@@ -67,7 +67,6 @@ public class RegistrationView extends VerticalLayout {
         this.emailService = emailService;
         addClassName("registration-view");
         createComponents();
-        fillTestData();
     }
 
     /**
@@ -160,16 +159,6 @@ public class RegistrationView extends VerticalLayout {
         }
 
         return ValidationResult.error("Passwords do not match");
-    }
-
-    // TEMPORARY
-    private void fillTestData() {
-        firstName.setValue("Max");
-        lastName.setValue("Mustermann");
-        email.setValue("max@gmail.com");
-        password.setValue("12345678");
-        confirmPassword.setValue("12345678");
-        fachbereich.setValue(Fachbereich.WIRTSCHAFT);
     }
 
 }

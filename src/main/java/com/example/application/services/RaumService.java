@@ -26,6 +26,10 @@ public class RaumService {
         return repository.save(entity);
     }
 
+    public long count() {
+        return repository.count();
+    }
+
     public Set<Raum> findAll() {
         return new HashSet<>(repository.findAll());
     }

@@ -21,7 +21,6 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.security.access.annotation.Secured;
 
 import java.util.Set;
 
@@ -31,8 +30,7 @@ import java.util.Set;
 
 @Route(value = "show-ausstattung", layout = MainLayout.class)
 @PageTitle("Ausstattung")
-@Secured({"ADMIN", "FBPLANUNG"})
-@RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
+@RolesAllowed({"ADMIN", "FBPLANUNG"})
 @Uses(Icon.class)
 public class AusstattungView extends VerticalLayout {
 
