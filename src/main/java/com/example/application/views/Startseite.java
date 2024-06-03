@@ -1,8 +1,12 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.User;
+import com.example.application.dialogs.BuchungAnlegenDialog;
+import com.example.application.dialogs.RaumBuchungenDialog;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.services.UserService;
+import com.example.application.services.*;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
@@ -18,6 +22,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * @author marcel weithoener
@@ -33,12 +38,21 @@ public class Startseite extends VerticalLayout {
 
     private final AuthenticatedUser authenticatedUser;
 
+    private final RaumService raumService;
+    private final DozentService dozentService;
+    private final BuchungService buchungService;
+    private final VeranstaltungService veranstaltungService;
+
     /**
      * @param userService Service für User
      */
-    public Startseite(UserService userService, AuthenticatedUser authenticatedUser) {
+    public Startseite(UserService userService, AuthenticatedUser authenticatedUser, RaumService raumService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
         this.authenticatedUser = authenticatedUser;
         this.userService = userService;
+        this.raumService = raumService;
+        this.dozentService = dozentService;
+        this.buchungService = buchungService;
+        this.veranstaltungService = veranstaltungService;
         LocalDate today = LocalDate.now();
         int weekNumber = today.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
 
@@ -59,9 +73,20 @@ public class Startseite extends VerticalLayout {
         weekSpan.getStyle().set("border", "1px solid white");
         weekSpan.getStyle().set("padding", "10px");
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
+        Button buchungAnlegen = new Button("Buchung anlegen", click -> {
+            Dialog roomBookDialog = new BuchungAnlegenDialog(Optional.empty(), Optional.empty(), Optional.empty(), raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
+            roomBookDialog.open();
+        });
 
-        add(h2, h3, horizontalLayout);
+        Button eigeneBuchungen = new Button("Eigene Buchungen", click -> {
+            Dialog showBookingsDialog = new RaumBuchungenDialog(Optional.empty(), raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
+            showBookingsDialog.open();
+        });
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
+        HorizontalLayout buchungButtons = new HorizontalLayout(buchungAnlegen, eigeneBuchungen);
+
+        add(h2, h3, horizontalLayout, buchungButtons);
     }
 
 }

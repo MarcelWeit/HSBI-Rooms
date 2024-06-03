@@ -1,13 +1,8 @@
 package com.example.application.dialogs;
 
-import com.example.application.data.entities.Buchung;
-import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Raum;
-import com.example.application.data.entities.Veranstaltung;
-import com.example.application.services.BuchungService;
-import com.example.application.services.DozentService;
-import com.example.application.services.RaumService;
-import com.example.application.services.VeranstaltungService;
+import com.example.application.data.entities.*;
+import com.example.application.security.AuthenticatedUser;
+import com.example.application.services.*;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
@@ -24,6 +19,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -53,9 +51,10 @@ public class BuchungAnlegenDialog extends Dialog {
     private final Optional<Buchung> selectedBuchung;
     private final Optional<Raum> selectedRoom;
     private final Optional<Veranstaltung> selectedVeranstaltung;
-    private final Optional<Dozent> selectedDozent;
 
-    public BuchungAnlegenDialog(Optional<Buchung> selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, Optional<Dozent> selectedDozent, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
+    private final AuthenticatedUser currentUser;
+
+    public BuchungAnlegenDialog(Optional<Buchung> selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.roomService = roomService;
         this.dozentService = dozentService;
         this.buchungService = buchungService;
@@ -63,7 +62,8 @@ public class BuchungAnlegenDialog extends Dialog {
         this.selectedBuchung = selectedBuchung;
         this.selectedRoom = selectedRoom;
         this.selectedVeranstaltung = selectedVeranstaltung;
-        this.selectedDozent = selectedDozent;
+        this.currentUser = currentUser;
+
         add(createInputLayout());
         createButtonLayout();
     }
@@ -71,7 +71,15 @@ public class BuchungAnlegenDialog extends Dialog {
     private FormLayout createInputLayout() {
         FormLayout dialogLayout = new FormLayout();
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
         raum.setItems(roomService.findAll());
+        if(currentUser.get().isPresent()) {
+            if(currentUser.get().get().getRoles().contains(Role.DOZENT) || currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+                raum.setItems(roomService.findAllByFachbereich(currentUser.get().get().getFachbereich()));
+            }
+        }
         raum.setItemLabelGenerator(Raum::getRefNr);
         raum.setRequiredIndicatorVisible(true);
         raum.addValueChangeListener((value -> {
@@ -84,6 +92,15 @@ public class BuchungAnlegenDialog extends Dialog {
         veranstaltung.setRequiredIndicatorVisible(true);
 
         dozent.setItems(dozentService.findAll());
+        if(currentUser.get().isPresent()) {
+            if(currentUser.get().get().getRoles().contains(Role.DOZENT)) {
+                dozent.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
+                if(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
+                    dozent.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
+                    dozent.setEnabled(false);
+                }
+            }
+        }
         dozent.setItemLabelGenerator(Dozent::getNachname);
         dozent.setRequiredIndicatorVisible(true);
 
@@ -140,10 +157,6 @@ public class BuchungAnlegenDialog extends Dialog {
             veranstaltung.setValue(selectedVeranstaltung.get());
             veranstaltung.setEnabled(false);
         }
-        if (selectedDozent.isPresent()) {
-            dozent.setValue(selectedDozent.get());
-            dozent.setEnabled(false);
-        }
 
         dialogLayout.add(raum, date, veranstaltung, dozent, startZeit, endZeit);
         dialogLayout.setResponsiveSteps(
@@ -185,6 +198,9 @@ public class BuchungAnlegenDialog extends Dialog {
     private boolean validateAndSave() {
         Buchung newBuchung = selectedBuchung.orElseGet(Buchung::new);
         if (binder.writeBeanIfValid(newBuchung) || selectedBuchung.isPresent()) {
+            if(currentUser.get().isPresent()) {
+                newBuchung.setUser(currentUser.get().get());
+            }
             buchungService.save(newBuchung);
             Notification sucessNotification = Notification.show("Erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
             sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
