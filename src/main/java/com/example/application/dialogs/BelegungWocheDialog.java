@@ -37,7 +37,7 @@ public class BelegungWocheDialog extends Dialog {
 
         verticalLayout = new VerticalLayout();
         setWidth("50vw");
-        setHeight("50vh");
+        setHeight("60vh");
         HorizontalLayout header = new HorizontalLayout();
         Button previousKWButton = new Button("Vorherige KW");
         Button nextKWButton = new Button("Nächste KW");
