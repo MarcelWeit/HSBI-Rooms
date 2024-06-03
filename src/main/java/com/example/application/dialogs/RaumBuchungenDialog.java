@@ -125,7 +125,7 @@ public class RaumBuchungenDialog extends Dialog {
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
                 dozentComboBox.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
-                if(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
+                if (dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
                     dozentComboBox.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
                     dozentComboBox.setEnabled(false);
                 }
@@ -146,7 +146,7 @@ public class RaumBuchungenDialog extends Dialog {
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBuchung.isPresent()) {
-            Dialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), roomService, dozentService, buchungService, veranstaltungService, currentUser);
+            BuchungAnlegenDialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), roomService, dozentService, buchungService, veranstaltungService, currentUser);
             editBookingDialog.open();
             this.close();
         } else {

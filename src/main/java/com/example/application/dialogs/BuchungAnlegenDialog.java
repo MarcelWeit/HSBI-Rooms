@@ -12,7 +12,6 @@ import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
 import com.example.application.services.RaumService;
 import com.example.application.services.VeranstaltungService;
-import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -30,6 +29,11 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Optional;
 
+/**
+ * Dialog zum Anlegen einer Buchung
+ *
+ * @author Mike Wiebe, Marcel Weithoener
+ */
 public class BuchungAnlegenDialog extends Dialog {
 
     private final RaumService roomService;
@@ -72,8 +76,8 @@ public class BuchungAnlegenDialog extends Dialog {
         FormLayout dialogLayout = new FormLayout();
 
         raum.setItems(roomService.findAll());
-        if(currentUser.get().isPresent()) {
-            if(currentUser.get().get().getRoles().contains(Role.DOZENT) || currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+        if (currentUser.get().isPresent()) {
+            if (currentUser.get().get().getRoles().contains(Role.DOZENT) || currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
                 raum.setItems(roomService.findAllByFachbereich(currentUser.get().get().getFachbereich()));
             }
         }
@@ -86,10 +90,10 @@ public class BuchungAnlegenDialog extends Dialog {
         veranstaltung.setRequiredIndicatorVisible(true);
 
         dozent.setItems(dozentService.findAll());
-        if(currentUser.get().isPresent()) {
-            if(currentUser.get().get().getRoles().contains(Role.DOZENT)) {
+        if (currentUser.get().isPresent()) {
+            if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
                 dozent.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
-                if(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
+                if (dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
                     dozent.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
                     dozent.setEnabled(false);
                 }
@@ -125,6 +129,7 @@ public class BuchungAnlegenDialog extends Dialog {
             binder.forField(zeitslot).asRequired()
                     .bind(Buchung::getZeitslot, Buchung::setZeitslot);
             binder.readBean(selectedBuchung.get());
+            zeitslot.setEnabled(false);
         } else {
             binder.forField(zeitslot).asRequired()
                     .withValidator(event -> !buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue()), "Raum bereits belegt")
@@ -175,7 +180,7 @@ public class BuchungAnlegenDialog extends Dialog {
         Buchung firstBuchung = selectedBuchung.orElseGet(Buchung::new);
         // Erste Buchung wird immer gespeichert, wenn alle Binder erfolgreich
         if (binder.writeBeanIfValid(firstBuchung)) {
-            if(currentUser.get().isPresent()) {
+            if (currentUser.get().isPresent()) {
                 firstBuchung.setUser(currentUser.get().get());
             }
             buchungService.save(firstBuchung);
