@@ -16,6 +16,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -212,7 +213,20 @@ public class BuchungAnlegenDialog extends Dialog {
                     currentDate = currentDate.plusDays(7);
                     Buchung nextBuchung = new Buchung(firstBuchung);
                     nextBuchung.setDate(currentDate);
-                    buchungService.save(nextBuchung);
+                    if(buchungService.roomBooked(nextBuchung.getRoom(), nextBuchung.getZeitslot(), nextBuchung.getDate())) {
+                        ConfirmDialog confirmDialog = new ConfirmDialog();
+                        confirmDialog.setHeader("Raum bereits belegt");
+                        confirmDialog.setText("Raum am " + currentDate + "um " + nextBuchung.getZeitslot() + " bereits belegt. " +
+                                "Möchten Sie trotzdem buchen?");
+                        confirmDialog.setConfirmText("Ja");
+                        confirmDialog.setCancelText("Nein");
+                        confirmDialog.addConfirmListener(confirm -> {
+                           buchungService.save(nextBuchung);
+                        });
+                        confirmDialog.open();
+                    } else {
+                        buchungService.save(nextBuchung);
+                    }
                 }
             }
             Notification sucessNotification = Notification.show("Buchungen erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
