@@ -39,7 +39,7 @@ public class User {
     }
 
     public User(String username, String lastName, String firstName, String hashedPassword, Set<Role> roles, Fachbereich fachbereich) {
-        this.username = username;
+        this.username = username.toLowerCase();
         this.lastName = lastName;
         this.firstName = firstName;
         this.hashedPassword = hashedPassword;
@@ -47,12 +47,13 @@ public class User {
         this.fachbereich = fachbereich;
     }
 
+    // E-Mail äquivalent zu Username
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username.toLowerCase();
     }
 
     public String getLastName() {

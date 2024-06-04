@@ -74,7 +74,8 @@ public class Startseite extends VerticalLayout {
         weekSpan.getStyle().set("padding", "10px");
 
         Button buchungAnlegen = new Button("Buchung anlegen", click -> {
-            Dialog roomBookDialog = new BuchungAnlegenDialog(Optional.empty(), Optional.empty(), Optional.empty(), raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
+            Dialog roomBookDialog = new BuchungAnlegenDialog(null, Optional.empty(), Optional.empty(), raumService, dozentService, buchungService, veranstaltungService,
+                    authenticatedUser);
             roomBookDialog.open();
         });
 

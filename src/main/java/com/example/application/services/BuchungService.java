@@ -37,6 +37,10 @@ public class BuchungService {
         return buchungRepository.save(buchung);
     }
 
+    public Buchung findByDateAndRoomAndZeitslot(LocalDate date, Raum room, Zeitslot zeitslot) {
+        return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot);
+    }
+
     public boolean existsById(Long id) {
         return buchungRepository.existsById(id);
     }
