@@ -69,6 +69,8 @@ public class VeranstaltungView extends VerticalLayout {
         grid.setItemDetailsRenderer(createDetailRenderer());
         grid.setDetailsVisibleOnClick(true);
 
+        grid.setMinHeight("80vh");
+
     }
     private static ComponentRenderer<VeranstaltungDetailsFormLayout, Veranstaltung> createDetailRenderer() {
         return new ComponentRenderer<>(VeranstaltungDetailsFormLayout::new, VeranstaltungDetailsFormLayout::linkData);
