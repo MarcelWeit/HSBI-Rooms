@@ -6,11 +6,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
+ * Repository für die Entität Ausstattung
+ *
  * @author Marcel Weithoener
  */
 @Repository
 public interface AusstattungRepository extends JpaRepository<Ausstattung, Long>, JpaSpecificationExecutor<Ausstattung> {
+
     boolean existsByBezEqualsIgnoreCase(String bez);
 
     Ausstattung findByBez(String bez);
+
 }

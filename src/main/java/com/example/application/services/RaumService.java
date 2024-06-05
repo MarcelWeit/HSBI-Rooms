@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
+ * Service für die Entität Raum
+ *
  * @author Marcel Weithoener
  */
 @Service

@@ -9,6 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 
+/**
+ * Registrierung Entity, wird für Registrierungen verwendet, für die noch kein User angelegt werden soll.
+ * Registrierungen können so in einer extra Tabelle gespeichert werden.
+ *
+ * @author Marcel Weithoener
+ */
 @Entity
 public class Registrierung {
 

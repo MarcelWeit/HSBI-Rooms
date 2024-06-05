@@ -11,6 +11,7 @@ import java.util.Set;
 
 @Repository
 public interface VeranstaltungRepository extends JpaRepository<Veranstaltung, Long>, JpaSpecificationExecutor<Veranstaltung> {
+
     Veranstaltung findById(String id);
 
     Set<Veranstaltung> findAllByBezeichnung(String bezeichnung);
@@ -18,4 +19,5 @@ public interface VeranstaltungRepository extends JpaRepository<Veranstaltung, Lo
     Set<Veranstaltung> findAllByFachbereich(Fachbereich fachbereich);
 
     Set<Veranstaltung> findAllByDozent(Dozent dozent);
+
 }

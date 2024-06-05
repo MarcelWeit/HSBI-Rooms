@@ -25,7 +25,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * @author Marcel Weithoener
+ * @author Marcel Weithoener, Mike Wiebe
  */
 @Route(value = "startseite", layout = MainLayout.class)
 @Secured({"DOZENT", "FBPLANUNG", "ADMIN"})

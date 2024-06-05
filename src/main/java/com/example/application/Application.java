@@ -72,14 +72,11 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             roomRepository.save(new Raum("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
         }
         if (userRepository.count() == 0) {
-            User admin = new User("admin@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
-            admin.setHashedPassword(passwordEncoder.encode("admin"));
+            User admin = new User("admin@gmail.com", "Mustermann", "Max", passwordEncoder.encode("admin"), Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
             userRepository.save(admin);
-            User dozent = new User("jkuester@hsbi.de", "Küster", "Jochen", "", Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT);
-            dozent.setHashedPassword(passwordEncoder.encode("kuester"));
+            User dozent = new User("jkuester@hsbi.de", "Küster", "Jochen", passwordEncoder.encode("kuester"), Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT);
             userRepository.save(dozent);
-            User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", "", Set.of(Role.FBPLANUNG), Fachbereich.WIRTSCHAFT);
-            fbplan.setHashedPassword(passwordEncoder.encode("fbplanung"));
+            User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", passwordEncoder.encode("fbplanung"), Set.of(Role.FBPLANUNG), Fachbereich.WIRTSCHAFT);
             userRepository.save(fbplan);
         }
         if (dozentRepository.count() == 0) {

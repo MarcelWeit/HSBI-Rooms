@@ -29,6 +29,8 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
+ * Registrierungsseite für neue Benutzer
+ *
  * @author Marcel Weithoener
  */
 @PageTitle("Registrierung")
@@ -55,10 +57,6 @@ public class RegistrationView extends VerticalLayout {
 
     /**
      * Konstruktor für die Registrierungsseite
-     *
-     * @param userService         Service für die Benutzer
-     * @param passwordEncoder     Encoder für das Passwort
-     * @param registrationService Service für die Registrierung
      */
     public RegistrationView(UserService userService, PasswordEncoder passwordEncoder, RegistrationService registrationService, EmailService emailService) {
         this.passwordEncoder = passwordEncoder;
@@ -118,7 +116,6 @@ public class RegistrationView extends VerticalLayout {
     /**
      * Binder für die Formularfelder erzeugen
      */
-    //@todo email lower case
     private void setupBinder() {
         binder.forField(firstName).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
         binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);

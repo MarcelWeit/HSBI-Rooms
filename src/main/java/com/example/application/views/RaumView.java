@@ -43,8 +43,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * View, um Räume zu verwalten (hinzufügen, bearbeiten, löschen)
- * Räume können gebucht und Buchungen, gelöscht und bearbeitet werden
+ * View, um Räume zu verwalten (hinzufügen, bearbeiten, löschen).
+ * Zudem können Räume gebucht werden, Buchungen angezeigt und die Verfügbarkeit in einer Kalenderwoche angezeigt werden.
  *
  * @author Marcel Weithoener
  */
@@ -65,7 +65,11 @@ public class RaumView extends VerticalLayout {
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
     private final AuthenticatedUser currentUser;
+    private HeaderRow headerRow;
 
+    /**
+     * Konstruktor der Klasse RaumView
+     */
     public RaumView(AusstattungService ausstattungService, RaumService roomService, DozentService dozentService,
                     VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser currentUser) {
         this.ausstattungService = ausstattungService;
@@ -81,6 +85,12 @@ public class RaumView extends VerticalLayout {
         add(buttonLayout, roomGrid);
     }
 
+    /**
+     * Erstellt ein Textfeld für die Filterung der Räume
+     *
+     * @param filterChangeConsumer Consumer für die Filterung
+     * @return Textfeld für die Filterung
+     */
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
         TextField textField = new TextField();
         textField.setValueChangeMode(ValueChangeMode.EAGER);
@@ -91,6 +101,9 @@ public class RaumView extends VerticalLayout {
         return textField;
     }
 
+    /**
+     * Erstellt das Grid für die Räume
+     */
     private void setupGrid() {
         GridListDataView<Raum> dataView = roomGrid.setItems(roomService.findAll());
 
@@ -123,6 +136,9 @@ public class RaumView extends VerticalLayout {
         setupFilter(dataView);
     }
 
+    /**
+     * Erstellt die Buttons für die Raumverwaltung
+     */
     private void setupButtons() {
         Button addRoomButton = new Button("Raum hinzufügen", new Icon(VaadinIcon.PLUS));
         addRoomButton.addClickListener(e -> openEditCreateDialog(Optional.empty()));
@@ -168,11 +184,18 @@ public class RaumView extends VerticalLayout {
         }
     }
 
+    /**
+     * Erstellt die Filter für die Räume
+     *
+     * @param dataView Data View für die Räume
+     */
     private void setupFilter(GridListDataView<Raum> dataView) {
         RoomFilter roomFilter = new RoomFilter(dataView);
 
         roomGrid.getHeaderRows().clear();
-        HeaderRow headerRow = roomGrid.appendHeaderRow();
+        if (headerRow == null) {
+            headerRow = roomGrid.appendHeaderRow();
+        }
 
         headerRow.getCell(roomGrid.getColumnByKey("refNr")).setComponent(createStringFilterHeader(roomFilter::setRefNr));
 
@@ -217,6 +240,11 @@ public class RaumView extends VerticalLayout {
 
     }
 
+    /**
+     * Öffnet den Dialog zum Bearbeiten oder Erstellen eines Raumes
+     *
+     * @param selectedRoom Optionaler Raum
+     */
     private void openEditCreateDialog(Optional<Raum> selectedRoom) {
         Dialog dialog = new Dialog();
         dialog.setMaxWidth("25vw");
@@ -285,6 +313,9 @@ public class RaumView extends VerticalLayout {
         dialog.open();
     }
 
+    /**
+     * Öffnet den Dialog zum Löschen eines Raumes
+     */
     private void openDeleteDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isEmpty()) {
@@ -309,6 +340,9 @@ public class RaumView extends VerticalLayout {
         }
     }
 
+    /**
+     * Öffnet den Dialog zum Buchen eines Raumes
+     */
     private void openRoomBookDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
@@ -321,6 +355,9 @@ public class RaumView extends VerticalLayout {
 
     }
 
+    /**
+     * Öffnet den Dialog zum Anzeigen der Buchungen eines Raumes
+     */
     private void openShowBookingsDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
@@ -331,6 +368,9 @@ public class RaumView extends VerticalLayout {
         }
     }
 
+    /**
+     * Statische Filter Klasse für die Räume
+     */
     private static class RoomFilter {
         private final GridListDataView<Raum> dataView;
 
