@@ -85,6 +85,11 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Veranstaltungen", VeranstaltungView.class, VaadinIcon.TABLE.create())
             );
         }
+        if (accessChecker.hasAccess(MeineBuchungenView.class)) {
+            nav.addItem(
+                    new SideNavItem("Meine Buchungen", MeineBuchungenView.class, VaadinIcon.TABLE.create())
+            );
+        }
 
         // Kopf Navigation Verwaltung mit Unterpunkten
         SideNavItem verwNav = new SideNavItem("Verwaltung");
