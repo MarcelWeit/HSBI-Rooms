@@ -1,8 +1,8 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.User;
-import com.example.application.dialogs.BuchungAnlegenDialog;
-import com.example.application.dialogs.RaumBuchungenDialog;
+import com.example.application.dialogs.BuchungAnlegenBearbeitenDialog;
+import com.example.application.dialogs.BuchungenAnzeigenDialog;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.vaadin.flow.component.button.Button;
@@ -74,13 +74,13 @@ public class Startseite extends VerticalLayout {
         weekSpan.getStyle().set("padding", "10px");
 
         Button buchungAnlegen = new Button("Buchung anlegen", click -> {
-            Dialog roomBookDialog = new BuchungAnlegenDialog(null, Optional.empty(), Optional.empty(), raumService, dozentService, buchungService, veranstaltungService,
+            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, Optional.empty(), Optional.empty(), raumService, dozentService, buchungService, veranstaltungService,
                     authenticatedUser);
             roomBookDialog.open();
         });
 
         Button eigeneBuchungen = new Button("Eigene Buchungen", click -> {
-            Dialog showBookingsDialog = new RaumBuchungenDialog(Optional.empty(), raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
+            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(Optional.empty(), raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
             showBookingsDialog.open();
         });
 

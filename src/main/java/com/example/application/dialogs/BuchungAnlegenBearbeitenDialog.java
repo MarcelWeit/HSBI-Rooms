@@ -33,11 +33,11 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Dialog zum Anlegen einer Buchung
+ * Dialog zum Anlegen oder bearbeiten einer Buchung
  *
  * @author Mike Wiebe, Marcel Weithoener
  */
-public class BuchungAnlegenDialog extends Dialog {
+public class BuchungAnlegenBearbeitenDialog extends Dialog {
 
     private final RaumService roomService;
     private final DozentService dozentService;
@@ -61,8 +61,8 @@ public class BuchungAnlegenDialog extends Dialog {
 
     private final AuthenticatedUser currentUser;
 
-    public BuchungAnlegenDialog(Buchung selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, RaumService roomService,
-                                DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
+    public BuchungAnlegenBearbeitenDialog(Buchung selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, RaumService roomService,
+                                          DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.roomService = roomService;
         this.dozentService = dozentService;
         this.buchungService = buchungService;
@@ -203,7 +203,7 @@ public class BuchungAnlegenDialog extends Dialog {
         }
         // Wiederholungsintervall soll bei existierenden Buchungen nicht beachtet werden, sondern immer nur die einzelne Buchung wird geändert
         if (selectedBuchung == null) {
-            if (wiederholungsintervall == Wiederholungsintervall.WOECHENTLICH || wiederholungsintervall == Wiederholungsintervall.TAEGLICH) {
+            if (wiederholungsintervall == Wiederholungsintervall.WOECHENTLICH || wiederholungsintervall == Wiederholungsintervall.TAEGLICH || wiederholungsintervall == Wiederholungsintervall.JAEHRLICH) {
                 List<Buchung> gespeicherteBuchungen = new ArrayList<>();
                 gespeicherteBuchungen.add(firstBuchung);
                 LocalDate currentDate = firstBuchung.getDate();
@@ -215,12 +215,14 @@ public class BuchungAnlegenDialog extends Dialog {
                     gespeicherteBuchungen.add(nextBuchung);
                     if (wiederholungsintervall == Wiederholungsintervall.WOECHENTLICH) {
                         currentDate = currentDate.plusDays(7);
-                    } else { // wiederholungsintervall = täglich
+                    } else if (wiederholungsintervall == Wiederholungsintervall.TAEGLICH) {
                         currentDate = currentDate.plusDays(1);
+                    } else {
+                        currentDate = currentDate.plusYears(1); // wiederholungsintervall jährlich
                     }
                 }
                 boolean fehlerBeiBuchung = false;
-                String fehlertext = "Der Raum ist bereits belegt am: \n";
+                String fehlertext = "Der " + raum.getValue() + " ist bereits an folgenden Terminen belegt: \n";
                 for (Buchung buchung : gespeicherteBuchungen) {
                     if (buchungService.roomBooked(buchung.getRoom(), buchung.getZeitslot(), buchung.getDate())) {
                         Buchung konfliktBuchung = buchungService.findByDateAndRoomAndZeitslot(buchung.getDate(), buchung.getRoom(), buchung.getZeitslot());
