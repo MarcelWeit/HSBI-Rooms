@@ -4,11 +4,11 @@ import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
-import com.example.application.data.repository.BuchungRepository;
+import com.example.application.data.enums.Zeitslot;
+import com.example.application.repository.BuchungRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -21,35 +21,13 @@ public class BuchungService {
         this.buchungRepository = buchungRepository;
     }
 
-    public boolean roomBooked(Raum room, LocalTime startZeit, LocalTime endZeit, LocalDate date) {
+    public boolean roomBooked(Raum room, Zeitslot zeitslot, LocalDate date) {
         Set<Buchung> buchungenThisDay = buchungRepository.findByDateAndRoom(date, room);
         boolean belegt = false;
         for (Buchung existingBuchung : buchungenThisDay) {
-            //Startet nachher und endet vor der gewünschten Zeit
-            // In der gewünschten Buchung
-            if (existingBuchung.getStartZeit().isAfter(startZeit) && existingBuchung.getEndZeit().isBefore(endZeit)) {
+            if (existingBuchung.getZeitslot() == zeitslot) {
                 belegt = true;
-            }
-            // Existierende Buchung startet nach unserer und geht noch länger als unsere
-            // Aber überschneidet sich in einem Zeitraum
-            if (existingBuchung.getStartZeit().isAfter(startZeit) && endZeit.isBefore(existingBuchung.getEndZeit())) {
-                belegt = true;
-            }
-            // Startet vorher und endet während der gewünschten Zeit
-            if (existingBuchung.getStartZeit().isBefore(startZeit) && existingBuchung.getEndZeit().isAfter(startZeit)) {
-                belegt = true;
-            }
-            // Neue Buchung liegt innerhalb einer existierenden Buchung
-            if (startZeit.isAfter(existingBuchung.getStartZeit()) && startZeit.isBefore(existingBuchung.getEndZeit())) {
-                belegt = true;
-            }
-            // Neue Buchung fängt vor einer existierenden an und hört nach einer existierenden auf
-            if (startZeit.isBefore(existingBuchung.getEndZeit()) && endZeit.isAfter(existingBuchung.getEndZeit())) {
-                belegt = true;
-            }
-            // Startet zur gleichen Zeit egal wann die Veranstaltung endet
-            if (existingBuchung.getStartZeit().equals(startZeit)) {
-                belegt = true;
+                break;
             }
         }
         return belegt;
@@ -57,6 +35,10 @@ public class BuchungService {
 
     public Buchung save(Buchung buchung) {
         return buchungRepository.save(buchung);
+    }
+
+    public Buchung findByDateAndRoomAndZeitslot(LocalDate date, Raum room, Zeitslot zeitslot) {
+        return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot);
     }
 
     public boolean existsById(Long id) {
@@ -95,7 +77,7 @@ public class BuchungService {
         return Set.copyOf(buchungRepository.findAllByDate(date));
     }
 
-    public Set<Buchung> findAllbyDateAndRoom(LocalDate date, Raum room) {
+    public Set<Buchung> findAllByDateAndRoom(LocalDate date, Raum room) {
         return Set.copyOf(buchungRepository.findByDateAndRoom(date, room));
     }
 }

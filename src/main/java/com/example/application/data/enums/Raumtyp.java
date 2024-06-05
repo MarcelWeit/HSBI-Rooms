@@ -1,7 +1,7 @@
-package com.example.application.data.entities;
+package com.example.application.data.enums;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 public enum Raumtyp {
     SEMINARRAUM("Seminarraum"),
@@ -15,7 +15,7 @@ public enum Raumtyp {
         this.anzeigeName = anzeigeName;
     }
 
-    public String toString(){
+    public String toString() {
         return anzeigeName;
     }
 }

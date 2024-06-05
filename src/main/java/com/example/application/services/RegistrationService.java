@@ -1,7 +1,7 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Registrierung;
-import com.example.application.data.repository.RegistrationRepository;
+import com.example.application.repository.RegistrationRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +18,6 @@ public class RegistrationService {
     }
 
     public boolean emailExists(String email) {
-        return repository.existsByUsername(email);
+        return repository.existsByUsername(email.toLowerCase());
     }
 }

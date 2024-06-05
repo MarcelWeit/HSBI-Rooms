@@ -1,10 +1,12 @@
 package com.example.application;
 
 import com.example.application.data.entities.*;
-import com.example.application.data.repository.*;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Raumtyp;
+import com.example.application.data.enums.Role;
+import com.example.application.repository.*;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,31 +15,30 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Set;
 
 /**
- * The entry point of the Spring Boot application.
- * Use the @PWA annotation make the application installable on phones, tablets
- * and some desktop browsers.
+ * @author Marcel Weithoener
+ * wird bei Start der Anwendung ausgeführt und initialisiert die Datenbank mit Testdaten.
  */
 @SpringBootApplication
 @Theme(value = "raumbuchung")
 public class Application implements AppShellConfigurator, CommandLineRunner {
 
-    @Autowired
-    private AusstattungRepository ausstattungRepository;
+    private final AusstattungRepository ausstattungRepository;
+    private final RaumRepository roomRepository;
+    private final UserRepository userRepository;
+    private final VeranstaltungRepository veranstaltungRepository;
+    private final DozentRepository dozentRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RegistrationRepository registrationRepository;
 
-    @Autowired
-    private RoomRepository roomRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private VeranstaltungRepository veranstaltungRepository;
-
-    @Autowired
-    private DozentRepository dozentRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public Application(AusstattungRepository ausstattungRepository, RaumRepository roomRepository, UserRepository userRepository, VeranstaltungRepository veranstaltungRepository, DozentRepository dozentRepository, PasswordEncoder passwordEncoder, RegistrationRepository registrationRepository) {
+        this.ausstattungRepository = ausstattungRepository;
+        this.roomRepository = roomRepository;
+        this.userRepository = userRepository;
+        this.veranstaltungRepository = veranstaltungRepository;
+        this.dozentRepository = dozentRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.registrationRepository = registrationRepository;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -70,10 +71,16 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             }
             roomRepository.save(new Raum("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
         }
-        if (userRepository.findByUsername("admin@gmail.com") == null) {
-            User user = new User("admin@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
-            user.setHashedPassword(passwordEncoder.encode("admin"));
-            userRepository.save(user);
+        if (userRepository.count() == 0) {
+            User admin = new User("admin@gmail.com", "Mustermann", "Max", "", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
+            admin.setHashedPassword(passwordEncoder.encode("admin"));
+            userRepository.save(admin);
+            User dozent = new User("jkuester@hsbi.de", "Küster", "Jochen", "", Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT);
+            dozent.setHashedPassword(passwordEncoder.encode("kuester"));
+            userRepository.save(dozent);
+            User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", "", Set.of(Role.FBPLANUNG), Fachbereich.WIRTSCHAFT);
+            fbplan.setHashedPassword(passwordEncoder.encode("fbplanung"));
+            userRepository.save(fbplan);
         }
         if (dozentRepository.count() == 0) {
             dozentRepository.save(new Dozent("Wiemann", "Volker", Fachbereich.WIRTSCHAFT));
@@ -81,8 +88,13 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
         }
         if (veranstaltungRepository.count() == 0) {
-            veranstaltungRepository.save(new Veranstaltung("CFR23", "SoftwareEngineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
-            veranstaltungRepository.save(new Veranstaltung("CGRH26", "InternesRechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
+        }
+        if (registrationRepository.count() == 0) {
+            Registrierung r = new Registrierung("register@gmail.com", "Meyer", "Sabine", "", Role.DOZENT, Fachbereich.WIRTSCHAFT);
+            r.setHashedPassword(passwordEncoder.encode("register"));
+            registrationRepository.save(r);
         }
     }
 }

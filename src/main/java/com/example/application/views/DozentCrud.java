@@ -2,7 +2,7 @@ package com.example.application.views;
 
 import com.example.application.data.dataProvider.DozentDataProvider;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Fachbereich;
+import com.example.application.data.enums.Fachbereich;
 import com.example.application.services.DozentService;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
@@ -17,9 +17,6 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.Validator;
-import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -44,7 +41,7 @@ public class DozentCrud extends Div {
     private final String VORNAME = "vorname";
     private final String FACHBEREICH = "fachbereich";
     private final String EDIT_COLUMN = "vaadin-crud-edit-column";
-    private Binder<Dozent> binder = new Binder<>(Dozent.class);
+    private final Binder<Dozent> binder = new Binder<>(Dozent.class);
 
     public DozentCrud(DozentService dozentService) {
         this.dozentService = dozentService;
@@ -103,20 +100,19 @@ public class DozentCrud extends Div {
             Dozent dozent = saveEvent.getItem();
             String duplicateDozentMessage = "Ein Dozent mit diesem Vor- und Nachnamen existiert bereits.";
             String saveSuccessMessage = "Eintrag erfolgreich gespeichert.";
-                if (dataProvider.checkDozentExist(dozent)) {
-                    Notification.show(duplicateDozentMessage, 3000, Notification.Position.BOTTOM_CENTER);
-                    Dozent previousDozent = dataProvider.find(saveEvent.getItem().getId()).orElse(null);
-                    binder.readBean(previousDozent);
-                    dozent.setVorname(previousDozent.getVorname());
-                    dozent.setNachname(previousDozent.getNachname());
-                    setupGrid();
-                }else {
-                    dataProvider.save(dozent);
-                    dataProvider.refreshAll();
-                    Notification.show(saveSuccessMessage, 3000, Notification.Position.BOTTOM_CENTER);
-                }
+            if (dataProvider.checkDozentExist(dozent)) {
+                Notification.show(duplicateDozentMessage, 3000, Notification.Position.BOTTOM_CENTER);
+                Dozent previousDozent = dataProvider.find(saveEvent.getItem().getId()).orElse(null);
+                binder.readBean(previousDozent);
+                dozent.setVorname(previousDozent.getVorname());
+                dozent.setNachname(previousDozent.getNachname());
+                setupGrid();
+            } else {
+                dataProvider.save(dozent);
+                dataProvider.refreshAll();
+                Notification.show(saveSuccessMessage, 3000, Notification.Position.BOTTOM_CENTER);
+            }
         });
-
     }
 
     private void setupLanguage() {

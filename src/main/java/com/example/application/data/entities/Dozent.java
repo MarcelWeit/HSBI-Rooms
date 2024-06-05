@@ -1,5 +1,6 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
 import jakarta.persistence.*;
 
 
@@ -10,10 +11,8 @@ public class Dozent {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private long id;
-
     private String nachname;
     private String vorname;
-
     private Fachbereich fachbereich;
 
     // Konstruktor

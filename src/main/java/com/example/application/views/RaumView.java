@@ -2,10 +2,14 @@ package com.example.application.views;
 
 import com.example.application.comparator.refNrComparator;
 import com.example.application.data.entities.Ausstattung;
-import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Raum;
-import com.example.application.data.entities.Raumtyp;
-import com.example.application.dialogs.BuchungAnlegenDialog;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Raumtyp;
+import com.example.application.data.enums.Role;
+import com.example.application.dialogs.BelegungRaumKalenderwocheDialog;
+import com.example.application.dialogs.BuchungAnlegenBearbeitenDialog;
+import com.example.application.dialogs.BuchungenAnzeigenDialog;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -32,23 +36,26 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.security.access.annotation.Secured;
 
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * View, um Räume zu verwalten (hinzufügen, bearbeiten, löschen)
+ * Räume können gebucht und Buchungen, gelöscht und bearbeitet werden
+ *
+ * @author Marcel Weithoener
+ */
 @Route(value = "raumverwaltung", layout = MainLayout.class)
-@Secured("ADMIN")
-@RolesAllowed("ADMIN")
+@RolesAllowed({"ADMIN", "DOZENT", "FBPLANUNG"})
 @Uses(Icon.class)
 @PageTitle("Räume verwalten")
 public class RaumView extends VerticalLayout {
 
     private final AusstattungService ausstattungService;
     private final RaumService roomService;
-
     private final DozentService dozentService;
     private final VeranstaltungService veranstaltungService;
     private final BuchungService buchungService;
@@ -57,14 +64,17 @@ public class RaumView extends VerticalLayout {
     private final Binder<Raum> roomBinder = new Binder<>(Raum.class);
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
+    private final AuthenticatedUser currentUser;
+
     public RaumView(AusstattungService ausstattungService, RaumService roomService, DozentService dozentService,
-                    VeranstaltungService veranstaltungService, BuchungService buchungService) {
+                    VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser currentUser) {
         this.ausstattungService = ausstattungService;
         this.roomService = roomService;
-
         this.dozentService = dozentService;
         this.veranstaltungService = veranstaltungService;
         this.buchungService = buchungService;
+
+        this.currentUser = currentUser;
 
         setupButtons();
         setupGrid();
@@ -134,17 +144,28 @@ public class RaumView extends VerticalLayout {
         bookRoomButton.addClickListener(click -> openRoomBookDialog());
 
         Button showBookingsButton = new Button("Buchungen anzeigen", new Icon(VaadinIcon.CALENDAR));
-        showBookingsButton.addClickListener(click -> {
+        showBookingsButton.addClickListener(click -> openShowBookingsDialog());
+
+        Button showWeekBookingButton = new Button("KW Verfügbarkeit", new Icon(VaadinIcon.CALENDAR));
+        showWeekBookingButton.addClickListener(click -> {
             Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
-            if (selectedRoom.isPresent()) {
-                Dialog roomBookingsDialog = new Dialog();
-                roomBookingsDialog.open();
+            if (selectedRoom.isEmpty()) {
+                Notification.show("Bitte wählen Sie einen Raum aus", 2000, Notification.Position.MIDDLE);
             } else {
-                Notification.show("Bitte wählen Sie einen Raum aus", 4000, Notification.Position.MIDDLE);
+                BelegungRaumKalenderwocheDialog belegungWocheDialog = new BelegungRaumKalenderwocheDialog(selectedRoom.get(), buchungService);
+                belegungWocheDialog.open();
             }
         });
 
-        buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton);
+        if (currentUser.get().isPresent()) {
+            buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton, showWeekBookingButton);
+            // Dozent, FBPlanung kann keine Räume hinzufügen, bearbeiten oder löschen
+            if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
+                buttonLayout.remove(addRoomButton, editRoomButton, deleteRoomButton);
+            } else if (currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+                buttonLayout.remove(addRoomButton, deleteRoomButton);
+            }
+        }
     }
 
     private void setupFilter(GridListDataView<Raum> dataView) {
@@ -291,12 +312,23 @@ public class RaumView extends VerticalLayout {
     private void openRoomBookDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog roomBookDialog = new BuchungAnlegenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService);
+            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, selectedRoom, Optional.empty(), roomService, dozentService, buchungService, veranstaltungService,
+                    currentUser);
             roomBookDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);
         }
 
+    }
+
+    private void openShowBookingsDialog() {
+        Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
+        if (selectedRoom.isPresent()) {
+            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService, currentUser);
+            showBookingsDialog.open();
+        } else {
+            Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);
+        }
     }
 
     private static class RoomFilter {

@@ -90,6 +90,11 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Meine Buchungen", MeineBuchungenView.class, VaadinIcon.TABLE.create())
             );
         }
+        if (accessChecker.hasAccess(AuslastungView.class)) {
+            nav.addItem(
+                    new SideNavItem("Auslastung", AuslastungView.class, VaadinIcon.BAR_CHART_H.create())
+            );
+        }
 
         // Kopf Navigation Verwaltung mit Unterpunkten
         SideNavItem verwNav = new SideNavItem("Verwaltung");
@@ -105,13 +110,17 @@ public class MainLayout extends AppLayout {
             verwNav.addItem(
                     new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
         }
+        if (accessChecker.hasAccess(BenutzerVerwaltungsView.class)) {
+            verwNav.addItem(
+                    new SideNavItem("BenutzerVerwaltung", BenutzerVerwaltungsView.class, VaadinIcon.TABLE.create()));
+        }
+        if (accessChecker.hasAccess(FreischaltenView.class)) {
+            verwNav.addItem(
+                    new SideNavItem("Registrierungen", FreischaltenView.class, VaadinIcon.TABLE.create()));
+        }
         if (accessChecker.hasAccess(DozentCrud.class)) {
             verwNav.addItem(
                     new SideNavItem("Dozenten", DozentCrud.class, VaadinIcon.USERS.create()));
-        }
-        if (accessChecker.hasAccess(RaumBuchungenView.class)) {
-            verwNav.addItem(
-                    new SideNavItem("RaumBuchungen", RaumBuchungenView.class, VaadinIcon.TABLE.create()));
         }
 
         verwNav.setExpanded(true);

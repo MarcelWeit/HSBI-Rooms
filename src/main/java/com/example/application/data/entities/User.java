@@ -1,5 +1,7 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -7,7 +9,9 @@ import jakarta.validation.constraints.Email;
 import java.util.Set;
 
 @Entity
-@Table(name = "application_user")
+@Table(name = "application_user", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username")
+})
 public class User {
 
     @Id
@@ -16,6 +20,7 @@ public class User {
     private Long id;
 
     @Email
+    @Column(unique = true)
     private String username;
 
     private String lastName;
@@ -28,17 +33,13 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
-    //    @Lob
-    //    @Column(length = 1000000)
-    //    private byte[] profilePicture;
-
     private Fachbereich fachbereich;
 
     public User() {
     }
 
     public User(String username, String lastName, String firstName, String hashedPassword, Set<Role> roles, Fachbereich fachbereich) {
-        this.username = username;
+        this.username = username.toLowerCase();
         this.lastName = lastName;
         this.firstName = firstName;
         this.hashedPassword = hashedPassword;
@@ -46,12 +47,13 @@ public class User {
         this.fachbereich = fachbereich;
     }
 
+    // E-Mail äquivalent zu Username
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username.toLowerCase();
     }
 
     public String getLastName() {
@@ -86,12 +88,6 @@ public class User {
         this.roles = roles;
     }
 
-    //    public byte[] getProfilePicture() {
-    //        return profilePicture;
-    //    }
-    //    public void setProfilePicture(byte[] profilePicture) {
-    //        this.profilePicture = profilePicture;
-    //    }
     public Fachbereich getFachbereich() {
         return fachbereich;
     }
@@ -103,10 +99,5 @@ public class User {
     public Long getId() {
         return id;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
 
 }
