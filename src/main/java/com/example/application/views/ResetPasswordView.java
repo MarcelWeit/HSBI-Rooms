@@ -1,7 +1,7 @@
 package com.example.application.views;
 
-import com.example.application.services.PasswordResetService;
 import com.example.application.data.entities.PasswordResetToken;
+import com.example.application.services.PasswordResetService;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
@@ -13,7 +13,6 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ public class ResetPasswordView extends VerticalLayout implements BeforeEnterObse
     private final UserService userService;
     private PasswordResetToken token;
 
-    @Autowired
     public ResetPasswordView(PasswordResetService passwordResetService, UserService userService) {
         this.passwordResetService = passwordResetService;
         this.userService = userService;

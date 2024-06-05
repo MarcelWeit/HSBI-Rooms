@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @Entity
 public class Ausstattung {

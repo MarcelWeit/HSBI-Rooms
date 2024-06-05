@@ -1,5 +1,7 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +30,15 @@ public class Registrierung {
     private Fachbereich fachbereich;
 
     public Registrierung() {
+    }
+
+    public Registrierung(String username, String lastName, String firstName, String hashedPassword, Role role, Fachbereich fachbereich) {
+        this.username = username;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.hashedPassword = hashedPassword;
+        this.role = role;
+        this.fachbereich = fachbereich;
     }
 
     public long getId() {

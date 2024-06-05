@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Registrierung, CrudFilter> {
 
     private final UserService userService;
-    private final List<Registrierung> registrations;
+    private List<Registrierung> registrations;
 
     public RegistrierungDataProvider(UserService userService) {
         this.userService = userService;
@@ -67,5 +67,10 @@ public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Regis
 
     public void delete(Registrierung registration) {
         userService.delete(registration);
+    }
+
+    public void freischalten(Registrierung registration) {
+        userService.approveRegistration(registration);
+        registrations = userService.findAllRegistrierungen();
     }
 }
