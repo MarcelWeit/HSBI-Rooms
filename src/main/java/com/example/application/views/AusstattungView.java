@@ -66,7 +66,7 @@ public class AusstattungView extends VerticalLayout {
             } else {
                 Ausstattung newAusstattung = new Ausstattung();
                 newAusstattung.setBez(bez.getValue());
-                ausstattungService.update(newAusstattung);
+                ausstattungService.save(newAusstattung);
                 grid.setItems(ausstattungService.findAll());
                 bez.clear();
             }

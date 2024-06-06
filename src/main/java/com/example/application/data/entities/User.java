@@ -3,6 +3,8 @@ package com.example.application.data.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 
 import java.util.Set;
 

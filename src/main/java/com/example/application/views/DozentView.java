@@ -3,7 +3,7 @@ package com.example.application.views;
 import com.example.application.comparator.NachnameComparator;
 import com.example.application.comparator.VornameComparator;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Fachbereich;
+import com.example.application.data.enums.Fachbereich;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
 import com.vaadin.flow.component.button.Button;

@@ -2,8 +2,8 @@ package com.example.application.services;
 
 import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.User;
-import com.example.application.data.repository.RegistrationRepository;
-import com.example.application.data.repository.UserRepository;
+import com.example.application.repository.RegistrationRepository;
+import com.example.application.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

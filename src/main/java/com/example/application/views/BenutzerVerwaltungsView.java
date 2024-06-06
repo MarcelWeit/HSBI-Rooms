@@ -1,8 +1,8 @@
 package com.example.application.views;
 
 import com.example.application.comparator.LastNameComparator;
-import com.example.application.data.entities.Fachbereich;
-import com.example.application.data.entities.Role;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.example.application.data.entities.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
