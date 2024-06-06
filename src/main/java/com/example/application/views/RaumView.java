@@ -265,8 +265,8 @@ public class RaumView extends VerticalLayout {
         if (selectedRoom.isPresent()) {
             roomBinder.readBean(selectedRoom.get());
             refNr.setEnabled(false);
-           // refNr.setErrorMessage(null);
-           // refNr.setInvalid(false);
+            refNr.setErrorMessage(null);
+            refNr.setInvalid(false);
         }
 
         Button cancelButton = new Button("Abbrechen", event -> dialog.close());
@@ -279,7 +279,7 @@ public class RaumView extends VerticalLayout {
                 room = new Raum();
             }
 
-            if (roomBinder.writeBeanIfValid(room)) {
+            if (roomBinder.writeBeanIfValid(room) ) {
                 roomService.save(room);
                 roomGrid.setItems(roomService.findAll());
                 dialog.close();
