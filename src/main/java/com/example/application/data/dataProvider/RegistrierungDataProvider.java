@@ -1,7 +1,7 @@
 package com.example.application.data.dataProvider;
 
 import com.example.application.data.entities.Registrierung;
-import com.example.application.services.UserService;
+import com.example.application.services.FreischaltenService;
 import com.vaadin.flow.component.crud.CrudFilter;
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
@@ -12,12 +12,12 @@ import java.util.stream.Stream;
 
 public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Registrierung, CrudFilter> {
 
-    private final UserService userService;
+    private final FreischaltenService freischaltenService;
     private List<Registrierung> registrations;
 
-    public RegistrierungDataProvider(UserService userService) {
-        this.userService = userService;
-        this.registrations = userService.findAllRegistrierungen();
+    public RegistrierungDataProvider(FreischaltenService freischaltenService) {
+        this.freischaltenService = freischaltenService;
+        this.registrations = freischaltenService.findAllRegistrierungen();
     }
 
     private static Object valueOf(String fieldName, Registrierung registration) {
@@ -31,7 +31,7 @@ public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Regis
     }
 
     public void update() {
-        this.registrations = userService.findAllRegistrierungen();
+        this.registrations = freischaltenService.findAllRegistrierungen();
     }
 
     @Override
@@ -66,10 +66,10 @@ public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Regis
     }
 
     public void save(Registrierung registration) {
-        userService.save(registration);
+        freischaltenService.save(registration);
     }
 
     public void delete(Registrierung registration) {
-        userService.delete(registration);
+        freischaltenService.delete(registration);
     }
 }

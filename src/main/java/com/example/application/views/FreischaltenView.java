@@ -1,9 +1,11 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Registrierung;
-import com.example.application.services.UserService;
+import com.example.application.services.FreischaltenService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -15,17 +17,18 @@ import jakarta.annotation.security.RolesAllowed;
 public class FreischaltenView extends VerticalLayout {
 
     private final Grid<Registrierung> grid;
-    private final UserService userService;
+    private final FreischaltenService freischaltenService;
 
-    public FreischaltenView(UserService userService) {
-        this.userService = userService;
+    public FreischaltenView(FreischaltenService freischaltenService) {
+        this.freischaltenService = freischaltenService;
         this.grid = new Grid<>(Registrierung.class, false);
         setupGrid();
+        grid.setItems(freischaltenService.findAllRegistrierungen());
         add(grid);
     }
 
     private void setupGrid() {
-        grid.setColumns("firstName", "lastName", "fachbereich", "role", "username");
+        grid.setColumns("lastName", "firstName", "fachbereich", "role", "username");
 
         grid.getColumnByKey("username").setHeader("Benutzername");
         grid.getColumnByKey("firstName").setHeader("Vorname");
@@ -34,18 +37,30 @@ public class FreischaltenView extends VerticalLayout {
         grid.getColumnByKey("fachbereich").setHeader("Fachbereich");
 
         grid.addComponentColumn(registrierung -> {
+            HorizontalLayout buttonsLayout = new HorizontalLayout();
+
             Button approveButton = new Button("Freischalten");
             approveButton.addClickListener(event -> approveRegistration(registrierung));
-            return approveButton;
-        }).setHeader("Freischalten");
+            buttonsLayout.add(approveButton);
 
-        grid.getColumns().forEach(column -> column.setAutoWidth(true));
-        grid.setItems(userService.findAllRegistrierungen());
+            Button deleteButton = new Button("Ablehnen");
+            deleteButton.addClickListener(event -> deleteRegistration(registrierung));
+            buttonsLayout.add(deleteButton);
+
+            return buttonsLayout;
+        }).setHeader("Aktionen");
     }
 
     private void approveRegistration(Registrierung registrierung) {
-        userService.approveRegistration(registrierung);
-        grid.setItems(userService.findAllRegistrierungen());
+        freischaltenService.approveRegistration(registrierung);
+        grid.setItems(freischaltenService.findAllRegistrierungen());
+        //Notification
+        Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
+    }
+    private void deleteRegistration(Registrierung registrierung) {
+        freischaltenService.delete(registrierung);
+        grid.setItems(freischaltenService.findAllRegistrierungen());
+        Notification.show("Registrierung abgelehnt", 3000, Notification.Position.MIDDLE);
     }
 }
 

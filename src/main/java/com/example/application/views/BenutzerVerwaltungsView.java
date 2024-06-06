@@ -79,13 +79,12 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         userGrid.addColumn(User::getUsername).setHeader("Benutzername").setKey("benutzername");
 
 
-        userGrid.getColumnByKey("nachname")
-                .setAutoWidth(true).setFlexGrow(0)
-                .setHeader("Nachname");
-        userGrid.getColumnByKey("vorname").setAutoWidth(true).setFlexGrow(0);
-        userGrid.getColumnByKey("fachbereich").setAutoWidth(true).setFlexGrow(0);
-        userGrid.getColumnByKey("role").setAutoWidth(true).setFlexGrow(0);
-        userGrid.getColumnByKey("benutzername").setAutoWidth(true).setFlexGrow(0);
+        userGrid.getColumnByKey("nachname").setHeader("Nachname");
+        userGrid.getColumnByKey("vorname");
+        userGrid.getColumnByKey("fachbereich");
+        userGrid.getColumnByKey("role");
+        userGrid.getColumnByKey("benutzername");
+        //userGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
 
         // Sort by reference number by default
@@ -118,12 +117,16 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         buttonLayout.add( editUserButton, deleteUserButton);
     }
 
-
+    //Edit
     private void openEditCreateDialog(Optional<User> selectedUser) {
         Dialog dialog = new Dialog();
         dialog.setMaxWidth("25vw");
         dialog.setMinWidth("200px");
         FormLayout form = new FormLayout();
+        form.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("600px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP)
+        );
 
         TextField nachname = new TextField("Nachname");
         TextField vorname = new TextField("Vorname");
@@ -131,6 +134,9 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         fachbereich.setItems(Fachbereich.values());
         TextField username = new TextField("Username");
         MultiSelectListBox<String> role = new MultiSelectListBox<>();
+        role.getElement().getStyle().set("border-radius", "20px");
+        role.getElement().getStyle().set("margin", "1em");
+        role.getElement().getStyle().set("padding", "0.5em");
         role.setItems("ADMIN", "DOZENT", "FBPLANUNG");
 
         form.add(nachname, vorname, fachbereich, username, role);
