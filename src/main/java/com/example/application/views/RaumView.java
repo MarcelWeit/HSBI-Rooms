@@ -265,15 +265,21 @@ public class RaumView extends VerticalLayout {
         if (selectedRoom.isPresent()) {
             roomBinder.readBean(selectedRoom.get());
             refNr.setEnabled(false);
-            refNr.setErrorMessage(null);
-            refNr.setInvalid(false);
+           // refNr.setErrorMessage(null);
+           // refNr.setInvalid(false);
         }
 
         Button cancelButton = new Button("Abbrechen", event -> dialog.close());
         Button saveButton = new Button("Speichern");
         saveButton.addClickListener(event -> {
-            Raum room = selectedRoom.orElseGet(Raum::new);
-            if (roomBinder.writeBeanIfValid(room) || selectedRoom.isPresent()) {
+            Raum room;
+            if (selectedRoom.isPresent()){
+                room = selectedRoom.get();
+            }else{
+                room = new Raum();
+            }
+
+            if (roomBinder.writeBeanIfValid(room)) {
                 roomService.save(room);
                 roomGrid.setItems(roomService.findAll());
                 dialog.close();
