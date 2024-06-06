@@ -66,6 +66,7 @@ public class RaumView extends VerticalLayout {
 
     private final AuthenticatedUser currentUser;
     private final RaumService raumService;
+    private GridListDataView<Raum> dataView;
     private HeaderRow headerRow;
 
     /**
@@ -107,10 +108,10 @@ public class RaumView extends VerticalLayout {
      * Erstellt das Grid für die Räume
      */
     private void setupGrid() {
-        updateGrid();
+        //updateGrid();
 
-        GridListDataView<Raum> dataView = roomGrid.getListDataView();
-
+        //dataView = roomGrid.getListDataView();
+        dataView = roomGrid.setItems(roomService.findAll());
         roomGrid.addColumn(Raum::getRefNr).setHeader("Referenznummer")
                 .setComparator(new refNrComparator())
                 .setKey("refNr");
@@ -137,7 +138,7 @@ public class RaumView extends VerticalLayout {
 
         roomGrid.setMinHeight("80vh");
 
-        setupFilter(dataView);
+        setupFilter();
     }
 
     /**
@@ -191,12 +192,12 @@ public class RaumView extends VerticalLayout {
     /**
      * Erstellt die Filter für die Räume
      *
-     * @param dataView Data View für die Räume
+     *
      */
-    private void setupFilter(GridListDataView<Raum> dataView) {
+    private void setupFilter() {
         RoomFilter roomFilter = new RoomFilter(dataView);
 
-        roomGrid.getHeaderRows().clear();
+        //roomGrid.getHeaderRows().clear();
         if (headerRow == null) {
             headerRow = roomGrid.appendHeaderRow();
         }
@@ -382,7 +383,8 @@ public class RaumView extends VerticalLayout {
     private void updateGrid() {
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.ADMIN)) {
-                roomGrid.setItems(roomService.findAll());
+                dataView = roomGrid.setItems(roomService.findAll());
+                setupFilter();
             } else {
                 roomGrid.setItems(roomService.findAllByFachbereich(currentUser.get().get().getFachbereich()));
             }
