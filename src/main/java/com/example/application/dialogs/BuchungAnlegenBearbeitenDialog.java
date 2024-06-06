@@ -35,7 +35,7 @@ import java.util.Optional;
 /**
  * Dialog zum Anlegen oder bearbeiten einer Buchung
  *
- * @author Mike Wiebe, Marcel Weithoener
+ * @author Mike Wiebe
  */
 public class BuchungAnlegenBearbeitenDialog extends Dialog {
 
@@ -56,12 +56,12 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
     private final ComboBox<Zeitslot> zeitslot = new ComboBox<>("Zeitslot");
 
     private final Buchung selectedBuchung;
-    private final Optional<Raum> selectedRoom;
-    private final Optional<Veranstaltung> selectedVeranstaltung;
+    private final Raum selectedRoom;
+    private final Veranstaltung selectedVeranstaltung;
 
     private final AuthenticatedUser currentUser;
 
-    public BuchungAnlegenBearbeitenDialog(Buchung selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, RaumService roomService,
+    public BuchungAnlegenBearbeitenDialog(Buchung selectedBuchung, Raum selectedRoom, Veranstaltung selectedVeranstaltung, RaumService roomService,
                                           DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.roomService = roomService;
         this.dozentService = dozentService;
@@ -137,13 +137,13 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                     .withValidator(event -> !buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue()), "Raum bereits belegt")
                     .bind(Buchung::getZeitslot, Buchung::setZeitslot);
         }
-        if (selectedRoom.isPresent()) {
-            raum.setValue(selectedRoom.get());
+        if (selectedRoom != null) {
+            raum.setValue(selectedRoom);
             raum.setEnabled(false);
             zeitslot.setEnabled(true);
         }
-        if (selectedVeranstaltung.isPresent()) {
-            veranstaltung.setValue(selectedVeranstaltung.get());
+        if (selectedVeranstaltung != null) {
+            veranstaltung.setValue(selectedVeranstaltung);
             veranstaltung.setEnabled(false);
         }
 
@@ -224,10 +224,10 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                 boolean fehlerBeiBuchung = false;
                 String fehlertext = "Der " + raum.getValue() + " ist bereits an folgenden Terminen belegt: \n";
                 for (Buchung buchung : gespeicherteBuchungen) {
-                    if (buchungService.roomBooked(buchung.getRoom(), buchung.getZeitslot(), buchung.getDate())) {
-                        Buchung konfliktBuchung = buchungService.findByDateAndRoomAndZeitslot(buchung.getDate(), buchung.getRoom(), buchung.getZeitslot());
+                    Optional<Buchung> konfliktBuchung = buchungService.findByDateAndRoomAndZeitslot(buchung.getDate(), buchung.getRoom(), buchung.getZeitslot());
+                    if (konfliktBuchung.isPresent()) {
                         fehlertext =
-                                fehlertext.concat(buchung.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " von " + buchung.getZeitslot() + ": " + konfliktBuchung.getVeranstaltung().toString() +
+                                fehlertext.concat(buchung.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " von " + buchung.getZeitslot() + ": " + konfliktBuchung.get().getVeranstaltung().toString() +
                                         "\n");
                         fehlerBeiBuchung = true;
                     }

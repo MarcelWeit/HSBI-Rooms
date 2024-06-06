@@ -141,7 +141,7 @@ public class RaumView extends VerticalLayout {
      */
     private void setupButtons() {
         Button addRoomButton = new Button("Raum hinzufügen", new Icon(VaadinIcon.PLUS));
-        addRoomButton.addClickListener(e -> openEditCreateDialog(Optional.empty()));
+        addRoomButton.addClickListener(e -> openEditCreateDialog(null));
 
         Button editRoomButton = new Button("Raum bearbeiten", new Icon(VaadinIcon.EDIT));
         editRoomButton.addClickListener(e -> {
@@ -149,7 +149,7 @@ public class RaumView extends VerticalLayout {
             if (selectedRoom.isEmpty()) {
                 Notification.show("Bitte wählen Sie einen Raum aus", 2000, Notification.Position.MIDDLE);
             } else {
-                openEditCreateDialog(selectedRoom);
+                openEditCreateDialog(selectedRoom.get());
             }
         });
 
@@ -245,7 +245,7 @@ public class RaumView extends VerticalLayout {
      *
      * @param selectedRoom Optionaler Raum
      */
-    private void openEditCreateDialog(Optional<Raum> selectedRoom) {
+    private void openEditCreateDialog(Raum selectedRoom) {
         Dialog dialog = new Dialog();
         dialog.setMaxWidth("25vw");
         dialog.setMinWidth("200px");
@@ -279,7 +279,7 @@ public class RaumView extends VerticalLayout {
         roomBinder.forField(fachbereich).asRequired("Bitte einen Fachbereich auswählen").bind(Raum::getFachbereich, Raum::setFachbereich);
         roomBinder.forField(position).asRequired("Bitte eine Position angeben").bind(Raum::getPosition, Raum::setPosition);
 
-        if (selectedRoom.isEmpty()) {
+        if (selectedRoom == null) {
             roomBinder.forField(refNr).asRequired("Bitte eine Referenznummer angeben")
                     .withValidator(refNrValue -> refNrValue.matches("^[A-Z]{1}.{0,3}$"),
                             "Die Referenznummer muss mit einem großen Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
@@ -288,10 +288,7 @@ public class RaumView extends VerticalLayout {
                     .bind(Raum::getRefNr, Raum::setRefNr);
         } else {
             roomBinder.forField(refNr).bind(Raum::getRefNr, Raum::setRefNr);
-        }
-
-        if (selectedRoom.isPresent()) {
-            roomBinder.readBean(selectedRoom.get());
+            roomBinder.readBean(selectedRoom);
             refNr.setEnabled(false);
             refNr.setErrorMessage(null);
             refNr.setInvalid(false);
@@ -300,9 +297,15 @@ public class RaumView extends VerticalLayout {
         Button cancelButton = new Button("Abbrechen", event -> dialog.close());
         Button saveButton = new Button("Speichern");
         saveButton.addClickListener(event -> {
-            Raum room = selectedRoom.orElseGet(Raum::new);
-            if (roomBinder.writeBeanIfValid(room) || selectedRoom.isPresent()) {
-                roomService.save(room);
+            Raum raum;
+            if (selectedRoom == null) {
+                raum = new Raum();
+            } else {
+                raum = selectedRoom;
+            }
+
+            if (roomBinder.writeBeanIfValid(raum) || selectedRoom != null) {
+                roomService.save(raum);
                 roomGrid.setItems(roomService.findAll());
                 dialog.close();
             }
@@ -346,7 +349,7 @@ public class RaumView extends VerticalLayout {
     private void openRoomBookDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, selectedRoom, Optional.empty(), roomService, dozentService, buchungService, veranstaltungService,
+            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, selectedRoom.get(), null, roomService, dozentService, buchungService, veranstaltungService,
                     currentUser);
             roomBookDialog.open();
         } else {

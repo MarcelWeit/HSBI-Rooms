@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Repository für die Entität Ausstattung
  *
@@ -15,6 +17,6 @@ public interface AusstattungRepository extends JpaRepository<Ausstattung, Long>,
 
     boolean existsByBezEqualsIgnoreCase(String bez);
 
-    Ausstattung findByBez(String bez);
+    Optional<Ausstattung> findByBez(String bez);
 
 }

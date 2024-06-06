@@ -149,7 +149,8 @@ public class BuchungenAnzeigenDialog extends Dialog {
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBuchung.isPresent()) {
-            BuchungAnlegenBearbeitenDialog editBookingDialog = new BuchungAnlegenBearbeitenDialog(selectedBuchung.get(), Optional.empty(), Optional.empty(), roomService, dozentService,
+            BuchungAnlegenBearbeitenDialog editBookingDialog = new BuchungAnlegenBearbeitenDialog(selectedBuchung.get(), null, null, roomService,
+                    dozentService,
                     buchungService, veranstaltungService, currentUser);
             editBookingDialog.open();
             this.close();

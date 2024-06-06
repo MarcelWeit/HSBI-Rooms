@@ -57,16 +57,16 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         if (roomRepository.count() == 0) {
             for (int i = 1; i < 5; i++) {
                 Raum room = new Raum("C" + i, Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 1");
-                room.addAusstattung(ausstattungRepository.findByBez("Beamer"));
-                room.addAusstattung(ausstattungRepository.findByBez("Whiteboard"));
-                room.addAusstattung(ausstattungRepository.findByBez("Kamera"));
+                room.addAusstattung(ausstattungRepository.findByBez("Beamer").get());
+                room.addAusstattung(ausstattungRepository.findByBez("Whiteboard").get());
+                room.addAusstattung(ausstattungRepository.findByBez("Kamera").get());
                 roomRepository.save(room);
             }
             for (int b = 1; b < 5; b++) {
                 Raum room = new Raum("A" + b, Raumtyp.HOERSAAL, 100, Fachbereich.SOZIALWESEN, "Fachbereich Sozialwesen Etage 1");
-                room.addAusstattung(ausstattungRepository.findByBez("Pult"));
-                room.addAusstattung(ausstattungRepository.findByBez("Soundanlage"));
-                room.addAusstattung(ausstattungRepository.findByBez("test"));
+                room.addAusstattung(ausstattungRepository.findByBez("Pult").get());
+                room.addAusstattung(ausstattungRepository.findByBez("Soundanlage").get());
+                room.addAusstattung(ausstattungRepository.findByBez("test").get());
                 roomRepository.save(room);
             }
             roomRepository.save(new Raum("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));

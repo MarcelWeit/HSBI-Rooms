@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
-import java.util.Optional;
 
 /**
  * @author Marcel Weithoener, Mike Wiebe
@@ -73,7 +72,7 @@ public class Startseite extends VerticalLayout {
         weekSpan.getStyle().set("padding", "10px");
 
         Button buchungAnlegen = new Button("Buchung anlegen", click -> {
-            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, Optional.empty(), Optional.empty(), raumService, dozentService, buchungService, veranstaltungService,
+            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, null, null, raumService, dozentService, buchungService, veranstaltungService,
                     authenticatedUser);
             roomBookDialog.open();
         });

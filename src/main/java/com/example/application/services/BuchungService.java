@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -22,22 +23,14 @@ public class BuchungService {
     }
 
     public boolean roomBooked(Raum room, Zeitslot zeitslot, LocalDate date) {
-        Set<Buchung> buchungenThisDay = buchungRepository.findByDateAndRoom(date, room);
-        boolean belegt = false;
-        for (Buchung existingBuchung : buchungenThisDay) {
-            if (existingBuchung.getZeitslot() == zeitslot) {
-                belegt = true;
-                break;
-            }
-        }
-        return belegt;
+        return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot).isPresent();
     }
 
     public Buchung save(Buchung buchung) {
         return buchungRepository.save(buchung);
     }
 
-    public Buchung findByDateAndRoomAndZeitslot(LocalDate date, Raum room, Zeitslot zeitslot) {
+    public Optional<Buchung> findByDateAndRoomAndZeitslot(LocalDate date, Raum room, Zeitslot zeitslot) {
         return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot);
     }
 
@@ -57,7 +50,7 @@ public class BuchungService {
         return buchungRepository.count();
     }
 
-    public Buchung findById(Long id) {
+    public Optional<Buchung> findById(Long id) {
         return buchungRepository.findBuchungById(id);
     }
 
