@@ -4,6 +4,11 @@ import com.example.application.data.entities.Registrierung;
 import com.example.application.repository.RegistrationRepository;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service für die Entität Registrierung
+ *
+ * @author Marcel Weithoener
+ */
 @Service
 public class RegistrationService {
 

@@ -60,6 +60,15 @@ public class DozentView extends VerticalLayout {
         add(buttonLayout, dozentGrid);
     }
 
+    private static TextField createStringFilterHeader(String placeholder, Consumer<String> filterChangeConsumer) {
+        TextField textField = new TextField();
+        textField.setPlaceholder(placeholder);
+        textField.setValueChangeMode(ValueChangeMode.EAGER);
+        textField.setClearButtonVisible(true);
+        textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
+        return textField;
+    }
+
     private void setupGrid() {
         dataView = dozentGrid.setItems(dozentService.findAll());
 
@@ -105,14 +114,6 @@ public class DozentView extends VerticalLayout {
         headerRow.getCell(dozentGrid.getColumnByKey("fachbereich")).setComponent(fachbereichComboBox);
 
     }
-    private static TextField createStringFilterHeader(String placeholder, Consumer<String> filterChangeConsumer) {
-        TextField textField = new TextField();
-        textField.setPlaceholder(placeholder);
-        textField.setValueChangeMode(ValueChangeMode.EAGER);
-        textField.setClearButtonVisible(true);
-        textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
-        return textField;
-    }
 
     private void setupButtons() {
         Button addDozentButton = new Button("Dozent hinzufügen", new Icon(VaadinIcon.PLUS));
@@ -147,11 +148,11 @@ public class DozentView extends VerticalLayout {
         Dozent dozent;
         String fehlermeldung;
 
-        if (selectedDozent.isPresent()){
+        if (selectedDozent.isPresent()) {
             inEditDialog = true;
             dozent = selectedDozent.get();
             fehlermeldung = "Eintrag erfolgreich aktualisiert.";
-        }else{
+        } else {
             dozent = new Dozent();
             fehlermeldung = "Eintrag erfolgreich gespeichert.";
         }
@@ -177,7 +178,7 @@ public class DozentView extends VerticalLayout {
         binder.forField(fachbereich).asRequired("Bitte einen Fachbereich auswählen")
                 .bind(Dozent::getFachbereich, Dozent::setFachbereich);
 
-        if (inEditDialog){
+        if (inEditDialog) {
             binder.readBean(selectedDozent.get());
         }
 

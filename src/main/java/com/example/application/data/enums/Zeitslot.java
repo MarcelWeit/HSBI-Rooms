@@ -1,5 +1,10 @@
 package com.example.application.data.enums;
 
+/**
+ * Aufzählung der Zeitslots
+ *
+ * @author Marcel Weithoener
+ */
 public enum Zeitslot {
     EINS("08:00 - 09:30"),
     ZWEI("09:45 - 11:15"),

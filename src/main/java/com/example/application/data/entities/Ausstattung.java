@@ -7,6 +7,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * Ausstattung Entity Klasse
+ * Raum gehört die Beziehung, daher mapped by ausstattung in der Raum Klasse
+ *
  * @author Marcel Weithoener
  */
 @Entity
@@ -54,7 +57,13 @@ public class Ausstattung {
         this.bez = bez;
     }
 
+    @Override
+    public String toString() {
+        return bez;
+    }
 
+    // equals und hashCode von JPABuddy generiert
+    // durch andere Implementationen können Probleme bei der Verwendung von Hibernate / SpringBoot entstehen
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
@@ -69,10 +78,5 @@ public class Ausstattung {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return bez;
     }
 }
