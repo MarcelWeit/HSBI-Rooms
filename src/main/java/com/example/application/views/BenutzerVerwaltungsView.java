@@ -1,8 +1,8 @@
 package com.example.application.views;
 
 import com.example.application.data.dataProvider.UserDataProvider;
-import com.example.application.data.entities.Fachbereich;
-import com.example.application.data.entities.Role;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.example.application.data.entities.User;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.combobox.ComboBox;

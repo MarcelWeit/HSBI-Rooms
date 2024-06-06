@@ -1,8 +1,8 @@
 package com.example.application.views;
 
-import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Registrierung;
-import com.example.application.data.entities.Role;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.example.application.services.EmailService;
 import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
@@ -29,7 +29,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @PageTitle("Registrierung")
 @AnonymousAllowed
@@ -67,7 +67,6 @@ public class RegistrationView extends VerticalLayout {
         this.emailService = emailService;
         addClassName("registration-view");
         createComponents();
-        fillTestData();
     }
 
     /**
@@ -119,6 +118,7 @@ public class RegistrationView extends VerticalLayout {
     /**
      * Binder für die Formularfelder erzeugen
      */
+    //@todo email lower case
     private void setupBinder() {
         binder.forField(firstName).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
         binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
@@ -159,16 +159,6 @@ public class RegistrationView extends VerticalLayout {
         }
 
         return ValidationResult.error("Passwords do not match");
-    }
-
-    // TEMPORARY
-    private void fillTestData() {
-        firstName.setValue("Max");
-        lastName.setValue("Mustermann");
-        email.setValue("max@gmail.com");
-        password.setValue("12345678");
-        confirmPassword.setValue("12345678");
-        fachbereich.setValue(Fachbereich.WIRTSCHAFT);
     }
 
 }

@@ -2,9 +2,9 @@ package com.example.application.views;
 
 import com.example.application.data.dataProvider.RegistrierungDataProvider;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Registrierung;
-import com.example.application.data.entities.Role;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.example.application.services.DozentService;
 import com.example.application.services.EmailService;
 import com.example.application.services.UserService;
@@ -51,15 +51,9 @@ public class FreischaltenView extends VerticalLayout {
         //ohne "New Item" button
         crud.setToolbarVisible(false);
 
-
         setupDataProvider();
-
-
         setupGrid();
-
-
         setupLanguage();
-
 
         add(crud);
         this.dozentService = dozentService;
@@ -131,7 +125,7 @@ public class FreischaltenView extends VerticalLayout {
             registrierungDataProvider.refreshAll();
             Notification.show("User approved and moved to Benutzerverwaltung", 3000, Notification.Position.MIDDLE);
             emailService.sendAprovedMail(registrierung.getUsername());
-            if ("DOZENT" == String.valueOf(registrierung.getRole())){
+            if (registrierung.getRole() == Role.DOZENT) {
                 Dozent newDozent = new Dozent();
                 newDozent.setFachbereich(registrierung.getFachbereich());
                 newDozent.setNachname(registrierung.getLastName());

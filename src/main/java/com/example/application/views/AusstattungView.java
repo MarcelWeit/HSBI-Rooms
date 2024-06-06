@@ -21,18 +21,16 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.security.access.annotation.Secured;
 
 import java.util.Set;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 
 @Route(value = "show-ausstattung", layout = MainLayout.class)
 @PageTitle("Ausstattung")
-@Secured({"ADMIN", "FBPLANUNG"})
-@RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
+@RolesAllowed({"ADMIN", "FBPLANUNG"})
 @Uses(Icon.class)
 public class AusstattungView extends VerticalLayout {
 
@@ -66,7 +64,7 @@ public class AusstattungView extends VerticalLayout {
             } else {
                 Ausstattung newAusstattung = new Ausstattung();
                 newAusstattung.setBez(bez.getValue());
-                ausstattungService.update(newAusstattung);
+                ausstattungService.save(newAusstattung);
                 grid.setItems(ausstattungService.findAll());
                 bez.clear();
             }
