@@ -1,5 +1,6 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Anrede;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,16 +36,21 @@ public class Registrierung {
 
     private Fachbereich fachbereich;
 
+    private Anrede anrede;
+    private String akadTitel;
+
     public Registrierung() {
     }
 
-    public Registrierung(String username, String lastName, String firstName, String hashedPassword, Role role, Fachbereich fachbereich) {
+    public Registrierung(String username, String lastName, String firstName, String hashedPassword, Role role, Fachbereich fachbereich, Anrede anrede, String akadTitel) {
         this.username = username;
         this.lastName = lastName;
         this.firstName = firstName;
         this.hashedPassword = hashedPassword;
         this.role = role;
         this.fachbereich = fachbereich;
+        this.anrede = anrede;
+        this.akadTitel = akadTitel;
     }
 
     public long getId() {
@@ -99,5 +105,21 @@ public class Registrierung {
 
     public void setFachbereich(Fachbereich fachbereich) {
         this.fachbereich = fachbereich;
+    }
+
+    public Anrede getAnrede() {
+        return anrede;
+    }
+
+    public void setAnrede(Anrede anrede) {
+        this.anrede = anrede;
+    }
+
+    public String getAkadTitel() {
+        return akadTitel;
+    }
+
+    public void setAkadTitel(String akadTitel) {
+        this.akadTitel = akadTitel;
     }
 }

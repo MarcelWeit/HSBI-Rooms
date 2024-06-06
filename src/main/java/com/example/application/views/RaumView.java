@@ -107,7 +107,9 @@ public class RaumView extends VerticalLayout {
      * Erstellt das Grid für die Räume
      */
     private void setupGrid() {
-        GridListDataView<Raum> dataView = roomGrid.setItems(roomService.findAll());
+        updateGrid();
+
+        GridListDataView<Raum> dataView = roomGrid.getListDataView();
 
         roomGrid.addColumn(Raum::getRefNr).setHeader("Referenznummer")
                 .setComparator(new refNrComparator())
@@ -177,7 +179,7 @@ public class RaumView extends VerticalLayout {
 
         if (currentUser.get().isPresent()) {
             buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton, showWeekBookingButton);
-            // Dozent, FBPlanung kann keine Räume hinzufügen, bearbeiten oder löschen
+            // Dozent kann keine Räume hinzufügen, bearbeiten oder löschen
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
                 buttonLayout.remove(addRoomButton, editRoomButton, deleteRoomButton);
             } else if (currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
@@ -305,7 +307,7 @@ public class RaumView extends VerticalLayout {
                     Notification.show("Die Referenznummer existiert bereits", 2000, Notification.Position.MIDDLE);
                 } else {
                     roomService.save(raum);
-                    roomGrid.setItems(roomService.findAll());
+                    updateGrid();
                     dialog.close();
                 }
             } else {
@@ -325,6 +327,10 @@ public class RaumView extends VerticalLayout {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isEmpty()) {
             Notification.show("Bitte wählen Sie einen Raum aus", 2000, Notification.Position.MIDDLE);
+        } else if (!buchungService.findAllByRoom(selectedRoom.get()).isEmpty()) {
+            Notification errorNotification = new Notification("Es existieren noch Buchungen für diesen Raum", 4000, Notification.Position.MIDDLE);
+            errorNotification.getElement().getThemeList().add("error");
+            errorNotification.open();
         } else {
             ConfirmDialog confirmDeleteDialog = new ConfirmDialog();
             confirmDeleteDialog.setHeader("Raum " + selectedRoom.get().getRefNr() + " löschen?");
@@ -335,7 +341,7 @@ public class RaumView extends VerticalLayout {
 
             confirmDeleteDialog.setConfirmButton("Löschen", event -> {
                 roomService.delete(selectedRoom.get());
-                roomGrid.setItems(roomService.findAll());
+                updateGrid();
                 confirmDeleteDialog.close();
             });
 
@@ -370,6 +376,16 @@ public class RaumView extends VerticalLayout {
             showBookingsDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);
+        }
+    }
+
+    private void updateGrid() {
+        if (currentUser.get().isPresent()) {
+            if (currentUser.get().get().getRoles().contains(Role.ADMIN)) {
+                roomGrid.setItems(roomService.findAll());
+            } else {
+                roomGrid.setItems(roomService.findAllByFachbereich(currentUser.get().get().getFachbereich()));
+            }
         }
     }
 

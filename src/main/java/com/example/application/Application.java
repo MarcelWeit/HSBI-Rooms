@@ -1,6 +1,7 @@
 package com.example.application;
 
 import com.example.application.data.entities.*;
+import com.example.application.data.enums.Anrede;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.enums.Raumtyp;
 import com.example.application.data.enums.Role;
@@ -57,26 +58,28 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         if (roomRepository.count() == 0) {
             for (int i = 1; i < 5; i++) {
                 Raum room = new Raum("C" + i, Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 1");
-                room.addAusstattung(ausstattungRepository.findByBez("Beamer").get());
-                room.addAusstattung(ausstattungRepository.findByBez("Whiteboard").get());
-                room.addAusstattung(ausstattungRepository.findByBez("Kamera").get());
+                room.addAusstattung(ausstattungRepository.findByBez("Beamer").orElse(null));
+                room.addAusstattung(ausstattungRepository.findByBez("Whiteboard").orElse(null));
+                room.addAusstattung(ausstattungRepository.findByBez("Kamera").orElse(null));
                 roomRepository.save(room);
             }
             for (int b = 1; b < 5; b++) {
                 Raum room = new Raum("A" + b, Raumtyp.HOERSAAL, 100, Fachbereich.SOZIALWESEN, "Fachbereich Sozialwesen Etage 1");
-                room.addAusstattung(ausstattungRepository.findByBez("Pult").get());
-                room.addAusstattung(ausstattungRepository.findByBez("Soundanlage").get());
-                room.addAusstattung(ausstattungRepository.findByBez("test").get());
+                room.addAusstattung(ausstattungRepository.findByBez("Pult").orElse(null));
+                room.addAusstattung(ausstattungRepository.findByBez("Soundanlage").orElse(null));
                 roomRepository.save(room);
             }
             roomRepository.save(new Raum("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
         }
         if (userRepository.count() == 0) {
-            User admin = new User("admin@gmail.com", "Mustermann", "Max", passwordEncoder.encode("admin"), Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT);
+            User admin = new User("admin@gmail.com", "Mustermann", "Max", passwordEncoder.encode("admin"), Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT, Anrede.HERR,
+                    "Prof. Dr.");
             userRepository.save(admin);
-            User dozent = new User("jkuester@hsbi.de", "Küster", "Jochen", passwordEncoder.encode("kuester"), Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT);
+            User dozent = new User("jkuester@hsbi.de", "Küster", "Jochen", passwordEncoder.encode("kuester"), Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT, Anrede.HERR,
+                    "Prof. Dr.");
             userRepository.save(dozent);
-            User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", passwordEncoder.encode("fbplanung"), Set.of(Role.FBPLANUNG), Fachbereich.WIRTSCHAFT);
+            User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", passwordEncoder.encode("fbplanung"), Set.of(Role.FBPLANUNG), Fachbereich.SOZIALWESEN, Anrede.HERR,
+                    "Prof. Dr.");
             userRepository.save(fbplan);
         }
         if (dozentRepository.count() == 0) {
@@ -89,7 +92,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
         }
         if (registrationRepository.count() == 0) {
-            Registrierung r = new Registrierung("register@gmail.com", "Meyer", "Sabine", "", Role.DOZENT, Fachbereich.WIRTSCHAFT);
+            Registrierung r = new Registrierung("register@gmail.com", "Meyer", "Sabine", "", Role.DOZENT, Fachbereich.WIRTSCHAFT, Anrede.FRAU, "Prof. Dr.");
             r.setHashedPassword(passwordEncoder.encode("register"));
             registrationRepository.save(r);
         }

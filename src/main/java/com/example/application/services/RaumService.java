@@ -37,7 +37,7 @@ public class RaumService {
     }
 
     public Set<Raum> findAllByFachbereich(Fachbereich entity) {
-        return new HashSet<>(repository.findAllByFachbereich(entity));
+        return repository.findAllByFachbereich(entity);
     }
 
     public boolean refNrExists(String refNr) {
