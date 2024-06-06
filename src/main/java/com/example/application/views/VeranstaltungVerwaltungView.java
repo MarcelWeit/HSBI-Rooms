@@ -182,6 +182,8 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         grid.addColumn(Veranstaltung::getFachbereich).setHeader("Fachbereich").setKey("fachbereich");
         grid.addColumn(Veranstaltung::getTeilnehmerzahl).setHeader("Teilnehmerzahl").setKey("teilnehmerzahl");
 
+        grid.setMinHeight("80vh");
+
         setupFilters(gridDataView);
     }
 
@@ -353,13 +355,13 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
             matchesID = compare(v.getId(), id);
             matchesBez = compare(v.getBezeichnung(), bezeichnung);
-            if (fachbereich != null) {
-                matchesFB = compareSet(v.getFachbereich().toString(), fachbereich);
-            }
+
+            matchesFB = compareSet(v.getFachbereich().toString(), fachbereich);
+
             matchesTeiln = v.getTeilnehmerzahl() >= teilnehmerzahl;
-            if (dozent != null) {
-                matchesDoz = compareSet(v.getDozent().toString(), dozent);
-            }
+
+            matchesDoz = compareSet(v.getDozent().toString(), dozent);
+
 
 
             return matchesID && matchesBez && matchesFB && matchesTeiln && matchesDoz;
@@ -371,7 +373,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         }
 
         private boolean compareSet(String value, Set<?> searchTerm) {
-            if (searchTerm.isEmpty()) {
+            if (searchTerm == null || searchTerm.isEmpty()) {
                 return true;
             }
 
@@ -385,6 +387,4 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
             return result;
         }
     }
-
-
 }

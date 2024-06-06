@@ -1,9 +1,6 @@
 package com.example.application.services;
 
-import com.example.application.data.entities.Buchung;
-import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Raum;
-import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.entities.*;
 import com.example.application.data.enums.Zeitslot;
 import com.example.application.repository.BuchungRepository;
 import org.springframework.stereotype.Service;
@@ -65,6 +62,10 @@ public class BuchungService {
         return Set.copyOf(buchungRepository.findAllByDozent(dozent));
     }
 
+    public Set<Buchung> findAllByUser(User user) {
+        return Set.copyOf(buchungRepository.findAllByUser(user));
+    }
+
     public Set<Buchung> findAllByRoom(Raum room) {
         return Set.copyOf(buchungRepository.findAllByRoom(room));
     }
@@ -79,5 +80,8 @@ public class BuchungService {
 
     public Set<Buchung> findAllByDateAndRoom(LocalDate date, Raum room) {
         return Set.copyOf(buchungRepository.findByDateAndRoom(date, room));
+    }
+    public Set<Buchung> findAllByUserOrDozent(User user, Dozent dozent) {
+        return buchungRepository.findAllByUserOrDozent(user, dozent);
     }
 }

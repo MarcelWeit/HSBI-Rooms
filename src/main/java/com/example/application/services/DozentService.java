@@ -6,6 +6,7 @@ import com.example.application.repository.DozentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DozentService {
@@ -44,7 +45,7 @@ public class DozentService {
         return repository.findAllByNachname(nachname);
     }
 
-    public List<Dozent> findByVornameAndNachname(String vorname, String nachname) {
+    public Optional<Dozent> findByVornameAndNachname(String vorname, String nachname) {
         return repository.findByVornameAndNachname(vorname, nachname);
     }
 
