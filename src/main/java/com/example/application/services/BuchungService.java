@@ -12,6 +12,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Service für die Buchungen, alle Datenbankabfragen
+ *
+ * @author Mike Wiebe
+ */
 @Service
 public class BuchungService {
 

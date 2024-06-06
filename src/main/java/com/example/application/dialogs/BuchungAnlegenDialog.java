@@ -72,10 +72,18 @@ public class BuchungAnlegenDialog extends Dialog {
         createButtonLayout();
     }
 
+    /**
+     * Methode zum Erstellen der Eingabemaske um eine Buchung anzulegen
+     *
+     * @return FormLayout
+     *
+     * @author Mike Wiebe, Marcel Weiterhoener
+     */
     private FormLayout createInputLayout() {
         FormLayout dialogLayout = new FormLayout();
 
         raum.setItems(roomService.findAll());
+        //Dozenten und die FBPlanung sollen nur Räume buchen können, die auch in ihren Fachbereich fallen
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT) || currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
                 raum.setItems(roomService.findAllByFachbereich(currentUser.get().get().getFachbereich()));
@@ -90,13 +98,12 @@ public class BuchungAnlegenDialog extends Dialog {
         veranstaltung.setRequiredIndicatorVisible(true);
 
         dozent.setItems(dozentService.findAll());
+        //Wenn der Nutzer ein Dozent ist, soll dieser beim Anlegen der Buchung selbst als Dozent eingetragen und nicht änderbar sein damit jeder Dozent nur Buchungen für sich anlegen kann
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
                 dozent.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
-                if (dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
-                    dozent.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
-                    dozent.setEnabled(false);
-                }
+                dozent.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
+                dozent.setEnabled(false);
             }
         }
         dozent.setRequiredIndicatorVisible(true);
@@ -162,6 +169,11 @@ public class BuchungAnlegenDialog extends Dialog {
 
     }
 
+    /**
+     * Methode für die Speichern und Abbrechen Buttons
+     *
+     * @author Mike Wiebe
+     */
     private void createButtonLayout() {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
@@ -176,6 +188,13 @@ public class BuchungAnlegenDialog extends Dialog {
         this.getFooter().add(save, cancel);
     }
 
+    /**
+     * Methode zum Prüfen und Speichern einer eingegebenen Buchung
+     *
+     * @return boolean, Speichern erfolgreich oder nicht
+     *
+     * @author Marcel Weiterhoener, Mike Wiebe
+     */
     private boolean validateAndSave() {
         Buchung firstBuchung = selectedBuchung.orElseGet(Buchung::new);
         // Erste Buchung wird immer gespeichert, wenn alle Binder erfolgreich
