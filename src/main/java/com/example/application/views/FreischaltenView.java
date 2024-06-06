@@ -1,7 +1,9 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Registrierung;
-import com.example.application.services.FreischaltenService;
+import com.example.application.data.entities.User;
+import com.example.application.services.RegistrationService;
+import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
@@ -11,19 +13,23 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.util.Set;
+
 @Route(value = "freischalten", layout = MainLayout.class)
 @PageTitle("User freischalten")
 @RolesAllowed("ADMIN")
 public class FreischaltenView extends VerticalLayout {
 
     private final Grid<Registrierung> grid;
-    private final FreischaltenService freischaltenService;
+    private final RegistrationService registrationService;
+    private final UserService userService;
 
-    public FreischaltenView(FreischaltenService freischaltenService) {
-        this.freischaltenService = freischaltenService;
+    public FreischaltenView(RegistrationService registrationService, UserService userService) {
+        this.registrationService = registrationService;
+        this.userService = userService;
         this.grid = new Grid<>(Registrierung.class, false);
         setupGrid();
-        grid.setItems(freischaltenService.findAllRegistrierungen());
+        grid.setItems(registrationService.findAllRegistrierungen());
         add(grid);
     }
 
@@ -51,17 +57,26 @@ public class FreischaltenView extends VerticalLayout {
         }).setHeader("Aktionen");
     }
 
-    private void approveRegistration(Registrierung registrierung) {
-        freischaltenService.approveRegistration(registrierung);
-        grid.setItems(freischaltenService.findAllRegistrierungen());
+    public void approveRegistration(Registrierung registrierung) {
+        User user = new User();
+        user.setUsername(registrierung.getUsername());
+        user.setFirstName(registrierung.getFirstName());
+        user.setLastName(registrierung.getLastName());
+        user.setHashedPassword(registrierung.getHashedPassword());
+        user.setRoles(Set.of(registrierung.getRole()));
+        user.setFachbereich(registrierung.getFachbereich());
+        userService.save(user);
+        registrationService.delete(registrierung);
+        grid.setItems(registrationService.findAllRegistrierungen());
         //Notification
         Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
     }
     private void deleteRegistration(Registrierung registrierung) {
-        freischaltenService.delete(registrierung);
-        grid.setItems(freischaltenService.findAllRegistrierungen());
+        registrationService.delete(registrierung);
+        grid.setItems(registrationService.findAllRegistrierungen());
         Notification.show("Registrierung abgelehnt", 3000, Notification.Position.MIDDLE);
     }
+
 }
 
 

@@ -4,6 +4,8 @@ import com.example.application.data.entities.Registrierung;
 import com.example.application.repository.RegistrationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RegistrationService {
 
@@ -15,6 +17,14 @@ public class RegistrationService {
 
     public void save(Registrierung registration) {
         repository.save(registration);
+    }
+
+    public void delete(Registrierung registrierung) {
+        repository.delete(registrierung);
+    }
+
+    public List<Registrierung> findAllRegistrierungen() {
+        return repository.findAll();
     }
 
     public boolean emailExists(String email) {
