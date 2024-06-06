@@ -34,10 +34,9 @@ import java.util.Optional;
 @RouteAlias(value = "", layout = MainLayout.class)
 public class Startseite extends VerticalLayout {
 
-    private final UserService userService;
-
     private final AuthenticatedUser authenticatedUser;
 
+    private final UserService userService;
     private final RaumService raumService;
     private final DozentService dozentService;
     private final BuchungService buchungService;
@@ -80,7 +79,7 @@ public class Startseite extends VerticalLayout {
         });
 
         Button eigeneBuchungen = new Button("Eigene Buchungen", click -> {
-            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(Optional.empty(), raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
+            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(null, raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
             showBookingsDialog.open();
         });
 

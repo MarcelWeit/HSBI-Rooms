@@ -361,7 +361,7 @@ public class RaumView extends VerticalLayout {
     private void openShowBookingsDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService, currentUser);
+            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(selectedRoom.get(), roomService, dozentService, buchungService, veranstaltungService, currentUser);
             showBookingsDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);
