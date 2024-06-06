@@ -1,5 +1,6 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Fachbereich;
 import jakarta.persistence.*;
 
 

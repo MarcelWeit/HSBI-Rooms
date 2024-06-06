@@ -25,9 +25,10 @@ import java.util.Optional;
  */
 public class MainLayout extends AppLayout {
 
+    private H2 viewTitle;
+
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
-    private H2 viewTitle;
 
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
@@ -86,9 +87,9 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Veranstaltungen", VeranstaltungView.class, VaadinIcon.TABLE.create())
             );
         }
-        if (accessChecker.hasAccess(KapaView.class)) {
+        if (accessChecker.hasAccess(AuslastungView.class)) {
             nav.addItem(
-                    new SideNavItem("Auslastung", KapaView.class, VaadinIcon.BAR_CHART_H.create())
+                    new SideNavItem("Auslastung", AuslastungView.class, VaadinIcon.BAR_CHART_H.create())
             );
         }
 
@@ -114,9 +115,9 @@ public class MainLayout extends AppLayout {
             verwNav.addItem(
                     new SideNavItem("Registrierungen", FreischaltenView.class, VaadinIcon.TABLE.create()));
         }
-        if (accessChecker.hasAccess(DozentCrud.class)) {
+        if (accessChecker.hasAccess(DozentView.class)) {
             verwNav.addItem(
-                    new SideNavItem("Dozenten", DozentCrud.class, VaadinIcon.USERS.create()));
+                    new SideNavItem("Dozenten", DozentView.class, VaadinIcon.USERS.create()));
         }
 
         verwNav.setExpanded(true);

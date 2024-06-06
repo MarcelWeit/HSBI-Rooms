@@ -2,7 +2,7 @@ package com.example.application.services;
 
 import com.example.application.data.entities.PasswordResetToken;
 import com.example.application.data.entities.User;
-import com.example.application.data.repository.PasswordResetRepository;
+import com.example.application.repository.PasswordResetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

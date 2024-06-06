@@ -1,8 +1,8 @@
 package com.example.application.views;
 
-import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Registrierung;
-import com.example.application.data.entities.Role;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.example.application.services.EmailService;
 import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
@@ -29,7 +29,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * @author marcel weithoener
+ * @author Marcel Weithoener
  */
 @PageTitle("Registrierung")
 @AnonymousAllowed
@@ -67,7 +67,6 @@ public class RegistrationView extends VerticalLayout {
         this.emailService = emailService;
         addClassName("registration-view");
         createComponents();
-        //        fillTestData();
     }
 
     /**
@@ -101,8 +100,9 @@ public class RegistrationView extends VerticalLayout {
             if (binder.writeBeanIfValid(registration)) {
                 registration.setHashedPassword(passwordEncoder.encode(registration.getHashedPassword()));
                 registrationService.save(registration);
-                UI.getCurrent().navigate("login");
                 emailService.sendWelcomeEmail(registration.getUsername());
+
+                UI.getCurrent().navigate("login");
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
             }
@@ -118,14 +118,14 @@ public class RegistrationView extends VerticalLayout {
     /**
      * Binder für die Formularfelder erzeugen
      */
+    //@todo email lower case
     private void setupBinder() {
         binder.forField(firstName).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
         binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
         binder.forField(email)
-                .asRequired()
-                .withValidator(new EmailValidator("ungültige E-Mail", false))
-                .withValidator(mail -> !userService.emailExists(mail), "Email existiert bereits")
-                .withValidator(mail -> !registrationService.emailExists(mail), "Email existiert bereits")
+                .withValidator(new EmailValidator("invalid email", false))
+                .withValidator(mail -> !userService.emailExists(mail), "Email already exists")
+                .withValidator(mail -> !registrationService.emailExists(mail), "Email already exists")
                 .bind(Registrierung::getUsername, Registrierung::setUsername);
         binder.forField(password)
                 .asRequired()
@@ -143,7 +143,7 @@ public class RegistrationView extends VerticalLayout {
      */
     private ValidationResult passwordValidator(String password, ValueContext valueContext) {
         if (password == null || password.length() < 8) {
-            return ValidationResult.error("Passwort muss mindestens 8 Zeichen lang sein");
+            return ValidationResult.error("Password should be at least 8 characters long");
         }
 
         // erst validieren, wenn ein zweites passwort eingegeben wurde
@@ -158,17 +158,7 @@ public class RegistrationView extends VerticalLayout {
             return ValidationResult.ok();
         }
 
-        return ValidationResult.error("Passwörter stimmen nicht überein");
-    }
-
-    // @todo TEMPORARY
-    private void fillTestData() {
-        firstName.setValue("Max");
-        lastName.setValue("Mustermann");
-        email.setValue("max@gmail.com");
-        password.setValue("12345678");
-        confirmPassword.setValue("12345678");
-        fachbereich.setValue(Fachbereich.WIRTSCHAFT);
+        return ValidationResult.error("Passwords do not match");
     }
 
 }

@@ -2,8 +2,8 @@ package com.example.application.views;
 
 import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.enums.Fachbereich;
 import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
@@ -29,8 +29,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @Route(value = "veranstaltung-crud", layout = MainLayout.class)
-@Secured({"ADMIN", "FBPLANUNG", "DOZENT"})
-@RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
+@Secured({"ADMIN", "FBPlanung", "DOZENT"})
+@RolesAllowed({"ADMIN", "FBPlanung", "DOZENT"})
 @Uses(Icon.class)
 @PageTitle("Veranstaltungen")
 public class VeranstaltungView extends VerticalLayout {
@@ -123,8 +123,7 @@ public class VeranstaltungView extends VerticalLayout {
         public VeranstaltungDetailsFormLayout() {
             buchungGrid.addColumn(Buchung::getRoom).setHeader("Raum");
             buchungGrid.addColumn(Buchung::getDate).setHeader("Datum");
-            buchungGrid.addColumn(Buchung::getStartZeit).setHeader("Startzeit");
-            buchungGrid.addColumn(Buchung::getEndZeit).setHeader("Endzeit");
+            buchungGrid.addColumn(Buchung::getZeitslot).setHeader("Zeitslot");
             buchungGrid.addColumn(Buchung::getDozent).setHeader("Dozent");
 
             add(buchungGrid);

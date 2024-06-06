@@ -1,7 +1,7 @@
 package com.example.application.data.dataProvider;
 
 import com.example.application.data.entities.Registrierung;
-import com.example.application.services.FreischaltenService;
+import com.example.application.services.UserService;
 import com.vaadin.flow.component.crud.CrudFilter;
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
@@ -12,26 +12,12 @@ import java.util.stream.Stream;
 
 public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Registrierung, CrudFilter> {
 
-    private final FreischaltenService freischaltenService;
+    private final UserService userService;
     private List<Registrierung> registrations;
 
-    public RegistrierungDataProvider(FreischaltenService freischaltenService) {
-        this.freischaltenService = freischaltenService;
-        this.registrations = freischaltenService.findAllRegistrierungen();
-    }
-
-    private static Object valueOf(String fieldName, Registrierung registration) {
-        try {
-            var field = Registrierung.class.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(registration);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public void update() {
-        this.registrations = freischaltenService.findAllRegistrierungen();
+    public RegistrierungDataProvider(UserService userService) {
+        this.userService = userService;
+        this.registrations = userService.findAllRegistrierungen();
     }
 
     @Override
@@ -65,11 +51,26 @@ public class RegistrierungDataProvider extends AbstractBackEndDataProvider<Regis
                 }).reduce(Predicate::and).orElse(e -> true);
     }
 
+    private static Object valueOf(String fieldName, Registrierung registration) {
+        try {
+            var field = Registrierung.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(registration);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public void save(Registrierung registration) {
-        freischaltenService.save(registration);
+        userService.save(registration);
     }
 
     public void delete(Registrierung registration) {
-        freischaltenService.delete(registration);
+        userService.delete(registration);
+    }
+
+    public void freischalten(Registrierung registration) {
+        userService.approveRegistration(registration);
+        registrations = userService.findAllRegistrierungen();
     }
 }

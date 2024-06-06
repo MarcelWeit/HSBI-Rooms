@@ -4,11 +4,13 @@ import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.enums.Role;
+import com.example.application.data.enums.Zeitslot;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.BuchungService;
 import com.example.application.services.DozentService;
 import com.example.application.services.RaumService;
 import com.example.application.services.VeranstaltungService;
-import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -22,22 +24,14 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.provider.SortDirection;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.RolesAllowed;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-@Route(value = "buchungen-raum", layout = MainLayout.class)
-@RolesAllowed({"ADMIN", "DOZENT", "FBPLANUNG"})
-@PageTitle("Raumbuchungen")
-public class RaumBuchungenOverviewDialog extends Dialog {
+public class BuchungenAnzeigenDialog extends Dialog {
 
     private final BuchungService buchungService;
     private final Grid<Buchung> raumBuchungGrid = new Grid<>(Buchung.class, false);
@@ -46,13 +40,15 @@ public class RaumBuchungenOverviewDialog extends Dialog {
     private final VeranstaltungService veranstaltungService;
     private final Optional<Raum> selectedRoom;
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
+    private final AuthenticatedUser currentUser;
 
-    public RaumBuchungenOverviewDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService) {
+    public BuchungenAnzeigenDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.buchungService = buchungService;
         this.roomService = roomService;
         this.selectedRoom = raum;
         this.dozentService = dozentService;
         this.veranstaltungService = veranstaltungService;
+        this.currentUser = currentUser;
         setupButtons();
         setupGrid();
         add(buttonLayout, raumBuchungGrid);
@@ -75,21 +71,17 @@ public class RaumBuchungenOverviewDialog extends Dialog {
         raumBuchungGrid.addColumn(Buchung::getVeranstaltung).setHeader("Veranstaltung").setKey("veranstaltung");
         raumBuchungGrid.addColumn(Buchung::getDozent).setHeader("Dozent").setKey("dozent");
         raumBuchungGrid.addColumn(Buchung::getDate).setHeader("Datum").setKey("date");
-        raumBuchungGrid.addColumn(Buchung::getStartZeit).setHeader("StartZeit").setKey("startZeit");
-        raumBuchungGrid.addColumn(Buchung::getEndZeit).setHeader("EndZeit").setKey("endZeit");
+        raumBuchungGrid.addColumn(Buchung::getZeitslot).setHeader("Zeitslot").setKey("zeitslot");
 
         raumBuchungGrid.getColumnByKey("room").setAutoWidth(true).setFlexGrow(0);
         raumBuchungGrid.getColumnByKey("veranstaltung").setAutoWidth(true).setFlexGrow(0);
         raumBuchungGrid.getColumnByKey("dozent").setAutoWidth(true).setFlexGrow(0);
         raumBuchungGrid.getColumnByKey("date").setAutoWidth(true).setFlexGrow(0);
-        raumBuchungGrid.getColumnByKey("startZeit").setAutoWidth(true).setFlexGrow(0);
-        raumBuchungGrid.getColumnByKey("endZeit").setAutoWidth(true).setFlexGrow(0);
+        raumBuchungGrid.getColumnByKey("zeitslot").setAutoWidth(true).setFlexGrow(0);
 
-        GridSortOrder<Buchung> sortOrderDate = new GridSortOrder<>(raumBuchungGrid.getColumnByKey("date"), SortDirection.ASCENDING);
-        GridSortOrder<Buchung> sortOrderTime = new GridSortOrder<>(raumBuchungGrid.getColumnByKey("startZeit"), SortDirection.ASCENDING);
+        GridSortOrder<Buchung> sortOrder = new GridSortOrder<>(raumBuchungGrid.getColumnByKey("veranstaltung"), SortDirection.ASCENDING);
         ArrayList<GridSortOrder<Buchung>> sortOrders = new ArrayList<>();
-        sortOrders.add(sortOrderDate);
-        sortOrders.add(sortOrderTime);
+        sortOrders.add(sortOrder);
         raumBuchungGrid.sort(sortOrders);
 
         raumBuchungGrid.setMinHeight("80vh");
@@ -130,6 +122,15 @@ public class RaumBuchungenOverviewDialog extends Dialog {
         dozentComboBox.setItems(dozentService.findAll());
         dozentComboBox.setClearButtonVisible(true);
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
+        if (currentUser.get().isPresent()) {
+            if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
+                dozentComboBox.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
+                if (dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
+                    dozentComboBox.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
+                    dozentComboBox.setEnabled(false);
+                }
+            }
+        }
         headerRow.getCell(raumBuchungGrid.getColumnByKey("dozent")).setComponent(dozentComboBox);
 
         Consumer<LocalDate> dateFilterChangeConsumer = buchungFilter::setDate;
@@ -139,26 +140,16 @@ public class RaumBuchungenOverviewDialog extends Dialog {
         datePicker.addValueChangeListener(e -> dateFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(raumBuchungGrid.getColumnByKey("date")).setComponent(datePicker);
 
-        Consumer<LocalTime> startZeitFilterChangeConsumer = buchungFilter::setStartZeit;
-        TimePicker startZeitPicker = new TimePicker();
-        startZeitPicker.setWidthFull();
-        startZeitPicker.setClearButtonVisible(true);
-        startZeitPicker.addValueChangeListener(e -> startZeitFilterChangeConsumer.accept(e.getValue()));
-        headerRow.getCell(raumBuchungGrid.getColumnByKey("startZeit")).setComponent(startZeitPicker);
-
-        Consumer<LocalTime> endZeitFilterChangeConsumer = buchungFilter::setEndZeit;
-        TimePicker endZeitPicker = new TimePicker();
-        endZeitPicker.setWidthFull();
-        endZeitPicker.setClearButtonVisible(true);
-        endZeitPicker.addValueChangeListener(e -> endZeitFilterChangeConsumer.accept(e.getValue()));
-        headerRow.getCell(raumBuchungGrid.getColumnByKey("endZeit")).setComponent(endZeitPicker);
+        //@todo filter zeitslot
     }
 
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBuchung.isPresent()) {
-            Dialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), Optional.empty(), roomService, dozentService, buchungService, veranstaltungService);
+            BuchungAnlegenBearbeitenDialog editBookingDialog = new BuchungAnlegenBearbeitenDialog(selectedBuchung.get(), Optional.empty(), Optional.empty(), roomService, dozentService,
+                    buchungService, veranstaltungService, currentUser);
             editBookingDialog.open();
+            this.close();
         } else {
             Notification.show("Bitte eine Buchung auswählen", 4000, Notification.Position.MIDDLE);
         }
@@ -177,8 +168,8 @@ public class RaumBuchungenOverviewDialog extends Dialog {
 
             confirmDeleteDialog.setConfirmButton("Löschen", event -> {
                 buchungService.delete(selectedBooking.get());
-                raumBuchungGrid.setItems(buchungService.findAll());
                 confirmDeleteDialog.close();
+                this.close();
             });
 
             confirmDeleteDialog.setCancelButton("Abbrechen", event -> confirmDeleteDialog.close());
@@ -193,8 +184,7 @@ public class RaumBuchungenOverviewDialog extends Dialog {
         private Veranstaltung veranstaltung;
         private Dozent dozent;
         private LocalDate date;
-        private LocalTime startZeit;
-        private LocalTime endZeit;
+        private Zeitslot zeitslot;
 
         public BuchungFilter(GridListDataView<Buchung> dataView) {
             this.dataView = dataView;
@@ -221,13 +211,8 @@ public class RaumBuchungenOverviewDialog extends Dialog {
             this.dataView.refreshAll();
         }
 
-        public void setStartZeit(LocalTime startZeit) {
-            this.startZeit = startZeit;
-            this.dataView.refreshAll();
-        }
-
-        public void setEndZeit(LocalTime endZeit) {
-            this.endZeit = endZeit;
+        public void setZeitslot(Zeitslot zeitslot) {
+            this.zeitslot = zeitslot;
             this.dataView.refreshAll();
         }
 
@@ -248,16 +233,12 @@ public class RaumBuchungenOverviewDialog extends Dialog {
             if (dozent != null) {
                 matchesDozent = matches(buchung.getDozent().toString(), dozent.toString());
             }
-            boolean matchesStartZeit = true;
-            if (startZeit != null) {
-                matchesStartZeit = matches(buchung.getStartZeit().toString(), startZeit.toString());
-            }
-            boolean matchesEndZeit = true;
-            if (endZeit != null) {
-                matchesEndZeit = matches(buchung.getEndZeit().toString(), endZeit.toString());
+            boolean matchesZeitslot = true;
+            if (zeitslot != null) {
+                matchesZeitslot = matches(buchung.getZeitslot().toString(), zeitslot.toString());
             }
 
-            return matchesRoom && matchesDate && matchesVeranstaltung && matchesDozent && matchesStartZeit && matchesEndZeit;
+            return matchesRoom && matchesDate && matchesVeranstaltung && matchesDozent && matchesZeitslot;
         }
 
         private boolean matches(String value, String searchTerm) {

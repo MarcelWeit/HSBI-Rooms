@@ -1,8 +1,8 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Fachbereich;
 import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.enums.Fachbereich;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
 import com.vaadin.flow.component.Component;
@@ -36,8 +36,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @Route(value = "veranstaltungVerwaltung-crud", layout = MainLayout.class)
-@Secured({"ADMIN", "FBPLANUNG"})
-@RolesAllowed({"ADMIN", "FBPLANUNG"})
+@Secured({"ADMIN", "FBPlanung"})
+@RolesAllowed({"ADMIN", "FBPlanung"})
 @Uses(Icon.class)
 @PageTitle("Veranstaltungen")
 public class VeranstaltungVerwaltungView extends VerticalLayout {
@@ -290,9 +290,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
             confirmDelete.setCancelable(true);
 
-            confirmDelete.setCancelButton("Abbrechen", e -> {
-                confirmDelete.close();
-            });
+            confirmDelete.setCancelButton("Abbrechen", e -> confirmDelete.close());
 
             confirmDelete.setConfirmButton("Bestätigen", e -> {
                 veranstaltungService.delete(selected.get());

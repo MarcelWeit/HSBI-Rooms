@@ -22,7 +22,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
     private final List<User> users;
     private Consumer<Long> sizeChangeListener;
 
-    public UserDataProvider(UserService userService) {
+    public UserDataProvider(UserService userService, boolean fetchLockedUsers) {
         this.userService = userService;
         users = new ArrayList<>(userService.findAll());
     }
