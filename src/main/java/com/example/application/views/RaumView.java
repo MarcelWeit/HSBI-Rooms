@@ -65,13 +65,14 @@ public class RaumView extends VerticalLayout {
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
     private final AuthenticatedUser currentUser;
+    private final RaumService raumService;
     private HeaderRow headerRow;
 
     /**
      * Konstruktor der Klasse RaumView
      */
     public RaumView(AusstattungService ausstattungService, RaumService roomService, DozentService dozentService,
-                    VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser currentUser) {
+                    VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser currentUser, RaumService raumService) {
         this.ausstattungService = ausstattungService;
         this.roomService = roomService;
         this.dozentService = dozentService;
@@ -83,6 +84,7 @@ public class RaumView extends VerticalLayout {
         setupButtons();
         setupGrid();
         add(buttonLayout, roomGrid);
+        this.raumService = raumService;
     }
 
     /**
@@ -279,19 +281,14 @@ public class RaumView extends VerticalLayout {
         roomBinder.forField(fachbereich).asRequired("Bitte einen Fachbereich auswählen").bind(Raum::getFachbereich, Raum::setFachbereich);
         roomBinder.forField(position).asRequired("Bitte eine Position angeben").bind(Raum::getPosition, Raum::setPosition);
 
-        if (selectedRoom == null) {
-            roomBinder.forField(refNr).asRequired("Bitte eine Referenznummer angeben")
-                    .withValidator(refNrValue -> refNrValue.matches("^[A-Z]{1}.{0,3}$"),
-                            "Die Referenznummer muss mit einem großen Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
-                    .withValidator(refNrValue -> !roomService.refNrExists(refNrValue),
-                            "Referenznummer existiert bereits")
-                    .bind(Raum::getRefNr, Raum::setRefNr);
-        } else {
-            roomBinder.forField(refNr).bind(Raum::getRefNr, Raum::setRefNr);
+        roomBinder.forField(refNr).asRequired("Bitte eine Referenznummer angeben")
+                .withValidator(refNrValue -> refNrValue.matches("^[A-Z]{1}.{0,3}$"),
+                        "Die Referenznummer muss mit einem großen Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
+                .bind(Raum::getRefNr, Raum::setRefNr);
+
+        if (selectedRoom != null) {
             roomBinder.readBean(selectedRoom);
             refNr.setEnabled(false);
-            refNr.setErrorMessage(null);
-            refNr.setInvalid(false);
         }
 
         Button cancelButton = new Button("Abbrechen", event -> dialog.close());
@@ -303,11 +300,16 @@ public class RaumView extends VerticalLayout {
             } else {
                 raum = selectedRoom;
             }
-
-            if (roomBinder.writeBeanIfValid(raum) || selectedRoom != null) {
-                roomService.save(raum);
-                roomGrid.setItems(roomService.findAll());
-                dialog.close();
+            if (roomBinder.writeBeanIfValid(raum)) {
+                if (selectedRoom == null && raumService.refNrExists(raum.getRefNr())) {
+                    Notification.show("Die Referenznummer existiert bereits", 2000, Notification.Position.MIDDLE);
+                } else {
+                    roomService.save(raum);
+                    roomGrid.setItems(roomService.findAll());
+                    dialog.close();
+                }
+            } else {
+                Notification.show("Bitte überprüfen Sie Ihre Eingaben", 2000, Notification.Position.MIDDLE);
             }
         });
 
