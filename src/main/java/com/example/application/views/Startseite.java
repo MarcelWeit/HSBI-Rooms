@@ -22,10 +22,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
-import java.util.Optional;
 
 /**
- * @author Marcel Weithoener
+ * @author Marcel Weithoener, Mike Wiebe
  */
 @Route(value = "startseite", layout = MainLayout.class)
 @Secured({"DOZENT", "FBPLANUNG", "ADMIN"})
@@ -34,10 +33,9 @@ import java.util.Optional;
 @RouteAlias(value = "", layout = MainLayout.class)
 public class Startseite extends VerticalLayout {
 
-    private final UserService userService;
-
     private final AuthenticatedUser authenticatedUser;
 
+    private final UserService userService;
     private final RaumService raumService;
     private final DozentService dozentService;
     private final BuchungService buchungService;
@@ -74,13 +72,13 @@ public class Startseite extends VerticalLayout {
         weekSpan.getStyle().set("padding", "10px");
 
         Button buchungAnlegen = new Button("Buchung anlegen", click -> {
-            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, Optional.empty(), Optional.empty(), raumService, dozentService, buchungService, veranstaltungService,
+            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, null, null, raumService, dozentService, buchungService, veranstaltungService,
                     authenticatedUser);
             roomBookDialog.open();
         });
 
         Button eigeneBuchungen = new Button("Eigene Buchungen", click -> {
-            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(Optional.empty(), raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
+            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(null, raumService, dozentService, buchungService, veranstaltungService, authenticatedUser);
             showBookingsDialog.open();
         });
 

@@ -1,7 +1,9 @@
 package com.example.application.data.enums;
 
 /**
- * @author Warcel Weithoener
+ * Aufzählung der Fachbereiche
+ *
+ * @author Marcel Weithoener
  */
 
 public enum Fachbereich {

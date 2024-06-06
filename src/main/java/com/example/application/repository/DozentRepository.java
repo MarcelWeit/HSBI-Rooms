@@ -5,9 +5,11 @@ import com.example.application.data.entities.Dozent;
 import com.example.application.data.enums.Fachbereich;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface DozentRepository extends JpaRepository<Dozent, Long>, JpaSpecificationExecutor<Dozent> {
 
     List<Dozent> findAllByNachname(String nachname);

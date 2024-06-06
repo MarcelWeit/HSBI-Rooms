@@ -1,6 +1,7 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Registrierung;
+import com.example.application.data.enums.Anrede;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.enums.Role;
 import com.example.application.services.EmailService;
@@ -29,6 +30,8 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
+ * Registrierungsseite für neue Benutzer
+ *
  * @author Marcel Weithoener
  */
 @PageTitle("Registrierung")
@@ -43,6 +46,8 @@ public class RegistrationView extends VerticalLayout {
     private final PasswordEncoder passwordEncoder;
 
     private final PasswordField confirmPassword = new PasswordField("Passwort bestätigen");
+    private final ComboBox<Anrede> anrede = new ComboBox<>("Anrede");
+    private final TextField akadTitel = new TextField("Akademischer Titel");
     private final TextField lastName = new TextField("Nachname");
     private final TextField firstName = new TextField("Vorname");
     private final EmailField email = new EmailField("E-Mail");
@@ -55,10 +60,6 @@ public class RegistrationView extends VerticalLayout {
 
     /**
      * Konstruktor für die Registrierungsseite
-     *
-     * @param userService         Service für die Benutzer
-     * @param passwordEncoder     Encoder für das Passwort
-     * @param registrationService Service für die Registrierung
      */
     public RegistrationView(UserService userService, PasswordEncoder passwordEncoder, RegistrationService registrationService, EmailService emailService) {
         this.passwordEncoder = passwordEncoder;
@@ -73,7 +74,7 @@ public class RegistrationView extends VerticalLayout {
      * Komponenten für die Registrierung erzeugen
      */
     private void createComponents() {
-        FormLayout form = new FormLayout();
+        FormLayout formLayout = new FormLayout();
         H2 title = new H2("HSBI Rooms");
         H4 subTitle = new H4("Registrierung");
 
@@ -82,13 +83,14 @@ public class RegistrationView extends VerticalLayout {
         fachbereich.setItems(Fachbereich.values());
         role.setItems(Role.DOZENT, Role.FBPLANUNG);
         backButton.addClickListener(e -> UI.getCurrent().navigate("login"));
+        anrede.setItems(Anrede.values());
 
         setupEventHandler();
         setupBinder();
 
-        form.setMaxWidth("320px");
-        form.add(title, subTitle, firstName, lastName, email, password, confirmPassword, fachbereich, role, submitButton, backButton);
-        add(form);
+        formLayout.setMaxWidth("320px");
+        formLayout.add(title, subTitle, anrede, akadTitel, firstName, lastName, email, password, confirmPassword, fachbereich, role, submitButton, backButton);
+        add(formLayout);
     }
 
     /**
@@ -118,14 +120,14 @@ public class RegistrationView extends VerticalLayout {
     /**
      * Binder für die Formularfelder erzeugen
      */
-    //@todo email lower case
     private void setupBinder() {
         binder.forField(firstName).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
         binder.forField(lastName).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
         binder.forField(email)
-                .withValidator(new EmailValidator("invalid email", false))
-                .withValidator(mail -> !userService.emailExists(mail), "Email already exists")
-                .withValidator(mail -> !registrationService.emailExists(mail), "Email already exists")
+                .asRequired()
+                .withValidator(new EmailValidator("Ungültige E-Mail", false))
+                .withValidator(mail -> !userService.emailExists(mail), "E-Mail existiert bereits")
+                .withValidator(mail -> !registrationService.emailExists(mail), "E-Mail existiert bereits")
                 .bind(Registrierung::getUsername, Registrierung::setUsername);
         binder.forField(password)
                 .asRequired()
@@ -134,6 +136,8 @@ public class RegistrationView extends VerticalLayout {
         binder.forField(fachbereich).asRequired().bind(Registrierung::getFachbereich, Registrierung::setFachbereich);
         binder.forField(confirmPassword).asRequired();
         binder.forField(role).asRequired().bind(Registrierung::getRole, Registrierung::setRole);
+        binder.forField(anrede).asRequired().bind(Registrierung::getAnrede, Registrierung::setAnrede);
+        binder.forField(akadTitel).bind(Registrierung::getAkadTitel, Registrierung::setAkadTitel);
     }
 
     /**
@@ -143,7 +147,7 @@ public class RegistrationView extends VerticalLayout {
      */
     private ValidationResult passwordValidator(String password, ValueContext valueContext) {
         if (password == null || password.length() < 8) {
-            return ValidationResult.error("Password should be at least 8 characters long");
+            return ValidationResult.error("Das Passwort muss mindestens 8 Zeichen lang sein");
         }
 
         // erst validieren, wenn ein zweites passwort eingegeben wurde
@@ -158,7 +162,7 @@ public class RegistrationView extends VerticalLayout {
             return ValidationResult.ok();
         }
 
-        return ValidationResult.error("Passwords do not match");
+        return ValidationResult.error("Passwörter stimmen nicht überein");
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Anrede;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,16 +36,21 @@ public class User {
 
     private Fachbereich fachbereich;
 
+    private Anrede anrede;
+    private String akadTitel;
+
     public User() {
     }
 
-    public User(String username, String lastName, String firstName, String hashedPassword, Set<Role> roles, Fachbereich fachbereich) {
+    public User(String username, String lastName, String firstName, String hashedPassword, Set<Role> roles, Fachbereich fachbereich, Anrede anrede, String akadTitel) {
         this.username = username.toLowerCase();
         this.lastName = lastName;
         this.firstName = firstName;
         this.hashedPassword = hashedPassword;
         this.roles = roles;
         this.fachbereich = fachbereich;
+        this.anrede = anrede;
+        this.akadTitel = akadTitel;
     }
 
     // E-Mail äquivalent zu Username
@@ -98,6 +104,22 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public Anrede getAnrede() {
+        return anrede;
+    }
+
+    public void setAnrede(Anrede anrede) {
+        this.anrede = anrede;
+    }
+
+    public String getAkadTitel() {
+        return akadTitel;
+    }
+
+    public void setAkadTitel(String akadTitel) {
+        this.akadTitel = akadTitel;
     }
 
 }
