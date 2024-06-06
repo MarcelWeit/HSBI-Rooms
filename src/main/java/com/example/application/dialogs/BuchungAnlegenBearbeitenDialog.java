@@ -23,18 +23,21 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.binder.Binder;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
- * Dialog zum Anlegen einer Buchung
+ * Dialog zum Anlegen oder bearbeiten einer Buchung
  *
  * @author Mike Wiebe, Marcel Weithoener
  */
-public class BuchungAnlegenDialog extends Dialog {
+public class BuchungAnlegenBearbeitenDialog extends Dialog {
 
     private final RaumService roomService;
     private final DozentService dozentService;
@@ -48,17 +51,18 @@ public class BuchungAnlegenDialog extends Dialog {
     private final DatePicker date = new DatePicker("Datum");
     private final Button save = new Button("Speichern");
     private final Button cancel = new Button("Abbrechen");
-    private final RadioButtonGroup<Wiederholungsintervall> wiederholungsintervall = new RadioButtonGroup<>("Wiederholungsintervall");
+    private final RadioButtonGroup<Wiederholungsintervall> wiederholungsintervallRadioButtonGroup = new RadioButtonGroup<>("Wiederholungsintervall");
     private final DatePicker endDatum = new DatePicker("Letzter Buchungstag");
     private final ComboBox<Zeitslot> zeitslot = new ComboBox<>("Zeitslot");
 
-    private final Optional<Buchung> selectedBuchung;
+    private final Buchung selectedBuchung;
     private final Optional<Raum> selectedRoom;
     private final Optional<Veranstaltung> selectedVeranstaltung;
 
     private final AuthenticatedUser currentUser;
 
-    public BuchungAnlegenDialog(Optional<Buchung> selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
+    public BuchungAnlegenBearbeitenDialog(Buchung selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, RaumService roomService,
+                                          DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.roomService = roomService;
         this.dozentService = dozentService;
         this.buchungService = buchungService;
@@ -91,7 +95,6 @@ public class BuchungAnlegenDialog extends Dialog {
         }
         raum.setItemLabelGenerator(Raum::getRefNr);
         raum.setRequiredIndicatorVisible(true);
-        raum.addValueChangeListener((value -> zeitslot.setEnabled(true)));
 
         veranstaltung.setItems(veranstaltungService.findAll());
         veranstaltung.setItemLabelGenerator(Veranstaltung::getBezeichnung);
@@ -112,13 +115,12 @@ public class BuchungAnlegenDialog extends Dialog {
         date.setRequiredIndicatorVisible(true);
 
         zeitslot.setItems(Zeitslot.values());
-        zeitslot.setEnabled(false);
 
-        wiederholungsintervall.setItems(Wiederholungsintervall.values());
-        wiederholungsintervall.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
-        wiederholungsintervall.setValue(Wiederholungsintervall.EINMALIG);
+        wiederholungsintervallRadioButtonGroup.setItems(Wiederholungsintervall.values());
+        wiederholungsintervallRadioButtonGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
+        wiederholungsintervallRadioButtonGroup.setValue(Wiederholungsintervall.EINMALIG);
         endDatum.setVisible(false);
-        wiederholungsintervall.addValueChangeListener(e -> {
+        wiederholungsintervallRadioButtonGroup.addValueChangeListener(e -> {
             if (e.getValue().equals(Wiederholungsintervall.EINMALIG)) {
                 endDatum.setVisible(false);
             } else {
@@ -132,10 +134,10 @@ public class BuchungAnlegenDialog extends Dialog {
         binder.forField(dozent).asRequired().bind(Buchung::getDozent, Buchung::setDozent);
         binder.forField(date).asRequired().bind(Buchung::getDate, Buchung::setDate);
 
-        if (selectedBuchung.isPresent()) {
+        if (selectedBuchung != null) {
             binder.forField(zeitslot).asRequired()
                     .bind(Buchung::getZeitslot, Buchung::setZeitslot);
-            binder.readBean(selectedBuchung.get());
+            binder.readBean(selectedBuchung);
             zeitslot.setEnabled(false);
         } else {
             binder.forField(zeitslot).asRequired()
@@ -154,8 +156,8 @@ public class BuchungAnlegenDialog extends Dialog {
 
         dialogLayout.add(raum, date, veranstaltung, dozent, zeitslot);
         // Kein Wiederholungsintervall bei Buchung bearbeiten
-        if (selectedBuchung.isEmpty()) {
-            dialogLayout.add(wiederholungsintervall, endDatum);
+        if (selectedBuchung == null) {
+            dialogLayout.add(wiederholungsintervallRadioButtonGroup, endDatum);
         }
 
         dialogLayout.setResponsiveSteps(
@@ -196,49 +198,80 @@ public class BuchungAnlegenDialog extends Dialog {
      * @author Marcel Weiterhoener, Mike Wiebe
      */
     private boolean validateAndSave() {
-        Buchung firstBuchung = selectedBuchung.orElseGet(Buchung::new);
-        // Erste Buchung wird immer gespeichert, wenn alle Binder erfolgreich
+        Wiederholungsintervall wiederholungsintervall = wiederholungsintervallRadioButtonGroup.getValue();
+        Buchung firstBuchung;
+        if (selectedBuchung != null) {
+            firstBuchung = selectedBuchung;
+        } else {
+            firstBuchung = new Buchung();
+        }
         if (binder.writeBeanIfValid(firstBuchung)) {
             if (currentUser.get().isPresent()) {
                 firstBuchung.setUser(currentUser.get().get());
-            }
-            buchungService.save(firstBuchung);
-            if (wiederholungsintervall.getValue() == Wiederholungsintervall.EINMALIG) {
-                Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);
-                sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                return true;
             }
         } else {
             Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
             return false;
         }
-        if (selectedBuchung.isEmpty()) {
-            if (wiederholungsintervall.getValue() == Wiederholungsintervall.TAEGLICH) {
-                LocalDate currentDate = firstBuchung.getDate();
-                LocalDate endDate = endDatum.getValue();
-                while (currentDate.plusDays(1).isBefore(endDate) || currentDate.plusDays(1).isEqual(endDate)) {
-                    DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
-                    // Wochenende wird nicht gebucht
-                    if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
-                        Buchung nextBuchung = new Buchung(firstBuchung);
-                        nextBuchung.setDate(currentDate);
-                        buchungService.save(nextBuchung);
-                    }
-                    currentDate = currentDate.plusDays(1);
-                }
-            } else if (wiederholungsintervall.getValue() == Wiederholungsintervall.WOECHENTLICH) {
-                LocalDate currentDate = firstBuchung.getDate();
-                LocalDate endDate = endDatum.getValue();
-                while (currentDate.plusDays(7).isBefore(endDate) || currentDate.plusDays(7).isEqual(endDate)) {
-                    currentDate = currentDate.plusDays(7);
-                    Buchung nextBuchung = new Buchung(firstBuchung);
-                    nextBuchung.setDate(currentDate);
-                    buchungService.save(nextBuchung);
-                }
-            }
-            Notification sucessNotification = Notification.show("Buchungen erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
+        // Erste Buchung wird immer gespeichert, wenn alle Binder erfolgreich
+        if (wiederholungsintervall == Wiederholungsintervall.EINMALIG) {
+            buchungService.save(firstBuchung);
+            Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);
             sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             return true;
+        }
+        // Wiederholungsintervall soll bei existierenden Buchungen nicht beachtet werden, sondern immer nur die einzelne Buchung wird geändert
+        if (selectedBuchung == null) {
+            if (wiederholungsintervall == Wiederholungsintervall.WOECHENTLICH || wiederholungsintervall == Wiederholungsintervall.TAEGLICH || wiederholungsintervall == Wiederholungsintervall.JAEHRLICH) {
+                List<Buchung> gespeicherteBuchungen = new ArrayList<>();
+                gespeicherteBuchungen.add(firstBuchung);
+                LocalDate currentDate = firstBuchung.getDate();
+                LocalDate endDate = endDatum.getValue();
+                while (currentDate.isBefore(endDate) || currentDate.isEqual(endDate)) {
+                    Buchung nextBuchung = new Buchung(firstBuchung);
+                    nextBuchung.setDate(currentDate);
+                    nextBuchung.setUser(currentUser.get().get());
+                    gespeicherteBuchungen.add(nextBuchung);
+                    if (wiederholungsintervall == Wiederholungsintervall.WOECHENTLICH) {
+                        currentDate = currentDate.plusDays(7);
+                    } else if (wiederholungsintervall == Wiederholungsintervall.TAEGLICH) {
+                        currentDate = currentDate.plusDays(1);
+                    } else {
+                        currentDate = currentDate.plusYears(1); // wiederholungsintervall jährlich
+                    }
+                }
+                boolean fehlerBeiBuchung = false;
+                String fehlertext = "Der " + raum.getValue() + " ist bereits an folgenden Terminen belegt: \n";
+                for (Buchung buchung : gespeicherteBuchungen) {
+                    if (buchungService.roomBooked(buchung.getRoom(), buchung.getZeitslot(), buchung.getDate())) {
+                        Buchung konfliktBuchung = buchungService.findByDateAndRoomAndZeitslot(buchung.getDate(), buchung.getRoom(), buchung.getZeitslot());
+                        fehlertext =
+                                fehlertext.concat(buchung.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " von " + buchung.getZeitslot() + ": " + konfliktBuchung.getVeranstaltung().toString() +
+                                        "\n");
+                        fehlerBeiBuchung = true;
+                    }
+                }
+                fehlertext = fehlertext.concat("Es wurden keine Buchungen erstellt.");
+                if (fehlerBeiBuchung) {
+                    Dialog errorDialog = new Dialog();
+                    errorDialog.setResizable(true);
+                    TextArea errorTextArea = new TextArea();
+                    errorTextArea.setReadOnly(true);
+                    errorTextArea.setWidth("40vw");
+                    errorTextArea.setValue(fehlertext);
+                    errorDialog.add(errorTextArea);
+                    errorDialog.getFooter().add(new Button("Fenster schließen", event -> errorDialog.close()));
+                    errorDialog.open();
+                    return false;
+                } else {
+                    for (Buchung buchung : gespeicherteBuchungen) {
+                        buchungService.save(buchung);
+                    }
+                    Notification sucessNotification = Notification.show("Buchungen erfolgreich gespeichert", 4000, Notification.Position.MIDDLE);
+                    sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                    return true;
+                }
+            }
         }
         return false;
     }

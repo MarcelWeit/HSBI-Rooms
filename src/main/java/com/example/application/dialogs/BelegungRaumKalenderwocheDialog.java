@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class BelegungWocheDialog extends Dialog {
+public class BelegungRaumKalenderwocheDialog extends Dialog {
 
     private final BuchungService buchungService;
     private final Raum selectedRaum;
@@ -28,7 +28,7 @@ public class BelegungWocheDialog extends Dialog {
     private int kw;
 
 
-    public BelegungWocheDialog(Raum selectedRaum, BuchungService buchungService) {
+    public BelegungRaumKalenderwocheDialog(Raum selectedRaum, BuchungService buchungService) {
         this.buchungService = buchungService;
         this.selectedRaum = selectedRaum;
 

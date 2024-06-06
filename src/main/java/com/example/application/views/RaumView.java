@@ -6,9 +6,9 @@ import com.example.application.data.entities.Raum;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.enums.Raumtyp;
 import com.example.application.data.enums.Role;
-import com.example.application.dialogs.BelegungWocheDialog;
-import com.example.application.dialogs.BuchungAnlegenDialog;
-import com.example.application.dialogs.RaumBuchungenDialog;
+import com.example.application.dialogs.BelegungRaumKalenderwocheDialog;
+import com.example.application.dialogs.BuchungAnlegenBearbeitenDialog;
+import com.example.application.dialogs.BuchungenAnzeigenDialog;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.*;
 import com.vaadin.flow.component.Component;
@@ -152,7 +152,7 @@ public class RaumView extends VerticalLayout {
             if (selectedRoom.isEmpty()) {
                 Notification.show("Bitte wählen Sie einen Raum aus", 2000, Notification.Position.MIDDLE);
             } else {
-                BelegungWocheDialog belegungWocheDialog = new BelegungWocheDialog(selectedRoom.get(), buchungService);
+                BelegungRaumKalenderwocheDialog belegungWocheDialog = new BelegungRaumKalenderwocheDialog(selectedRoom.get(), buchungService);
                 belegungWocheDialog.open();
             }
         });
@@ -312,7 +312,8 @@ public class RaumView extends VerticalLayout {
     private void openRoomBookDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog roomBookDialog = new BuchungAnlegenDialog(Optional.empty(), selectedRoom, Optional.empty(), roomService, dozentService, buchungService, veranstaltungService, currentUser);
+            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, selectedRoom, Optional.empty(), roomService, dozentService, buchungService, veranstaltungService,
+                    currentUser);
             roomBookDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);
@@ -323,7 +324,7 @@ public class RaumView extends VerticalLayout {
     private void openShowBookingsDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog showBookingsDialog = new RaumBuchungenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService, currentUser);
+            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService, currentUser);
             showBookingsDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);

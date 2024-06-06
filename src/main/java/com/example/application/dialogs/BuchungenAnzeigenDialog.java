@@ -36,7 +36,7 @@ import java.util.function.Consumer;
  *
  * @author Mike Wiebe
  */
-public class RaumBuchungenDialog extends Dialog {
+public class BuchungenAnzeigenDialog extends Dialog {
 
     private final BuchungService buchungService;
     private final Grid<Buchung> raumBuchungGrid = new Grid<>(Buchung.class, false);
@@ -47,7 +47,7 @@ public class RaumBuchungenDialog extends Dialog {
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
     private final AuthenticatedUser currentUser;
 
-    public RaumBuchungenDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
+    public BuchungenAnzeigenDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.buchungService = buchungService;
         this.roomService = roomService;
         this.selectedRoom = raum;
@@ -178,7 +178,8 @@ public class RaumBuchungenDialog extends Dialog {
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBuchung.isPresent()) {
-            BuchungAnlegenDialog editBookingDialog = new BuchungAnlegenDialog(selectedBuchung, Optional.empty(), Optional.empty(), roomService, dozentService, buchungService, veranstaltungService, currentUser);
+            BuchungAnlegenBearbeitenDialog editBookingDialog = new BuchungAnlegenBearbeitenDialog(selectedBuchung.get(), Optional.empty(), Optional.empty(), roomService, dozentService,
+                    buchungService, veranstaltungService, currentUser);
             editBookingDialog.open();
             this.close();
         } else {

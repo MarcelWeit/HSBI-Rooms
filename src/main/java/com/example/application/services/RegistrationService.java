@@ -18,6 +18,6 @@ public class RegistrationService {
     }
 
     public boolean emailExists(String email) {
-        return repository.existsByUsername(email);
+        return repository.existsByUsername(email.toLowerCase());
     }
 }

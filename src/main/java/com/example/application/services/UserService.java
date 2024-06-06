@@ -65,7 +65,7 @@ public class UserService {
     }
 
     public boolean emailExists(String email) {
-        return repository.existsByUsername(email);
+        return repository.existsByUsername(email.toLowerCase());
     }
 
     private boolean usernameExists(String username, Long id) {
