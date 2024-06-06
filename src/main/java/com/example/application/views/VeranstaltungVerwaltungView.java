@@ -48,6 +48,8 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
     private final Grid<Veranstaltung> grid = new Grid<>(Veranstaltung.class, false);
 
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
+    private GridListDataView<Veranstaltung> gridDataView;
+    private HeaderRow headerRow;
 
     //private final Crud<Veranstaltung> crud;
 
@@ -174,7 +176,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
     }
 
     private void setupGrid() {
-        GridListDataView<Veranstaltung> gridDataView = grid.setItems(veranstaltungService.findAll());
+        gridDataView = grid.setItems(veranstaltungService.findAll());
 
         grid.addColumn(Veranstaltung::getId).setHeader("VeranstaltungsID").setKey("id");
         grid.addColumn(Veranstaltung::getBezeichnung).setHeader("Bezeichnung").setKey("bezeichnung");
@@ -182,13 +184,15 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         grid.addColumn(Veranstaltung::getFachbereich).setHeader("Fachbereich").setKey("fachbereich");
         grid.addColumn(Veranstaltung::getTeilnehmerzahl).setHeader("Teilnehmerzahl").setKey("teilnehmerzahl");
 
-        setupFilters(gridDataView);
+        setupFilters();
     }
 
-    private void setupFilters(GridListDataView<Veranstaltung> gridDataView) {
+    private void setupFilters() {
         VeranstaltungFilter vFilter = new VeranstaltungFilter(gridDataView);
-        grid.getHeaderRows().clear();
-        HeaderRow headerRow = grid.appendHeaderRow();
+
+        if (headerRow == null ){
+            headerRow = grid.appendHeaderRow();
+        }
 
         Consumer<Set<Fachbereich>> fachbereichFilterChangeConsumer = vFilter::setFachbereich;
         MultiSelectComboBox<Fachbereich> fachbereichComboBox = new MultiSelectComboBox<>();
@@ -266,7 +270,8 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
             Veranstaltung veranstaltung = new Veranstaltung();
             if (binder.writeBeanIfValid(veranstaltung)) {
                 veranstaltungService.save(veranstaltung);
-                grid.setItems(veranstaltungService.findAll());
+                refreshGrid();
+                //grid.setItems(veranstaltungService.findAll());
                 dialog.close();
             } else {
                 Notification.show("Bitte alle Felder korrekt befüllen!", 2000, Notification.Position.BOTTOM_CENTER);
@@ -294,7 +299,8 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
             confirmDelete.setConfirmButton("Bestätigen", e -> {
                 veranstaltungService.delete(selected.get());
-                grid.setItems(veranstaltungService.findAll());
+                refreshGrid();
+                //grid.setItems(veranstaltungService.findAll());
                 confirmDelete.close();
             });
 
@@ -303,6 +309,11 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         } else {
             Notification.show("Bitte wählen sie einen Eintrag aus!", 2000, Notification.Position.BOTTOM_CENTER);
         }
+    }
+
+    private void refreshGrid() {
+        gridDataView = grid.setItems(veranstaltungService.findAll());
+        setupFilters();
     }
 
     private static class VeranstaltungFilter {
