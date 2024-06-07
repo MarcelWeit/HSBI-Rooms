@@ -244,6 +244,7 @@ public class RaumView extends VerticalLayout {
      */
     private void openEditCreateDialog(Raum selectedRoom) {
         Dialog dialog = new Dialog();
+        dialog.setId("raum-dialog");
         dialog.setMaxWidth("25vw");
         dialog.setMinWidth("200px");
         FormLayout form = new FormLayout();
@@ -254,6 +255,7 @@ public class RaumView extends VerticalLayout {
         fachbereich.setItems(Fachbereich.values());
 
         TextField position = new TextField("Position");
+        position.setId("position-textfield");
 
         ComboBox<Raumtyp> raumtyp = new ComboBox<>("Typ");
         raumtyp.setItems(Raumtyp.values());

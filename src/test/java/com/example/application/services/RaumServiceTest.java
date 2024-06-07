@@ -32,9 +32,6 @@ public class RaumServiceTest {
     @InjectMocks
     private RaumService raumService;
 
-    @Mock
-    private AusstattungService ausstattungService;
-
     @Test
     void save() {
         Raum raumToTest = new Raum("C1", Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "FB Wirtschaft Etage 1");
