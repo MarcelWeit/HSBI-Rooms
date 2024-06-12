@@ -255,7 +255,7 @@ public class RaumView extends VerticalLayout {
         fachbereich.setItems(Fachbereich.values());
 
         TextField position = new TextField("Position");
-        position.setId("position-textfield");
+        position.setId("textfield-position");
 
         ComboBox<Raumtyp> raumtyp = new ComboBox<>("Typ");
         raumtyp.setItems(Raumtyp.values());
@@ -265,6 +265,7 @@ public class RaumView extends VerticalLayout {
         capacity.setMax(1000);
         capacity.setValue(50);
         capacity.setStepButtonsVisible(true);
+        capacity.setId("integerfield-capacity");
 
         MultiSelectComboBox<Ausstattung> ausstattung = new MultiSelectComboBox<>("Ausstattung");
         ausstattung.setItems(ausstattungService.findAll());

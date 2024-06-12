@@ -1,12 +1,15 @@
 package com.example.application.services;
 
+import com.example.application.repository.BuchungRepository;
 import com.example.application.repository.RaumRepository;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +34,9 @@ public class RaumViewIT {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.get("http://localhost:8080/login");
+        driver.manage().window().maximize();
+        Actions actions = new Actions(driver);
+        actions.keyDown(Keys.CONTROL).sendKeys(Keys.SUBTRACT).keyUp(Keys.CONTROL).perform();
 
         new WebDriverWait(driver, ofSeconds(30), ofSeconds(1))
                 .until(d -> d.getTitle().startsWith("Login"));
@@ -42,28 +48,6 @@ public class RaumViewIT {
         new WebDriverWait(driver, ofSeconds(30), ofSeconds(1))
                 .until(d -> d.getTitle().startsWith("Startseite"));
     }
-
-    //    @Test
-    //    @Order(1)
-    //    public void buttons() {
-    //        driver.get("http://localhost:8080/raumverwaltung");
-    //        new WebDriverWait(driver, ofSeconds(30), ofSeconds(1))
-    //                .until(d -> d.getTitle().startsWith("Räume verwalten"));
-    //
-    //        var addRoomButton = driver.findElement(By.xpath("//vaadin-button[contains(.,'Raum hinzufügen')]"));
-    //        var editRoomButton = driver.findElement(By.xpath("//vaadin-button[contains(.,'Raum bearbeiten')]"));
-    //        var deleteRoomButton = driver.findElement(By.xpath("//vaadin-button[contains(.,'Raum löschen')]"));
-    //        var bookRoomButton = driver.findElement(By.xpath("//vaadin-button[contains(.,'Raum buchen')]"));
-    //        var showBookingsButton = driver.findElement(By.xpath("//vaadin-button[contains(.,'Buchungen anzeigen')]"));
-    //        var kwButton = driver.findElement(By.xpath("//vaadin-button[contains(.,'KW Verfügbarkeit')]"));
-    //
-    //        assertEquals("Raum hinzufügen", addRoomButton.getText());
-    //        assertEquals("Raum bearbeiten", editRoomButton.getText());
-    //        assertEquals("Raum löschen", deleteRoomButton.getText());
-    //        assertEquals("Raum buchen", bookRoomButton.getText());
-    //        assertEquals("Buchungen anzeigen", showBookingsButton.getText());
-    //        assertEquals("KW Verfügbarkeit", kwButton.getText());
-    //    }
 
     @Test
     @Order(2)
@@ -117,15 +101,19 @@ public class RaumViewIT {
         var refNr = "C337";
         var newPos = "Fachbereich Wirtschaft Etage 4";
 
+        new WebDriverWait(driver, ofSeconds(30), ofSeconds(1))
+                .until(visibilityOfElementLocated(By.xpath("//vaadin-grid-cell-content[contains(.,'" + refNr + "')]")));
         driver.findElement(By.xpath("//vaadin-grid-cell-content[contains(.,'" + refNr + "')]")).click();
         driver.findElement(By.xpath("//vaadin-button[contains(.,'Raum bearbeiten')]")).click();
 
         new WebDriverWait(driver, ofSeconds(30), ofSeconds(1))
-                .until(visibilityOfElementLocated(By.id("position-textfield")));
-        driver.findElement(By.id("position-textfield")).sendKeys(Keys.CONTROL + "a");
-        driver.findElement(By.id("position-textfield")).sendKeys(Keys.DELETE);
-        // Irgendwie sendet er die ersten zwei Zeichen nicht - keine ahnung warum
-        driver.findElement(By.id("position-textfield")).sendKeys("..Fachbereich Wirtschaft Etage 4");
+                .until(visibilityOfElementLocated(By.id("textfield-position")));
+        WebElement positionField = driver.findElement(By.id("textfield-position"));
+        positionField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
+        driver.findElement(By.id("input-vaadin-text-field-50")).sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
+        // Anderes Feld fokussieren, damit anschließend das Positionsfeld geändert werden kann
+        driver.findElement(By.id("integerfield-capacity")).click();
+        positionField.sendKeys("Fachbereich Wirtschaft Etage 4");
 
         driver.findElement(By.xpath("//vaadin-button[contains(.,'Speichern')]")).click();
 
@@ -171,4 +159,5 @@ public class RaumViewIT {
             driver.quit();
         }
     }
+
 }
