@@ -1,6 +1,8 @@
 package com.example.application.data.enums;
 
 /**
+ * Aufzählung der Raumtypen
+ *
  * @author Marcel Weithoener
  */
 public enum Raumtyp {

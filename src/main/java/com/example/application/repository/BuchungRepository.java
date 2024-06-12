@@ -7,13 +7,14 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
 public interface BuchungRepository extends JpaRepository<Buchung, Long>, JpaSpecificationExecutor<Buchung> {
-    Buchung findBuchungById(long id);
+    Optional<Buchung> findBuchungById(long id);
 
-    Buchung findByDateAndRoomAndZeitslot(LocalDate date, Raum room, Zeitslot zeitslot);
+    Optional<Buchung> findByDateAndRoomAndZeitslot(LocalDate date, Raum room, Zeitslot zeitslot);
 
     Set<Buchung> findAllByDozent(Dozent dozent);
 

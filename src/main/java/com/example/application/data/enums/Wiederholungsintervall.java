@@ -1,5 +1,10 @@
 package com.example.application.data.enums;
 
+/**
+ * Aufzählung der Wiederholungsintervalle
+ *
+ * @author Marcel Weithoener
+ */
 public enum Wiederholungsintervall {
     EINMALIG("Einmalig"),
     TAEGLICH("Täglich"),

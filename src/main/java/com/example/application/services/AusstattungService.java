@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 /**
+ * Service für die Entität Ausstattung
+ *
  * @author Marcel Weithoener
  */
 @Service

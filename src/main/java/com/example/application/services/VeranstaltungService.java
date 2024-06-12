@@ -2,7 +2,6 @@ package com.example.application.services;
 
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Veranstaltung;
-import com.example.application.data.enums.Fachbereich;
 import com.example.application.repository.VeranstaltungRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,20 +20,8 @@ public class VeranstaltungService {
         return Set.copyOf(repository.findAll());
     }
 
-    public Veranstaltung findVeranstaltung(String id) {
-        return repository.findById(id);
-    }
-
-    public Set<Veranstaltung> findVeranstaltungSet(String bezeichnung) {
-        return Set.copyOf(repository.findAllByBezeichnung(bezeichnung));
-    }
-
     public Set<Veranstaltung> findVeranstaltungSet(Dozent dozent) {
         return Set.copyOf(repository.findAllByDozent(dozent));
-    }
-
-    public Set<Veranstaltung> findVeranstaltungSet(Fachbereich fachbereich) {
-        return Set.copyOf(repository.findAllByFachbereich(fachbereich));
     }
 
     public void save(Veranstaltung veranstaltung) {

@@ -43,8 +43,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * View, um Räume zu verwalten (hinzufügen, bearbeiten, löschen)
- * Räume können gebucht und Buchungen, gelöscht und bearbeitet werden
+ * View, um Räume zu verwalten (hinzufügen, bearbeiten, löschen).
+ * Zudem können Räume gebucht werden, Buchungen angezeigt und die Verfügbarkeit in einer Kalenderwoche angezeigt werden.
  *
  * @author Marcel Weithoener
  */
@@ -65,9 +65,14 @@ public class RaumView extends VerticalLayout {
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
 
     private final AuthenticatedUser currentUser;
+    private final RaumService raumService;
+    private HeaderRow headerRow;
 
+    /**
+     * Konstruktor der Klasse RaumView
+     */
     public RaumView(AusstattungService ausstattungService, RaumService roomService, DozentService dozentService,
-                    VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser currentUser) {
+                    VeranstaltungService veranstaltungService, BuchungService buchungService, AuthenticatedUser currentUser, RaumService raumService) {
         this.ausstattungService = ausstattungService;
         this.roomService = roomService;
         this.dozentService = dozentService;
@@ -79,8 +84,15 @@ public class RaumView extends VerticalLayout {
         setupButtons();
         setupGrid();
         add(buttonLayout, roomGrid);
+        this.raumService = raumService;
     }
 
+    /**
+     * Erstellt ein Textfeld für die Filterung der Räume
+     *
+     * @param filterChangeConsumer Consumer für die Filterung
+     * @return Textfeld für die Filterung
+     */
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
         TextField textField = new TextField();
         textField.setValueChangeMode(ValueChangeMode.EAGER);
@@ -91,8 +103,13 @@ public class RaumView extends VerticalLayout {
         return textField;
     }
 
+    /**
+     * Erstellt das Grid für die Räume
+     */
     private void setupGrid() {
-        GridListDataView<Raum> dataView = roomGrid.setItems(roomService.findAll());
+        updateGrid();
+
+        GridListDataView<Raum> dataView = roomGrid.getListDataView();
 
         roomGrid.addColumn(Raum::getRefNr).setHeader("Referenznummer")
                 .setComparator(new refNrComparator())
@@ -123,9 +140,12 @@ public class RaumView extends VerticalLayout {
         setupFilter(dataView);
     }
 
+    /**
+     * Erstellt die Buttons für die Raumverwaltung
+     */
     private void setupButtons() {
         Button addRoomButton = new Button("Raum hinzufügen", new Icon(VaadinIcon.PLUS));
-        addRoomButton.addClickListener(e -> openEditCreateDialog(Optional.empty()));
+        addRoomButton.addClickListener(e -> openEditCreateDialog(null));
 
         Button editRoomButton = new Button("Raum bearbeiten", new Icon(VaadinIcon.EDIT));
         editRoomButton.addClickListener(e -> {
@@ -133,7 +153,7 @@ public class RaumView extends VerticalLayout {
             if (selectedRoom.isEmpty()) {
                 Notification.show("Bitte wählen Sie einen Raum aus", 2000, Notification.Position.MIDDLE);
             } else {
-                openEditCreateDialog(selectedRoom);
+                openEditCreateDialog(selectedRoom.get());
             }
         });
 
@@ -159,7 +179,7 @@ public class RaumView extends VerticalLayout {
 
         if (currentUser.get().isPresent()) {
             buttonLayout.add(addRoomButton, editRoomButton, deleteRoomButton, bookRoomButton, showBookingsButton, showWeekBookingButton);
-            // Dozent, FBPlanung kann keine Räume hinzufügen, bearbeiten oder löschen
+            // Dozent kann keine Räume hinzufügen, bearbeiten oder löschen
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
                 buttonLayout.remove(addRoomButton, editRoomButton, deleteRoomButton);
             } else if (currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
@@ -168,11 +188,18 @@ public class RaumView extends VerticalLayout {
         }
     }
 
+    /**
+     * Erstellt die Filter für die Räume
+     *
+     * @param dataView Data View für die Räume
+     */
     private void setupFilter(GridListDataView<Raum> dataView) {
         RoomFilter roomFilter = new RoomFilter(dataView);
 
         roomGrid.getHeaderRows().clear();
-        HeaderRow headerRow = roomGrid.appendHeaderRow();
+        if (headerRow == null) {
+            headerRow = roomGrid.appendHeaderRow();
+        }
 
         headerRow.getCell(roomGrid.getColumnByKey("refNr")).setComponent(createStringFilterHeader(roomFilter::setRefNr));
 
@@ -217,7 +244,12 @@ public class RaumView extends VerticalLayout {
 
     }
 
-    private void openEditCreateDialog(Optional<Raum> selectedRoom) {
+    /**
+     * Öffnet den Dialog zum Bearbeiten oder Erstellen eines Raumes
+     *
+     * @param selectedRoom Optionaler Raum
+     */
+    private void openEditCreateDialog(Raum selectedRoom) {
         Dialog dialog = new Dialog();
         dialog.setMaxWidth("25vw");
         dialog.setMinWidth("200px");
@@ -251,32 +283,35 @@ public class RaumView extends VerticalLayout {
         roomBinder.forField(fachbereich).asRequired("Bitte einen Fachbereich auswählen").bind(Raum::getFachbereich, Raum::setFachbereich);
         roomBinder.forField(position).asRequired("Bitte eine Position angeben").bind(Raum::getPosition, Raum::setPosition);
 
-        if (selectedRoom.isEmpty()) {
-            roomBinder.forField(refNr).asRequired("Bitte eine Referenznummer angeben")
-                    .withValidator(refNrValue -> refNrValue.matches("^[A-Z]{1}.{0,3}$"),
-                            "Die Referenznummer muss mit einem großen Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
-                    .withValidator(refNrValue -> !roomService.refNrExists(refNrValue),
-                            "Referenznummer existiert bereits")
-                    .bind(Raum::getRefNr, Raum::setRefNr);
-        } else {
-            roomBinder.forField(refNr).bind(Raum::getRefNr, Raum::setRefNr);
-        }
+        roomBinder.forField(refNr).asRequired("Bitte eine Referenznummer angeben")
+                .withValidator(refNrValue -> refNrValue.matches("^[A-Z]{1}.{0,3}$"),
+                        "Die Referenznummer muss mit einem großen Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
+                .bind(Raum::getRefNr, Raum::setRefNr);
 
-        if (selectedRoom.isPresent()) {
-            roomBinder.readBean(selectedRoom.get());
+        if (selectedRoom != null) {
+            roomBinder.readBean(selectedRoom);
             refNr.setEnabled(false);
-            refNr.setErrorMessage(null);
-            refNr.setInvalid(false);
         }
 
         Button cancelButton = new Button("Abbrechen", event -> dialog.close());
         Button saveButton = new Button("Speichern");
         saveButton.addClickListener(event -> {
-            Raum room = selectedRoom.orElseGet(Raum::new);
-            if (roomBinder.writeBeanIfValid(room) || selectedRoom.isPresent()) {
-                roomService.save(room);
-                roomGrid.setItems(roomService.findAll());
-                dialog.close();
+            Raum raum;
+            if (selectedRoom == null) {
+                raum = new Raum();
+            } else {
+                raum = selectedRoom;
+            }
+            if (roomBinder.writeBeanIfValid(raum)) {
+                if (selectedRoom == null && raumService.refNrExists(raum.getRefNr())) {
+                    Notification.show("Die Referenznummer existiert bereits", 2000, Notification.Position.MIDDLE);
+                } else {
+                    roomService.save(raum);
+                    updateGrid();
+                    dialog.close();
+                }
+            } else {
+                Notification.show("Bitte überprüfen Sie Ihre Eingaben", 2000, Notification.Position.MIDDLE);
             }
         });
 
@@ -285,10 +320,17 @@ public class RaumView extends VerticalLayout {
         dialog.open();
     }
 
+    /**
+     * Öffnet den Dialog zum Löschen eines Raumes
+     */
     private void openDeleteDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isEmpty()) {
             Notification.show("Bitte wählen Sie einen Raum aus", 2000, Notification.Position.MIDDLE);
+        } else if (!buchungService.findAllByRoom(selectedRoom.get()).isEmpty()) {
+            Notification errorNotification = new Notification("Es existieren noch Buchungen für diesen Raum", 4000, Notification.Position.MIDDLE);
+            errorNotification.getElement().getThemeList().add("error");
+            errorNotification.open();
         } else {
             ConfirmDialog confirmDeleteDialog = new ConfirmDialog();
             confirmDeleteDialog.setHeader("Raum " + selectedRoom.get().getRefNr() + " löschen?");
@@ -299,7 +341,7 @@ public class RaumView extends VerticalLayout {
 
             confirmDeleteDialog.setConfirmButton("Löschen", event -> {
                 roomService.delete(selectedRoom.get());
-                roomGrid.setItems(roomService.findAll());
+                updateGrid();
                 confirmDeleteDialog.close();
             });
 
@@ -309,10 +351,13 @@ public class RaumView extends VerticalLayout {
         }
     }
 
+    /**
+     * Öffnet den Dialog zum Buchen eines Raumes
+     */
     private void openRoomBookDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, selectedRoom, Optional.empty(), roomService, dozentService, buchungService, veranstaltungService,
+            Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, selectedRoom.get(), null, roomService, dozentService, buchungService, veranstaltungService,
                     currentUser);
             roomBookDialog.open();
         } else {
@@ -321,16 +366,32 @@ public class RaumView extends VerticalLayout {
 
     }
 
+    /**
+     * Öffnet den Dialog zum Anzeigen der Buchungen eines Raumes
+     */
     private void openShowBookingsDialog() {
         Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedRoom.isPresent()) {
-            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(selectedRoom, roomService, dozentService, buchungService, veranstaltungService, currentUser);
+            Dialog showBookingsDialog = new BuchungenAnzeigenDialog(selectedRoom.get(), roomService, dozentService, buchungService, veranstaltungService, currentUser);
             showBookingsDialog.open();
         } else {
             Notification.show("Bitte einen Raum auswählen", 4000, Notification.Position.MIDDLE);
         }
     }
 
+    private void updateGrid() {
+        if (currentUser.get().isPresent()) {
+            if (currentUser.get().get().getRoles().contains(Role.ADMIN)) {
+                roomGrid.setItems(roomService.findAll());
+            } else {
+                roomGrid.setItems(roomService.findAllByFachbereich(currentUser.get().get().getFachbereich()));
+            }
+        }
+    }
+
+    /**
+     * Statische Filter Klasse für die Räume
+     */
     private static class RoomFilter {
         private final GridListDataView<Raum> dataView;
 

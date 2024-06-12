@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * View für die Anzeige der Raumauslastung
+ *
  * @author Marcel Weithoener
  */
 @Route(value = "kapa", layout = MainLayout.class)
