@@ -1,15 +1,13 @@
 package com.example.application.services;
 
-import com.example.application.data.entities.Buchung;
-import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Raum;
-import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.entities.*;
 import com.example.application.data.enums.Zeitslot;
 import com.example.application.repository.BuchungRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -27,22 +25,14 @@ public class BuchungService {
     }
 
     public boolean roomBooked(Raum room, Zeitslot zeitslot, LocalDate date) {
-        Set<Buchung> buchungenThisDay = buchungRepository.findByDateAndRoom(date, room);
-        boolean belegt = false;
-        for (Buchung existingBuchung : buchungenThisDay) {
-            if (existingBuchung.getZeitslot() == zeitslot) {
-                belegt = true;
-                break;
-            }
-        }
-        return belegt;
+        return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot).isPresent();
     }
 
     public Buchung save(Buchung buchung) {
         return buchungRepository.save(buchung);
     }
 
-    public Buchung findByDateAndRoomAndZeitslot(LocalDate date, Raum room, Zeitslot zeitslot) {
+    public Optional<Buchung> findByDateAndRoomAndZeitslot(LocalDate date, Raum room, Zeitslot zeitslot) {
         return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot);
     }
 
@@ -62,12 +52,16 @@ public class BuchungService {
         return buchungRepository.count();
     }
 
-    public Buchung findById(Long id) {
+    public Optional<Buchung> findById(Long id) {
         return buchungRepository.findBuchungById(id);
     }
 
     public Set<Buchung> findAllByDozent(Dozent dozent) {
         return Set.copyOf(buchungRepository.findAllByDozent(dozent));
+    }
+
+    public Set<Buchung> findAllByUser(User user) {
+        return Set.copyOf(buchungRepository.findAllByUser(user));
     }
 
     public Set<Buchung> findAllByRoom(Raum room) {
@@ -84,5 +78,8 @@ public class BuchungService {
 
     public Set<Buchung> findAllByDateAndRoom(LocalDate date, Raum room) {
         return Set.copyOf(buchungRepository.findByDateAndRoom(date, room));
+    }
+    public Set<Buchung> findAllByUserOrDozent(User user, Dozent dozent) {
+        return buchungRepository.findAllByUserOrDozent(user, dozent);
     }
 }

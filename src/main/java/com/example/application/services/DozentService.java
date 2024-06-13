@@ -6,6 +6,7 @@ import com.example.application.repository.DozentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DozentService {
@@ -40,11 +41,14 @@ public class DozentService {
         return repository.findById(id).orElse(null);
     }
 
-    public List<Dozent> findByNachname(String nachname) {
+    public Optional<Dozent> findByNachname(String nachname) {
+        return repository.findByNachname(nachname);
+    }
+    public List<Dozent> findAllByNachname(String nachname) {
         return repository.findAllByNachname(nachname);
     }
 
-    public Dozent findByVornameAndNachname(String vorname, String nachname) {
+    public Optional<Dozent> findByVornameAndNachname(String vorname, String nachname) {
         return repository.findByVornameAndNachname(vorname, nachname);
     }
 

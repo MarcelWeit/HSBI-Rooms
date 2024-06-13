@@ -35,7 +35,7 @@ import java.util.Optional;
 /**
  * Dialog zum Anlegen oder bearbeiten einer Buchung
  *
- * @author Mike Wiebe, Marcel Weithoener
+ * @author Mike Wiebe
  */
 public class BuchungAnlegenBearbeitenDialog extends Dialog {
 
@@ -56,12 +56,12 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
     private final ComboBox<Zeitslot> zeitslot = new ComboBox<>("Zeitslot");
 
     private final Buchung selectedBuchung;
-    private final Optional<Raum> selectedRoom;
-    private final Optional<Veranstaltung> selectedVeranstaltung;
+    private final Raum selectedRoom;
+    private final Veranstaltung selectedVeranstaltung;
 
     private final AuthenticatedUser currentUser;
 
-    public BuchungAnlegenBearbeitenDialog(Buchung selectedBuchung, Optional<Raum> selectedRoom, Optional<Veranstaltung> selectedVeranstaltung, RaumService roomService,
+    public BuchungAnlegenBearbeitenDialog(Buchung selectedBuchung, Raum selectedRoom, Veranstaltung selectedVeranstaltung, RaumService roomService,
                                           DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.roomService = roomService;
         this.dozentService = dozentService;
@@ -99,6 +99,7 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
         veranstaltung.setItems(veranstaltungService.findAll());
         veranstaltung.setItemLabelGenerator(Veranstaltung::getBezeichnung);
         veranstaltung.setRequiredIndicatorVisible(true);
+        veranstaltung.setId("combobox-veranstaltung");
 
         dozent.setItems(dozentService.findAll());
         //Wenn der Nutzer ein Dozent ist, soll dieser beim Anlegen der Buchung selbst als Dozent eingetragen und nicht änderbar sein damit jeder Dozent nur Buchungen für sich anlegen kann
@@ -110,11 +111,14 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
             }
         }
         dozent.setRequiredIndicatorVisible(true);
+        dozent.setId("combobox-dozent");
 
         date.setLabel("Datum");
         date.setRequiredIndicatorVisible(true);
+        date.setId("datepicker-startdate");
 
         zeitslot.setItems(Zeitslot.values());
+        zeitslot.setId("combobox-zeitslot");
 
         wiederholungsintervallRadioButtonGroup.setItems(Wiederholungsintervall.values());
         wiederholungsintervallRadioButtonGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
@@ -128,6 +132,8 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                 binder.forField(endDatum).asRequired();
             }
         });
+        wiederholungsintervallRadioButtonGroup.setId("radiogroup-wiederholungsintervall");
+        endDatum.setId("datepicker-enddate");
 
         binder.forField(raum).asRequired("Bitte wählen Sie einem Raum aus").bind(Buchung::getRoom, Buchung::setRoom);
         binder.forField(veranstaltung).asRequired().bind(Buchung::getVeranstaltung, Buchung::setVeranstaltung);
@@ -144,13 +150,13 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                     .withValidator(event -> !buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue()), "Raum bereits belegt")
                     .bind(Buchung::getZeitslot, Buchung::setZeitslot);
         }
-        if (selectedRoom.isPresent()) {
-            raum.setValue(selectedRoom.get());
+        if (selectedRoom != null) {
+            raum.setValue(selectedRoom);
             raum.setEnabled(false);
             zeitslot.setEnabled(true);
         }
-        if (selectedVeranstaltung.isPresent()) {
-            veranstaltung.setValue(selectedVeranstaltung.get());
+        if (selectedVeranstaltung != null) {
+            veranstaltung.setValue(selectedVeranstaltung);
             veranstaltung.setEnabled(false);
         }
 
@@ -184,6 +190,7 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                 close();
             }
         });
+        save.setId("button-speichern");
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         cancel.addClickShortcut(Key.ESCAPE);
         cancel.addClickListener(event -> close());

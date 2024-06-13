@@ -25,9 +25,10 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.Set;
 
 /**
+ * View um Ausstattung anzulegen, anzuzeigen und zu löschen
+ *
  * @author Marcel Weithoener
  */
-
 @Route(value = "show-ausstattung", layout = MainLayout.class)
 @PageTitle("Ausstattung")
 @RolesAllowed({"ADMIN", "FBPLANUNG"})

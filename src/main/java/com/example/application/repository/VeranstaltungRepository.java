@@ -7,15 +7,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
 public interface VeranstaltungRepository extends JpaRepository<Veranstaltung, Long>, JpaSpecificationExecutor<Veranstaltung> {
-    Veranstaltung findById(String id);
+
+    Optional<Veranstaltung> findById(String id);
 
     Set<Veranstaltung> findAllByBezeichnung(String bezeichnung);
 
     Set<Veranstaltung> findAllByFachbereich(Fachbereich fachbereich);
 
     Set<Veranstaltung> findAllByDozent(Dozent dozent);
+
 }
