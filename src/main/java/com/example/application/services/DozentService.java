@@ -41,7 +41,10 @@ public class DozentService {
         return repository.findById(id).orElse(null);
     }
 
-    public List<Dozent> findByNachname(String nachname) {
+    public Optional<Dozent> findByNachname(String nachname) {
+        return repository.findByNachname(nachname);
+    }
+    public List<Dozent> findAllByNachname(String nachname) {
         return repository.findAllByNachname(nachname);
     }
 
