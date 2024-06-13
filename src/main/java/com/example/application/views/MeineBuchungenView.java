@@ -11,6 +11,7 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.icon.Icon;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -25,6 +27,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 
 @Route(value = "meine-buchungen", layout = MainLayout.class)
@@ -57,12 +60,17 @@ public class MeineBuchungenView extends VerticalLayout {
     private void setupGrid() {
         grid = new Grid<>();
 
-        grid.addColumn(Buchung::getRoom).setHeader("Raum").setKey("raum");
-        grid.addColumn(Buchung::getVeranstaltung).setHeader("Veranstaltung").setKey("veranstaltung");
-        grid.addColumn(Buchung::getDate).setHeader("Datum").setKey("datum");
-        grid.addColumn(Buchung::getZeitslot).setHeader("Zeitslot").setKey("zeitslot");
-
+        grid.addColumn(Buchung::getRoom).setHeader("Raum").setKey("raum").setSortable(true);
+        grid.addColumn(Buchung::getVeranstaltung).setHeader("Veranstaltung").setKey("veranstaltung").setSortable(true);
+        grid.addColumn(Buchung::getDate).setHeader("Datum").setKey("datum").setSortable(true);
+        grid.addColumn(Buchung::getZeitslot).setHeader("Zeitslot").setKey("zeitslot").setSortable(true);
         grid.setMinHeight("80vh");
+
+        GridSortOrder<Buchung> sortOrderRaum = new GridSortOrder<>(grid.getColumnByKey("raum"), SortDirection.ASCENDING);
+        ArrayList<GridSortOrder<Buchung>> sortOrder = new ArrayList<>();
+        sortOrder.add(sortOrderRaum);
+
+        grid.sort(sortOrder);
 
         refreshGrid();
         setupButtons();
@@ -74,28 +82,40 @@ public class MeineBuchungenView extends VerticalLayout {
 
         Optional<Dozent> dozent = dozentService.findByVornameAndNachname(userData.getFirstName(), userData.getLastName());
 
-        Set<Buchung> dozentBuchungen = buchungService.findAllByDozent(dozent.get());
-
         Set<Buchung> userBuchungen = buchungService.findAllByUser(userData);
 
         Set<Buchung> allBuchungen = new HashSet<>();
 
-        if(dozentBuchungen != null) {
-            allBuchungen.addAll(dozentBuchungen);
+        if(dozent.isPresent()) {
+            allBuchungen = buchungService.findAllByUserOrDozent(userData, dozent.get());
         }
+        else {
+            allBuchungen = buchungService.findAllByUser(userData);
+        }
+        grid.setItems(allBuchungen);
+    }
+    private Set<?> selectFilterData(Set<?> data) {
+        GridListDataView<Buchung> dataView = grid.getListDataView();
+        List<Raum> helpListRaum = dataView.getItems().map(Buchung::getRoom).toList();
+        List<Veranstaltung> helpListVeranstaltung = dataView.getItems().map(Buchung::getVeranstaltung).toList();
 
-        if(userBuchungen != null) {
-            userBuchungen.forEach(buchung -> {
-                if(allBuchungen.contains(buchung)) {
-                } else {
-                    allBuchungen.add(buchung);
+        List<String> buchungsRaum = helpListRaum.stream().map(Raum::toString).toList();
+        List<String> buchungsVeranstaltung = helpListVeranstaltung.stream().map(Veranstaltung::toString).toList();
+
+        Set<?> result = new HashSet<>(Set.copyOf(data));
+
+        for(Object item : data) {
+            if(item instanceof Raum) {
+                if(!buchungsRaum.contains(item.toString())) {
+                    result.remove(item);
                 }
-            });
+            } else if(item instanceof Veranstaltung) {
+                if(!buchungsVeranstaltung.contains(item.toString())) {
+                    result.remove(item);
+                }
+            }
         }
-
-        Set<Buchung> testSet = buchungService.findAllByUserOrDozent(userData, dozent.get());
-
-        grid.setItems(testSet);
+        return result;
     }
     private void setupFilters() {
         BuchungFilter bFilter = new BuchungFilter(grid.getListDataView());
@@ -105,13 +125,14 @@ public class MeineBuchungenView extends VerticalLayout {
 
         Consumer<Set<Raum>> raumFilterChangeConsumer = bFilter::setRaum;
         MultiSelectComboBox<Raum> raumComboBox = new MultiSelectComboBox<>();
-        raumComboBox.setItems(raumService.findAll());
+
+        raumComboBox.setItems((Set<Raum>) selectFilterData(raumService.findAll()));
         raumComboBox.addValueChangeListener(e -> raumFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("raum")).setComponent(raumComboBox);
 
         Consumer<Set<Veranstaltung>> veranstaltungFilterChangeConsumer = bFilter::setVeranstaltung;
         MultiSelectComboBox<Veranstaltung> veranstaltungComboBox = new MultiSelectComboBox<>();
-        veranstaltungComboBox.setItems(veranstaltungService.findAll());
+        veranstaltungComboBox.setItems((Set<Veranstaltung>) selectFilterData(veranstaltungService.findAll()));
         veranstaltungComboBox.addValueChangeListener(e -> veranstaltungFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("veranstaltung")).setComponent(veranstaltungComboBox);
 
@@ -133,10 +154,14 @@ public class MeineBuchungenView extends VerticalLayout {
             if (selectedBuchung.isEmpty()) {
                 Notification.show("Bitte wählen Sie eine Buchung aus", 2000, Notification.Position.MIDDLE);
             } else {
-                Dialog buchungEditDialog = new BuchungAnlegenBearbeitenDialog(selectedBuchung.get(), Optional.empty(), Optional.empty(), raumService, dozentService, buchungService, veranstaltungService,
+                Dialog buchungEditDialog = new BuchungAnlegenBearbeitenDialog(selectedBuchung.get(), null, null, raumService, dozentService, buchungService, veranstaltungService,
                         currentUser);
                 buchungEditDialog.open();
-                buchungEditDialog.addDialogCloseActionListener(event -> refreshGrid());
+                buchungEditDialog.addOpenedChangeListener(event -> {
+                    if(!event.isOpened()) {
+                        refreshGrid();
+                    }
+                });
             }
         });
 
