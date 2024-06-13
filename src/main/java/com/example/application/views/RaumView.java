@@ -36,6 +36,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -54,6 +55,7 @@ import java.util.function.Consumer;
 @PageTitle("Räume verwalten")
 public class RaumView extends VerticalLayout {
 
+    @Autowired
     private final AusstattungService ausstattungService;
     private final RaumService roomService;
     private final DozentService dozentService;
