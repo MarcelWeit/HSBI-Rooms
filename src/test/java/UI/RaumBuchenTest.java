@@ -1,4 +1,4 @@
-package com.example.application.services;
+package UI;
 
 import com.example.application.data.enums.Zeitslot;
 import com.example.application.repository.BuchungRepository;
@@ -21,7 +21,7 @@ import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
-@SpringBootTest
+@SpringBootTest(classes = {com.example.application.Application.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RaumBuchenTest {
 
@@ -54,7 +54,7 @@ public class RaumBuchenTest {
 
     @Test
     @Order(1)
-    public void bookRoom(){
+    public void bookRoom() {
         driver.get("http://localhost:8080/raumverwaltung");
         new WebDriverWait(driver, ofSeconds(30), ofSeconds(1))
                 .until(d -> d.getTitle().startsWith("Räume verwalten"));
@@ -76,7 +76,7 @@ public class RaumBuchenTest {
 
     @Test
     @Order(2)
-    public void deleteBuchung(){
+    public void deleteBuchung() {
         driver.get("http://localhost:8080/raumverwaltung");
         new WebDriverWait(driver, ofSeconds(30), ofSeconds(1))
                 .until(d -> d.getTitle().startsWith("Räume verwalten"));

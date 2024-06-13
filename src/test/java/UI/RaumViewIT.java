@@ -1,6 +1,5 @@
-package com.example.application.services;
+package UI;
 
-import com.example.application.repository.BuchungRepository;
 import com.example.application.repository.RaumRepository;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
@@ -20,7 +19,7 @@ import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
-@SpringBootTest
+@SpringBootTest(classes = {com.example.application.Application.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RaumViewIT {
 
