@@ -85,6 +85,11 @@ public class MainLayout extends AppLayout {
                     new SideNavItem("Veranstaltungen", VeranstaltungView.class, VaadinIcon.TABLE.create())
             );
         }
+        if (accessChecker.hasAccess(MeineBuchungenView.class)) {
+            nav.addItem(
+                    new SideNavItem("Meine Buchungen", MeineBuchungenView.class, VaadinIcon.TABLE.create())
+            );
+        }
         if (accessChecker.hasAccess(AuslastungView.class)) {
             nav.addItem(
                     new SideNavItem("Auslastung", AuslastungView.class, VaadinIcon.BAR_CHART_H.create())

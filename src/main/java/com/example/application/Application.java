@@ -92,8 +92,8 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             System.out.println("Dozent Daten initialisiert");
         }
         if (veranstaltungRepository.count() == 0) {
-            veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
-            veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozentRepository.findByNachname("Küster").get(), 100, Fachbereich.WIRTSCHAFT));
+            veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann").get(), 120, Fachbereich.WIRTSCHAFT));
             System.out.println("Veranstaltung Daten initialisiert");
         }
         if (registrationRepository.count() == 0) {

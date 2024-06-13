@@ -191,7 +191,7 @@ public class DozentView extends VerticalLayout {
         saveButton.addClickListener(event -> {
 
             if (binder.writeBeanIfValid(dozent)) {
-                List<Dozent> existingDozenten = dozentService.findByVornameAndNachname(dozent.getVorname(), dozent.getNachname());
+                List<Dozent> existingDozenten = dozentService.findAllByNachname(dozent.getNachname());
                 boolean isDuplicate = existingDozenten.stream().anyMatch(d -> d.getId() != dozent.getId());
                 if (!isDuplicate) {
                     dozentService.save(dozent);
