@@ -11,12 +11,14 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -24,10 +26,17 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * View um Veranstaltungen einzusehen. Zusätzlich können beim Klicken auf eine Veranstaltung, die jeweiligen Buchungen
+ * zur Veranstaltung angezeigt werden. Veranstaltungen können hier nicht bearbeitet, sondern jediglich eingesehen werden.
+ *
+ * @author Leon Gepfner
+ */
 @Route(value = "veranstaltung-crud", layout = MainLayout.class)
 @Secured({"ADMIN", "FBPlanung", "DOZENT"})
 @RolesAllowed({"ADMIN", "FBPlanung", "DOZENT"})
@@ -40,6 +49,12 @@ public class VeranstaltungView extends VerticalLayout {
     private final DozentService dozentService;
     private Grid<Veranstaltung> grid;
 
+    /**
+     * Konstruktur der Klasse VeranstaltungView
+     * @param veranstaltungService
+     * @param dozentService
+     * @param buchungService
+     */
     public VeranstaltungView(VeranstaltungService veranstaltungService, DozentService dozentService, BuchungService buchungService) {
         this.veranstaltungService = veranstaltungService;
         this.dozentService = dozentService;
@@ -49,10 +64,19 @@ public class VeranstaltungView extends VerticalLayout {
         add(grid);
     }
 
+    /**
+     *
+     * @return
+     */
     private static ComponentRenderer<VeranstaltungDetailsFormLayout, Veranstaltung> createDetailRenderer() {
         return new ComponentRenderer<>(VeranstaltungDetailsFormLayout::new, VeranstaltungDetailsFormLayout::linkData);
     }
 
+    /**
+     *
+     * @param filterChangeConsumer
+     * @return
+     */
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
         TextField textField = new TextField();
         textField.setValueChangeMode(ValueChangeMode.EAGER);
@@ -63,17 +87,25 @@ public class VeranstaltungView extends VerticalLayout {
         return textField;
     }
 
+    /**
+     * Erstellt das Grid für den VeranstaltungsView in dem die Veranstaltungen abbgebildet werden.
+     */
     private void addGrid() {
         Set<Veranstaltung> veranstaltungSet = veranstaltungService.findAll();
 
         grid = new Grid<>();
         grid.setItems(veranstaltungSet);
 
-        grid.addColumn(Veranstaltung::getId).setHeader("ID").setKey("id");
-        grid.addColumn(Veranstaltung::getBezeichnung).setHeader("Bezeichnung").setKey("bezeichnung");
-        grid.addColumn(Veranstaltung::getDozent).setHeader("Dozent").setKey("dozent");
-        grid.addColumn(Veranstaltung::getFachbereich).setHeader("Fachbereich").setKey("fachbereich");
-        grid.addColumn(Veranstaltung::getTeilnehmerzahl).setHeader("Teilnehmer").setKey("teilnehmerzahl");
+        grid.addColumn(Veranstaltung::getId).setHeader("ID").setKey("id").setSortable(true);
+        grid.addColumn(Veranstaltung::getBezeichnung).setHeader("Bezeichnung").setKey("bezeichnung").setSortable(true);
+        grid.addColumn(Veranstaltung::getDozent).setHeader("Dozent").setKey("dozent").setSortable(true);
+        grid.addColumn(Veranstaltung::getFachbereich).setHeader("Fachbereich").setKey("fachbereich").setSortable(true);
+        grid.addColumn(Veranstaltung::getTeilnehmerzahl).setHeader("Teilnehmer").setKey("teilnehmerzahl").setSortable(true);
+
+        GridSortOrder<Veranstaltung> sortOrderVeranstaltung = new GridSortOrder<>(grid.getColumnByKey("id"), SortDirection.ASCENDING);
+        ArrayList<GridSortOrder<Veranstaltung>> sortOrder = new ArrayList<>();
+        sortOrder.add(sortOrderVeranstaltung);
+        grid.sort(sortOrder);
 
 
         setupFilters(grid.getListDataView());
@@ -84,6 +116,10 @@ public class VeranstaltungView extends VerticalLayout {
 
     }
 
+    /**
+     * Erstellt die Filter des Grids zum Selektieren von Datensätzen
+     * @param gridDataView Data View für die Veranstaltungen
+     */
     private void setupFilters(GridListDataView<Veranstaltung> gridDataView) {
         VeranstaltungFilter vFilter = new VeranstaltungFilter(gridDataView);
         grid.getHeaderRows().clear();
@@ -119,9 +155,16 @@ public class VeranstaltungView extends VerticalLayout {
         headerRow.getCell(grid.getColumnByKey("bezeichnung")).setComponent(createStringFilterHeader(vFilter::setBezeichnung));
     }
 
+    /**
+     * Interne Klasse um die Detail Ansichten für die Veranstaltungen zu realisieren. Detail Ansicht zeigt
+     * ein Grid mit allen Buchungen der Veranstaltung
+     */
     private static class VeranstaltungDetailsFormLayout extends VerticalLayout {
         private final Grid<Buchung> buchungGrid = new Grid<>();
 
+        /**
+         * Konstruktur der Internen Klasse
+         */
         public VeranstaltungDetailsFormLayout() {
             buchungGrid.addColumn(Buchung::getRoom).setHeader("Raum");
             buchungGrid.addColumn(Buchung::getDate).setHeader("Datum");
@@ -131,11 +174,19 @@ public class VeranstaltungView extends VerticalLayout {
             add(buchungGrid);
         }
 
+        /**
+         * Setzt die Buchungen des Grids für die jeweilig übergebene Veranstaltung
+         * @param veranstaltung Angeklickte Veranstaltung
+         */
         public void linkData(Veranstaltung veranstaltung) {
             buchungGrid.setItems(buchungService.findAllByVeranstaltung(veranstaltung));
         }
     }
 
+    /**
+     * Interne Klasse zur Realisierung der Filterfunktion. Klasse speichert die Filterwerte ab, damit diese
+     * zur Selektierung der Datensätze verwendet werden kann.
+     */
     private static class VeranstaltungFilter {
         private final GridListDataView<Veranstaltung> gridDataView;
 
@@ -175,6 +226,11 @@ public class VeranstaltungView extends VerticalLayout {
             this.gridDataView.refreshAll();
         }
 
+        /**
+         * Realisiert den Abgleich einer Veranstaltung mit den aktuellen Filterwerten
+         * @param v Veranstaltungsdatensatz die abgeglichen werden soll
+         * @return boolean Wert ob Veranstaltung Filtern entspricht
+         */
         private boolean createFilter(Veranstaltung v) {
             boolean matchesID = true;
             boolean matchesBez = true;
@@ -193,6 +249,12 @@ public class VeranstaltungView extends VerticalLayout {
             return matchesID && matchesBez && matchesFB && matchesTeiln && matchesDoz;
         }
 
+        /**
+         *
+         * @param value
+         * @param searchTerm
+         * @return
+         */
         private boolean compare(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty()
                     || value.toLowerCase().contains(searchTerm.toLowerCase());
