@@ -127,9 +127,9 @@ public class BuchungenAnzeigenDialog extends Dialog {
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
-                dozentComboBox.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
-                if (dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
-                    dozentComboBox.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
+                dozentComboBox.setItems(dozentService.findAllByNachname(currentUser.get().get().getLastName()));
+                if (dozentService.findAllByNachname(currentUser.get().get().getLastName()).size() == 1) {
+                    dozentComboBox.setValue(dozentService.findAllByNachname(currentUser.get().get().getLastName()).getFirst());
                     dozentComboBox.setEnabled(false);
                 }
             }

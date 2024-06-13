@@ -14,6 +14,7 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.icon.Icon;
@@ -24,12 +25,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -176,11 +179,18 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
     private void setupGrid() {
         GridListDataView<Veranstaltung> gridDataView = grid.setItems(veranstaltungService.findAll());
 
-        grid.addColumn(Veranstaltung::getId).setHeader("VeranstaltungsID").setKey("id");
-        grid.addColumn(Veranstaltung::getBezeichnung).setHeader("Bezeichnung").setKey("bezeichnung");
-        grid.addColumn(Veranstaltung::getDozent).setHeader("Dozent").setKey("dozent");
-        grid.addColumn(Veranstaltung::getFachbereich).setHeader("Fachbereich").setKey("fachbereich");
-        grid.addColumn(Veranstaltung::getTeilnehmerzahl).setHeader("Teilnehmerzahl").setKey("teilnehmerzahl");
+        grid.addColumn(Veranstaltung::getId).setHeader("VeranstaltungsID").setKey("id").setSortable(true);
+        grid.addColumn(Veranstaltung::getBezeichnung).setHeader("Bezeichnung").setKey("bezeichnung").setSortable(true);
+        grid.addColumn(Veranstaltung::getDozent).setHeader("Dozent").setKey("dozent").setSortable(true);
+        grid.addColumn(Veranstaltung::getFachbereich).setHeader("Fachbereich").setKey("fachbereich").setSortable(true);
+        grid.addColumn(Veranstaltung::getTeilnehmerzahl).setHeader("Teilnehmerzahl").setKey("teilnehmerzahl").setSortable(true);
+
+        GridSortOrder<Veranstaltung> sortOrderID = new GridSortOrder<>(grid.getColumnByKey("id"), SortDirection.ASCENDING);
+        ArrayList<GridSortOrder<Veranstaltung>> sortOrder = new ArrayList<>();
+        sortOrder.add(sortOrderID);
+        grid.sort(sortOrder);
+
+        grid.setMinHeight("80vh");
 
         setupFilters(gridDataView);
     }
@@ -353,13 +363,13 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
             matchesID = compare(v.getId(), id);
             matchesBez = compare(v.getBezeichnung(), bezeichnung);
-            if (fachbereich != null) {
-                matchesFB = compareSet(v.getFachbereich().toString(), fachbereich);
-            }
+
+            matchesFB = compareSet(v.getFachbereich().toString(), fachbereich);
+
             matchesTeiln = v.getTeilnehmerzahl() >= teilnehmerzahl;
-            if (dozent != null) {
-                matchesDoz = compareSet(v.getDozent().toString(), dozent);
-            }
+
+            matchesDoz = compareSet(v.getDozent().toString(), dozent);
+
 
 
             return matchesID && matchesBez && matchesFB && matchesTeiln && matchesDoz;
@@ -371,7 +381,7 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         }
 
         private boolean compareSet(String value, Set<?> searchTerm) {
-            if (searchTerm.isEmpty()) {
+            if (searchTerm == null || searchTerm.isEmpty()) {
                 return true;
             }
 
@@ -385,6 +395,4 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
             return result;
         }
     }
-
-
 }
