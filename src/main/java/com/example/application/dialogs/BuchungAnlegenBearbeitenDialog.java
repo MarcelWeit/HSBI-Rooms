@@ -95,9 +95,9 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
         dozent.setItems(dozentService.findAll());
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
-                dozent.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
-                if (dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
-                    dozent.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
+                dozent.setItems(dozentService.findAllByNachname(currentUser.get().get().getLastName()));
+                if (dozentService.findAllByNachname(currentUser.get().get().getLastName()).size() == 1) {
+                    dozent.setValue(dozentService.findAllByNachname(currentUser.get().get().getLastName()).getFirst());
                     dozent.setEnabled(false);
                 }
             }
