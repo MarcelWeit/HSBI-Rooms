@@ -63,9 +63,9 @@ public class RaumView extends VerticalLayout {
     private final Grid<Raum> roomGrid = new Grid<>(Raum.class, false);
     private final Binder<Raum> roomBinder = new Binder<>(Raum.class);
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
-
     private final AuthenticatedUser currentUser;
     private final RaumService raumService;
+    private GridListDataView<Raum> dataView;
     private HeaderRow headerRow;
 
     /**
@@ -83,6 +83,7 @@ public class RaumView extends VerticalLayout {
 
         setupButtons();
         setupGrid();
+        updateGrid();
         add(buttonLayout, roomGrid);
         this.raumService = raumService;
     }
@@ -107,9 +108,6 @@ public class RaumView extends VerticalLayout {
      * Erstellt das Grid für die Räume
      */
     private void setupGrid() {
-        updateGrid();
-
-        GridListDataView<Raum> dataView = roomGrid.getListDataView();
 
         roomGrid.addColumn(Raum::getRefNr).setHeader("Referenznummer")
                 .setComparator(new refNrComparator())
@@ -136,8 +134,6 @@ public class RaumView extends VerticalLayout {
         roomGrid.sort(sortOrders);
 
         roomGrid.setMinHeight("80vh");
-
-        setupFilter(dataView);
     }
 
     /**
@@ -190,13 +186,10 @@ public class RaumView extends VerticalLayout {
 
     /**
      * Erstellt die Filter für die Räume
-     *
-     * @param dataView Data View für die Räume
      */
-    private void setupFilter(GridListDataView<Raum> dataView) {
+    private void setupFilter() {
         RoomFilter roomFilter = new RoomFilter(dataView);
 
-        roomGrid.getHeaderRows().clear();
         if (headerRow == null) {
             headerRow = roomGrid.appendHeaderRow();
         }
@@ -251,6 +244,7 @@ public class RaumView extends VerticalLayout {
      */
     private void openEditCreateDialog(Raum selectedRoom) {
         Dialog dialog = new Dialog();
+        dialog.setId("raum-dialog");
         dialog.setMaxWidth("25vw");
         dialog.setMinWidth("200px");
         FormLayout form = new FormLayout();
@@ -261,6 +255,7 @@ public class RaumView extends VerticalLayout {
         fachbereich.setItems(Fachbereich.values());
 
         TextField position = new TextField("Position");
+        position.setId("textfield-position");
 
         ComboBox<Raumtyp> raumtyp = new ComboBox<>("Typ");
         raumtyp.setItems(Raumtyp.values());
@@ -270,6 +265,7 @@ public class RaumView extends VerticalLayout {
         capacity.setMax(1000);
         capacity.setValue(50);
         capacity.setStepButtonsVisible(true);
+        capacity.setId("integerfield-capacity");
 
         MultiSelectComboBox<Ausstattung> ausstattung = new MultiSelectComboBox<>("Ausstattung");
         ausstattung.setItems(ausstattungService.findAll());
@@ -284,7 +280,7 @@ public class RaumView extends VerticalLayout {
         roomBinder.forField(position).asRequired("Bitte eine Position angeben").bind(Raum::getPosition, Raum::setPosition);
 
         roomBinder.forField(refNr).asRequired("Bitte eine Referenznummer angeben")
-                .withValidator(refNrValue -> refNrValue.matches("^[A-Z]{1}.{0,3}$"),
+                .withValidator(refNrValue -> refNrValue.matches("^[A-Z].{0,3}$"),
                         "Die Referenznummer muss mit einem großen Buchstaben anfangen und darf maximal 4 Zeichen lang sein")
                 .bind(Raum::getRefNr, Raum::setRefNr);
 
@@ -382,9 +378,11 @@ public class RaumView extends VerticalLayout {
     private void updateGrid() {
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.ADMIN)) {
-                roomGrid.setItems(roomService.findAll());
+                dataView = roomGrid.setItems(roomService.findAll());
+                setupFilter();
             } else {
-                roomGrid.setItems(roomService.findAllByFachbereich(currentUser.get().get().getFachbereich()));
+                dataView = roomGrid.setItems(roomService.findAllByFachbereich(currentUser.get().get().getFachbereich()));
+                setupFilter();
             }
         }
     }
