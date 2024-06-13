@@ -29,6 +29,7 @@ import com.vaadin.flow.data.binder.Binder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,10 +96,17 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
         dozent.setItems(dozentService.findAll());
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
-                dozent.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
-                if (dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
-                    dozent.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
+                Optional<Dozent> optionalDozent = dozentService.findByVornameAndNachname(
+                        currentUser.get().get().getFirstName(),
+                        currentUser.get().get().getLastName()
+                );
+                if (optionalDozent.isPresent()) {
+                    Dozent dozentFound = optionalDozent.get();
+                    dozent.setItems(List.of(dozentFound));
+                    dozent.setValue(dozentFound);
                     dozent.setEnabled(false);
+                } else {
+                    dozent.setItems(Collections.emptyList());
                 }
             }
         }

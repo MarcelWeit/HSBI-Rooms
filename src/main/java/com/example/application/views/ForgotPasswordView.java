@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Passwort vergessen")
 @AnonymousAllowed
 @Route(value = "forgot-password")
-public class ForgotPasswordView extends VerticalLayout implements BeforeEnterObserver {
+public class ForgotPasswordView extends VerticalLayout  {
 
     private final UserService userService;
     private final EmailService emailService;
@@ -32,38 +32,48 @@ public class ForgotPasswordView extends VerticalLayout implements BeforeEnterObs
         this.userService = userService;
         this.emailService = emailService;
         this.passwordResetService = passwordResetService;
-        addClassName("forgot-password-view");
 
+        // Grundlegende Layout-Einstellungen
+        addClassName("forgot-password-view");
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
 
-        // Header
+        // Erstellen des Titels der Seite
         H2 title = new H2("Passwort vergessen?");
         title.getStyle().set("textAlign", "center");
 
-        // Description
+        // Beschreibungstext zur Anleitung für Benutzer
         Div description = new Div();
         description.setText("Bitte geben Sie Ihre E-Mail an. Sie erhalten dann eine E-Mail mit einem Link, über den Sie ein neues Passwort wählen können.");
         description.getStyle().set("textAlign", "center");
         description.getStyle().set("marginBottom", "20px");
 
-        // Email field
+        // Eingabefeld für die E-Mail
         EmailField emailField = new EmailField();
         emailField.setPlaceholder("E-Mail");
         emailField.setWidthFull();
 
-        // Send button
+        // Button zum Senden der Anfrage zum Zurücksetzen des Passworts
         Button resetPasswordButton = new Button("Senden", event -> {
+            // Überprüfung, ob das E-Mail-Feld leer ist
             if (emailField.isEmpty()) {
                 Notification.show("Das E-Mail-Feld darf nicht leer sein.", 3000, Notification.Position.MIDDLE);
             } else {
-                String email = emailField.getValue();
+                String email = emailField.getValue();   // E-Mail-Wert aus dem E-Mail-Feld holen
+                // Überprüfen, ob ein Konto mit der eingegebenen E-Mail-Adresse existiert
                 if (userService.emailExists(email)) {
-                    User user = userService.findByUsername(email);
+                    User user = userService.findByUsername(email);// Benutzer anhand der E-Mail-Adresse finden
+
+                    // Erstellen eines neuen Passwort-Reset-Tokens für den Benutzer
                     PasswordResetToken token = passwordResetService.createToken(user);
+
+                    // URL für das Zurücksetzen des Passworts generieren, einschließlich des Tokens
                     String resetUrl = createPasswordResetUrl(token.getToken());
+
+                    // Senden einer E-Mail an den Benutzer mit dem Link zum Zurücksetzen des Passworts
                     emailService.sendSimpleMessage(email, "Passwort zurücksetzen", "Hier ist der Link zum Zurücksetzen Ihres Passworts: " + resetUrl);
+
                     Notification.show("Eine E-Mail zum Zurücksetzen des Passworts wurde versendet.", 3000, Notification.Position.MIDDLE);
                     getUI().ifPresent(ui -> ui.navigate("login"));
                 } else {
@@ -72,12 +82,12 @@ public class ForgotPasswordView extends VerticalLayout implements BeforeEnterObs
             }
         });
 
-        // Back to login button
+        // Zurück zum Login-Button
         Button backButton = new Button("Zurück zum Login", event -> {
             getUI().ifPresent(ui -> ui.navigate("login"));
         });
 
-        // Layout
+        // Layout konfiguration
         VerticalLayout formLayout = new VerticalLayout();
         formLayout.setAlignItems(Alignment.CENTER);
         formLayout.setWidth("100%");
@@ -91,17 +101,8 @@ public class ForgotPasswordView extends VerticalLayout implements BeforeEnterObs
         add(formLayout);
     }
 
+    //Generierung eines Links zum Passwort zurücksetzen
     private String createPasswordResetUrl(String token) {
         return "http://localhost:8080/reset-password?token=" + token;
     }
-
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        // Any additional logic to be executed before entering the view
-    }
 }
-
-
-
-
-

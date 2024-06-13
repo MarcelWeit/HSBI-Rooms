@@ -13,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -88,8 +89,10 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
         }
         if (veranstaltungRepository.count() == 0) {
-            veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozentRepository.findByNachname("Küster"), 100, Fachbereich.WIRTSCHAFT));
-            veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann"), 120, Fachbereich.WIRTSCHAFT));
+            Optional<Dozent> dozentKuester = dozentRepository.findByNachname("Küster");
+            Optional<Dozent> dozentWiemann = dozentRepository.findByNachname("Wiemann");
+            dozentKuester.ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozent, 100, Fachbereich.WIRTSCHAFT)));
+            dozentWiemann.ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozent, 120, Fachbereich.WIRTSCHAFT)));
         }
         if (registrationRepository.count() == 0) {
             Registrierung r = new Registrierung("register@gmail.com", "Meyer", "Sabine", "", Role.DOZENT, Fachbereich.WIRTSCHAFT, Anrede.FRAU, "Prof. Dr.");

@@ -8,15 +8,16 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DozentRepository extends JpaRepository<Dozent, Long>, JpaSpecificationExecutor<Dozent> {
 
     List<Dozent> findAllByNachname(String nachname);
 
-    Dozent findByNachname(String nachname);
+    Optional<Dozent> findByNachname(String nachname);
 
-    List<Dozent> findByVornameAndNachname(String vorname, String nachname);
+    Optional<Dozent> findByVornameAndNachname(String vorname, String nachname);
 
     List<Dozent> findByFachbereich(Fachbereich fachbereich);
 }
