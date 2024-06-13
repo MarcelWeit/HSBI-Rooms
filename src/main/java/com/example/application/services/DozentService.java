@@ -44,7 +44,7 @@ public class DozentService {
         return repository.findAllByNachname(nachname);
     }
 
-    public List<Dozent> findByVornameAndNachname(String vorname, String nachname) {
+    public Dozent findByVornameAndNachname(String vorname, String nachname) {
         return repository.findByVornameAndNachname(vorname, nachname);
     }
 

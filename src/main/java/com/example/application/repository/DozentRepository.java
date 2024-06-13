@@ -14,7 +14,7 @@ public interface DozentRepository extends JpaRepository<Dozent, Long>, JpaSpecif
 
     Dozent findByNachname(String nachname);
 
-    List<Dozent> findByVornameAndNachname(String vorname, String nachname);
+    Dozent findByVornameAndNachname(String vorname, String nachname);
 
     List<Dozent> findByFachbereich(Fachbereich fachbereich);
 }

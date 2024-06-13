@@ -3,7 +3,7 @@ package com.example.application.views;
 import com.example.application.comparator.NachnameComparator;
 import com.example.application.comparator.VornameComparator;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Fachbereich;
+import com.example.application.data.enums.Fachbereich;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
 import com.vaadin.flow.component.button.Button;
@@ -190,9 +190,9 @@ public class DozentView extends VerticalLayout {
         saveButton.addClickListener(event -> {
 
             if (binder.writeBeanIfValid(dozent)) {
-                List<Dozent> existingDozenten = dozentService.findByVornameAndNachname(dozent.getVorname(), dozent.getNachname());
-                boolean isDuplicate = existingDozenten.stream().anyMatch(d -> d.getId() != dozent.getId());
-                if (!isDuplicate) {
+//                Dozent existingDozent = dozentService.findByVornameAndNachname(dozent.getVorname(), dozent.getNachname());
+//                boolean isDuplicate = existingDozent.stream().anyMatch(d -> d.getId() != dozent.getId());
+                if (true) {
                     dozentService.save(dozent);
                     refreshGrid();
                     dialog.close();
