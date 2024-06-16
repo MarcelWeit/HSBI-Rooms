@@ -93,6 +93,19 @@ public class MeineBuchungenView extends VerticalLayout {
             allBuchungen = buchungService.findAllByUser(userData);
         }
         grid.setItems(allBuchungen);
+
+        HeaderRow headerRow = grid.getHeaderRows().getLast();
+        MultiSelectComboBox<Raum> raumFilter = (MultiSelectComboBox<Raum>) headerRow.getCell(grid.getColumnByKey("raum")).getComponent();
+        MultiSelectComboBox<Veranstaltung> veranstaltungFilter = (MultiSelectComboBox<Veranstaltung>) headerRow.getCell(grid.getColumnByKey("veranstaltung")).getComponent();
+
+        if(raumFilter != null) {
+            raumFilter.setItems((Set<Raum>) selectFilterData(raumService.findAll()));
+        }
+
+        if(veranstaltungFilter != null) {
+            veranstaltungFilter.setItems((Set<Veranstaltung>) selectFilterData(veranstaltungService.findAll()));
+        }
+
     }
     private Set<?> selectFilterData(Set<?> data) {
         GridListDataView<Buchung> dataView = grid.getListDataView();
@@ -146,6 +159,7 @@ public class MeineBuchungenView extends VerticalLayout {
         DatePicker datePicker = new DatePicker();
         datePicker.addValueChangeListener(e -> datumFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("datum")).setComponent(datePicker);
+
     }
     private void setupButtons() {
         Button buchungBearbeiten = new Button("Buchung bearbeiten", new Icon(VaadinIcon.EDIT));
