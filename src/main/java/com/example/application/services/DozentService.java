@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DozentService {
@@ -25,8 +26,8 @@ public class DozentService {
         return repository.existsById(id);
     }
 
-    public List<Dozent> findAll() {
-        return repository.findAll();
+    public Set<Dozent> findAll() {
+        return Set.copyOf(repository.findAll());
     }
 
     public void delete(Dozent dozent) {
