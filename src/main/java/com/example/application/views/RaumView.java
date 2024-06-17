@@ -36,7 +36,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -55,7 +54,6 @@ import java.util.function.Consumer;
 @PageTitle("Räume verwalten")
 public class RaumView extends VerticalLayout {
 
-    @Autowired
     private final AusstattungService ausstattungService;
     private final RaumService roomService;
     private final DozentService dozentService;
@@ -201,7 +199,13 @@ public class RaumView extends VerticalLayout {
         Consumer<Fachbereich> fachbereichFilterChangeConsumer = roomFilter::setFachbereich;
         ComboBox<Fachbereich> fachbereichComboBox = new ComboBox<>();
         fachbereichComboBox.setWidthFull();
-        fachbereichComboBox.setItems(Fachbereich.values());
+        if (currentUser.get().isPresent()) {
+            fachbereichComboBox.setItems(currentUser.get().get().getFachbereich());
+            fachbereichComboBox.setValue(currentUser.get().get().getFachbereich());
+            fachbereichComboBox.setEnabled(false);
+        } else {
+            fachbereichComboBox.setItems(Fachbereich.values());
+        }
         fachbereichComboBox.setClearButtonVisible(true);
         fachbereichComboBox.addValueChangeListener(e -> fachbereichFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(roomGrid.getColumnByKey("fachbereich")).setComponent(fachbereichComboBox);

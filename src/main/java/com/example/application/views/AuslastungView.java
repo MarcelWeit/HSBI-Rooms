@@ -81,7 +81,7 @@ public class AuslastungView extends VerticalLayout {
      * Erstellt die Interaktionsleiste für die Raumauslastung
      */
     private void setupInteractionBar() {
-        startDatePicker.setValue(LocalDate.now());
+        startDatePicker.setValue(LocalDate.now().minusDays(30));
         startDatePicker.addValueChangeListener(event -> updateGrid(event.getValue(), endDatePicker.getValue(), weeekendCheckbox.getValue()));
 
         endDatePicker.setValue(LocalDate.now());
