@@ -4,6 +4,11 @@ import com.example.application.data.entities.Raum;
 
 import java.util.Comparator;
 
+/**
+ * Comparator um Räume nach ihrer Referenznummer zu sortieren.
+ *
+ * @author Marcel Weithoener
+ */
 public class refNrComparator implements Comparator<Raum> {
 
     @Override

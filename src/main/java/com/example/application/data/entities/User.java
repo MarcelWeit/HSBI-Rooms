@@ -1,5 +1,8 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Anrede;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -28,32 +31,28 @@ public class User {
 
     @JsonIgnore
     private String hashedPassword;
-   // private boolean locked;
-
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
-    @Version
-    @Column(nullable = false)
-    private Long version;
-    //    @Lob
-    //    @Column(length = 1000000)
-    //    private byte[] profilePicture;
-
     private Fachbereich fachbereich;
+
+    private Anrede anrede;
+    private String akadTitel;
 
     public User() {
     }
 
-    public User(String username, String lastName, String firstName, String hashedPassword, Set<Role> roles, Fachbereich fachbereich) {
+    public User(String username, String lastName, String firstName, String hashedPassword, Set<Role> roles, Fachbereich fachbereich, Anrede anrede, String akadTitel) {
         this.username = username.toLowerCase();
         this.lastName = lastName;
         this.firstName = firstName;
         this.hashedPassword = hashedPassword;
         this.roles = roles;
         this.fachbereich = fachbereich;
+        this.anrede = anrede;
+        this.akadTitel = akadTitel;
     }
 
     // E-Mail äquivalent zu Username
@@ -63,10 +62,6 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username.toLowerCase();
-    }
-
-    public void getID(Long id) {
-        this.id = id;
     }
 
     public String getLastName() {
@@ -111,6 +106,22 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public Anrede getAnrede() {
+        return anrede;
+    }
+
+    public void setAnrede(Anrede anrede) {
+        this.anrede = anrede;
+    }
+
+    public String getAkadTitel() {
+        return akadTitel;
+    }
+
+    public void setAkadTitel(String akadTitel) {
+        this.akadTitel = akadTitel;
     }
 
     public void setId(Long id) {

@@ -19,6 +19,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Dialog zur Anzeige der Belegung eines Raumes in einer Kalenderwoche.
+ * Der Dialog zeigt für jeden Zeitslot eines Tages an, ob der Raum belegt ist oder nicht.
+ *
+ * @author Marcel Weithoener
+ */
 public class BelegungRaumKalenderwocheDialog extends Dialog {
 
     private final BuchungService buchungService;

@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * @author Mike Wiebe
+ */
 public class BuchungenAnzeigenDialog extends Dialog {
 
     private final BuchungService buchungService;
@@ -38,11 +41,11 @@ public class BuchungenAnzeigenDialog extends Dialog {
     private final RaumService roomService;
     private final DozentService dozentService;
     private final VeranstaltungService veranstaltungService;
-    private final Optional<Raum> selectedRoom;
+    private final Raum selectedRoom; //canbenull
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
     private final AuthenticatedUser currentUser;
 
-    public BuchungenAnzeigenDialog(Optional<Raum> raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
+    public BuchungenAnzeigenDialog(Raum raum, RaumService roomService, DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.buchungService = buchungService;
         this.roomService = roomService;
         this.selectedRoom = raum;
@@ -60,6 +63,7 @@ public class BuchungenAnzeigenDialog extends Dialog {
 
         Button deleteBookingButton = new Button("Buchung löschen", new Icon(VaadinIcon.TRASH));
         deleteBookingButton.addClickListener(click -> openDeleteDialog());
+        deleteBookingButton.setId("button-deletebooking");
 
         buttonLayout.add(editBookingButton, deleteBookingButton);
     }
@@ -102,8 +106,8 @@ public class BuchungenAnzeigenDialog extends Dialog {
         roomComboBox.setItems(roomService.findAll());
         roomComboBox.setClearButtonVisible(true);
         roomComboBox.addValueChangeListener(e -> roomFilterChangeConsumer.accept(e.getValue()));
-        if (selectedRoom.isPresent()) {
-            roomComboBox.setValue(selectedRoom.get());
+        if (selectedRoom != null) {
+            roomComboBox.setValue(selectedRoom);
             roomComboBox.setEnabled(false);
         }
         headerRow.getCell(raumBuchungGrid.getColumnByKey("room")).setComponent(roomComboBox);
@@ -124,9 +128,9 @@ public class BuchungenAnzeigenDialog extends Dialog {
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
-                dozentComboBox.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
-                if (dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).size() == 1) {
-                    dozentComboBox.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()).getFirst());
+                dozentComboBox.setItems(dozentService.findAllByNachname(currentUser.get().get().getLastName()));
+                if (dozentService.findAllByNachname(currentUser.get().get().getLastName()).size() == 1) {
+                    dozentComboBox.setValue(dozentService.findAllByNachname(currentUser.get().get().getLastName()).getFirst());
                     dozentComboBox.setEnabled(false);
                 }
             }
@@ -146,7 +150,8 @@ public class BuchungenAnzeigenDialog extends Dialog {
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBuchung.isPresent()) {
-            BuchungAnlegenBearbeitenDialog editBookingDialog = new BuchungAnlegenBearbeitenDialog(selectedBuchung.get(), Optional.empty(), Optional.empty(), roomService, dozentService,
+            BuchungAnlegenBearbeitenDialog editBookingDialog = new BuchungAnlegenBearbeitenDialog(selectedBuchung.get(), null, null, roomService,
+                    dozentService,
                     buchungService, veranstaltungService, currentUser);
             editBookingDialog.open();
             this.close();

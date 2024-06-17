@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
+ * Repository für die Entität Raum
+ *
  * @author Marcel Weithoener
  */
 @Repository

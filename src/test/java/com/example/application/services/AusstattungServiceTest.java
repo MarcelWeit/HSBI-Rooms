@@ -14,6 +14,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+/**
+ * Testet alle Methoden der AusstattungService Klasse
+ *
+ * @author Marcel Weithoener
+ */
 @ExtendWith(MockitoExtension.class)
 class AusstattungServiceTest {
 

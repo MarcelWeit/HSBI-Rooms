@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * Raum Entity
+ *
  * @author Marcel Weithoener
  */
 @Entity
@@ -110,7 +112,7 @@ public class Raum {
             return "Keine Ausstattung";
         }
         return ausstattung.stream()
-                .map(Ausstattung::getBez) // assuming getBez() returns the string representation of an Ausstattung
+                .map(Ausstattung::getBez)
                 .collect(Collectors.joining(", "));
     }
 
