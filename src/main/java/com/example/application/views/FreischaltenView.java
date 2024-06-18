@@ -127,9 +127,11 @@ public class FreischaltenView extends VerticalLayout {
             emailService.sendAprovedMail(registrierung.getUsername());
             if (registrierung.getRole() == Role.DOZENT) {
                 Dozent newDozent = new Dozent();
-                newDozent.setFachbereich(registrierung.getFachbereich());
+                newDozent.setAnrede(registrierung.getAnrede());
                 newDozent.setNachname(registrierung.getLastName());
                 newDozent.setVorname(registrierung.getFirstName());
+                newDozent.setFachbereich(registrierung.getFachbereich());
+                newDozent.setAkad_titel(registrierung.getAkadTitel());
                 dozentService.save(newDozent);
             }
         } catch (Exception e) {

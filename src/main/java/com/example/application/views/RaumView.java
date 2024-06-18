@@ -63,6 +63,7 @@ public class RaumView extends VerticalLayout {
     private final Grid<Raum> roomGrid = new Grid<>(Raum.class, false);
     private final Binder<Raum> roomBinder = new Binder<>(Raum.class);
     private final HorizontalLayout buttonLayout = new HorizontalLayout();
+
     private final AuthenticatedUser currentUser;
     private final RaumService raumService;
     private GridListDataView<Raum> dataView;
@@ -134,6 +135,7 @@ public class RaumView extends VerticalLayout {
         roomGrid.sort(sortOrders);
 
         roomGrid.setMinHeight("80vh");
+
     }
 
     /**
