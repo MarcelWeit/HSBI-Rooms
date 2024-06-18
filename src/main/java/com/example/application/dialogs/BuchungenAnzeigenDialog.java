@@ -127,7 +127,6 @@ public class BuchungenAnzeigenDialog extends Dialog {
         dozentComboBox.setItems(dozentService.findAll());
         dozentComboBox.setClearButtonVisible(true);
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
-
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
                 Optional<Dozent> optionalDozent = dozentService.findByVornameAndNachname(

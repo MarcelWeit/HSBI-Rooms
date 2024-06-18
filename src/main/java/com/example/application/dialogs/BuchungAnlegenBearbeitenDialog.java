@@ -92,6 +92,7 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
         veranstaltung.setItems(veranstaltungService.findAll());
         veranstaltung.setItemLabelGenerator(Veranstaltung::getBezeichnung);
         veranstaltung.setRequiredIndicatorVisible(true);
+        veranstaltung.setId("combobox-veranstaltung");
 
         dozent.setItems(dozentService.findAll());
         if (currentUser.get().isPresent()) {
@@ -111,11 +112,14 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
             }
         }
         dozent.setRequiredIndicatorVisible(true);
+        dozent.setId("combobox-dozent");
 
         date.setLabel("Datum");
         date.setRequiredIndicatorVisible(true);
+        date.setId("datepicker-startdate");
 
         zeitslot.setItems(Zeitslot.values());
+        zeitslot.setId("combobox-zeitslot");
 
         wiederholungsintervallRadioButtonGroup.setItems(Wiederholungsintervall.values());
         wiederholungsintervallRadioButtonGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
@@ -129,6 +133,8 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                 binder.forField(endDatum).asRequired();
             }
         });
+        wiederholungsintervallRadioButtonGroup.setId("radiogroup-wiederholungsintervall");
+        endDatum.setId("datepicker-enddate");
 
         binder.forField(raum).asRequired("Bitte wählen Sie einem Raum aus").bind(Buchung::getRoom, Buchung::setRoom);
         binder.forField(veranstaltung).asRequired().bind(Buchung::getVeranstaltung, Buchung::setVeranstaltung);
@@ -180,6 +186,7 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                 close();
             }
         });
+        save.setId("button-speichern");
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         cancel.addClickShortcut(Key.ESCAPE);
         cancel.addClickListener(event -> close());
