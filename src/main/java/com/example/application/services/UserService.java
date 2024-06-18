@@ -38,7 +38,7 @@ public class UserService {
     public User update(User entity) {
         return repository.save(entity);
     }
-
+    // Updaten des Passwortes
     public void updatePassword(User user, String newPassword) {
         user.setHashedPassword(passwordEncoder.encode(newPassword));
         update(user);

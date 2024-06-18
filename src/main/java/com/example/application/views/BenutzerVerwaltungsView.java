@@ -51,12 +51,12 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     public BenutzerVerwaltungsView(UserService userService, AuthenticatedUser currentUser) {
         this.userService = userService;
         this.currentUser = currentUser;
-
+        //Grid und Buttons Einrichten
         setupButtons();
         setupGrid();
         add(buttonLayout, userGrid);
     }
-
+    // Methode zur Erstellung des Filter-Headers
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
         TextField textField = new TextField();
         textField.setValueChangeMode(ValueChangeMode.EAGER);
@@ -66,7 +66,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         return textField;
     }
-
+    // Methode zur Einrichtung des Grids
     private void setupGrid() {
         GridListDataView<User> dataView = userGrid.setItems(userService.findAll());
 
@@ -84,10 +84,10 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         userGrid.getColumnByKey("fachbereich");
         userGrid.getColumnByKey("role");
         userGrid.getColumnByKey("benutzername");
-        //userGrid.getColumns().forEach(column -> column.setAutoWidth(true));
 
 
-        // Sort by reference number by default
+
+        // Sortierung nach Nachname
         GridSortOrder<User> sortOrder = new GridSortOrder<>(userGrid.getColumnByKey("nachname"), SortDirection.ASCENDING);
         ArrayList<GridSortOrder<User>> sortOrders = new ArrayList<>();
         sortOrders.add(sortOrder);
@@ -97,10 +97,10 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         setupFilter(dataView);
     }
-
+    // Methode zur Einrichtung der Buttons
     private void setupButtons() {
 
-
+        // Button zum Bearbeiten eines Benutzers
         Button editUserButton = new Button("Benutzer bearbeiten", new Icon(VaadinIcon.EDIT));
         editUserButton.addClickListener(e -> {
             Optional<User> selectedUser = userGrid.getSelectionModel().getFirstSelectedItem();
@@ -110,14 +110,14 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
                 openEditCreateDialog(selectedUser);
             }
         });
-
+        // Button zum Löschen eines Benutzers
         Button deleteUserButton = new Button("Benutzer Löschen", new Icon(VaadinIcon.TRASH));
         deleteUserButton.addClickListener(e -> openDeleteDialog());
 
         buttonLayout.add( editUserButton, deleteUserButton);
     }
 
-    //Edit
+    // Methode zum Öffnen des Dialogs zum Bearbeiten oder Erstellen eines Benutzers
     private void openEditCreateDialog(Optional<User> selectedUser) {
         Dialog dialog = new Dialog();
         dialog.setMaxWidth("25vw");
@@ -158,7 +158,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
             userBinder.readBean(selectedUser.get());
             username.setEnabled(false); // Username should not be editable
         }
-
+        // Buttons zum Speichern und Abbrechen
         Button cancelButton = new Button("Cancel", event -> dialog.close());
         Button saveButton = new Button("Save");
         saveButton.addClickListener(event -> {
@@ -178,7 +178,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         dialog.open();
     }
-
+    // Methode zum Öffnen des Dialogs zum Löschen eines Benutzers
     private void openDeleteDialog() {
         Optional<User> selectedUser = userGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedUser.isEmpty()) {
@@ -202,7 +202,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
             confirmDeleteDialog.open();
         }
     }
-
+    // Methode zum Einrichten des Filters
     private void setupFilter(GridListDataView<User> dataView) {
         UserFilter userFilter = new UserFilter(dataView);
 
@@ -216,7 +216,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         headerRow.getCell(userGrid.getColumnByKey("benutzername")).setComponent(createStringFilterHeader(userFilter::setUsername));
     }
 
-
+    // Klasse zum Filtern der Benutzer
     private static class UserFilter {
         private final GridListDataView<User> dataView;
 
@@ -226,11 +226,13 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         private String role;
         private String username;
 
+        // Konstruktor
         public UserFilter(GridListDataView<User> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::test);
         }
 
+        // Setter
         public void setLastName(String lastName) {
             this.lastName = lastName;
             this.dataView.refreshAll();
@@ -256,6 +258,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
             this.dataView.refreshAll();
         }
 
+        // Methode zum Testen, ob ein Benutzer den Filterkriterien entspricht
         public boolean test(User user) {
             return matches(user.getLastName(), lastName)
                     && matches(user.getFirstName(), firstName)
@@ -263,7 +266,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
                     && matches(user.getRoles().stream().map(Enum::name).collect(Collectors.joining(",")), role)
                     && matches(user.getUsername(), username);
         }
-
+        // Methode zum Überprüfen, ob ein Wert einem Suchbegriff entspricht
         private boolean matches(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty()
                     || value.toLowerCase().contains(searchTerm.toLowerCase());

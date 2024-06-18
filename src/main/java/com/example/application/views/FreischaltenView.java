@@ -32,7 +32,7 @@ public class FreischaltenView extends VerticalLayout {
         grid.setItems(registrationService.findAllRegistrierungen());
         add(grid);
     }
-
+    // Methode zur Einrichtung des Grids
     private void setupGrid() {
         grid.setColumns("lastName", "firstName", "fachbereich", "role", "username");
 
@@ -45,10 +45,12 @@ public class FreischaltenView extends VerticalLayout {
         grid.addComponentColumn(registrierung -> {
             HorizontalLayout buttonsLayout = new HorizontalLayout();
 
+            // Freischalten Button
             Button approveButton = new Button("Freischalten");
             approveButton.addClickListener(event -> approveRegistration(registrierung));
             buttonsLayout.add(approveButton);
 
+            // Ablehnen Button
             Button deleteButton = new Button("Ablehnen");
             deleteButton.addClickListener(event -> deleteRegistration(registrierung));
             buttonsLayout.add(deleteButton);
@@ -57,6 +59,7 @@ public class FreischaltenView extends VerticalLayout {
         }).setHeader("Aktionen");
     }
 
+    // Methode zur Freischaltung der Registrierung
     public void approveRegistration(Registrierung registrierung) {
         User user = new User();
         user.setUsername(registrierung.getUsername());
@@ -65,12 +68,16 @@ public class FreischaltenView extends VerticalLayout {
         user.setHashedPassword(registrierung.getHashedPassword());
         user.setRoles(Set.of(registrierung.getRole()));
         user.setFachbereich(registrierung.getFachbereich());
+        user.setAnrede((registrierung.getAnrede()));
+        user.setAkadTitel((registrierung.getAkadTitel()));
+
         userService.save(user);
         registrationService.delete(registrierung);
         grid.setItems(registrationService.findAllRegistrierungen());
         //Notification
         Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
     }
+    // Methode zum Löschen der Registrierung
     private void deleteRegistration(Registrierung registrierung) {
         registrationService.delete(registrierung);
         grid.setItems(registrationService.findAllRegistrierungen());

@@ -68,7 +68,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
             throw new RuntimeException(ex);
         }
     }
-
+    // Fetchen der Daten
     @Override
     protected Stream<User> fetchFromBackEnd(Query<User, CrudFilter> query) {
         int offset = query.getOffset();
@@ -99,13 +99,14 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         sizeChangeListener = listener;
     }
 
+    // Speichen eines neuen Nutzers
     public void save(User user) {
         Optional<User> existingUser = users.stream()
                 .filter(u -> u.getId().equals(user.getId()))
                 .findFirst();
 
         if (existingUser.isPresent()) {
-            // Update existing user
+            // Existierenden User Updaten
             User userToUpdate = existingUser.get();
             userToUpdate.setFirstName(user.getFirstName());
             userToUpdate.setLastName(user.getLastName());
