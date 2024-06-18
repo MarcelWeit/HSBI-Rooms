@@ -106,8 +106,6 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                     dozent.setItems(List.of(dozentFound));
                     dozent.setValue(dozentFound);
                     dozent.setEnabled(false);
-                } else {
-                    dozent.setItems(Collections.emptyList());
                 }
             }
         }

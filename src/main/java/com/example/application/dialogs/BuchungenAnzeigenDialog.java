@@ -65,6 +65,7 @@ public class BuchungenAnzeigenDialog extends Dialog {
 
         Button deleteBookingButton = new Button("Buchung löschen", new Icon(VaadinIcon.TRASH));
         deleteBookingButton.addClickListener(click -> openDeleteDialog());
+        deleteBookingButton.setId("button-deletebooking");
 
         buttonLayout.add(editBookingButton, deleteBookingButton);
     }
@@ -138,8 +139,6 @@ public class BuchungenAnzeigenDialog extends Dialog {
                     dozentComboBox.setItems(List.of(dozentFound));
                     dozentComboBox.setValue(dozentFound);
                     dozentComboBox.setEnabled(false);
-                } else {
-                    dozentComboBox.setItems(Collections.emptyList());
                 }
             }
         }
