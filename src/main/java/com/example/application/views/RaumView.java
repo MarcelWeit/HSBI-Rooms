@@ -109,10 +109,7 @@ public class RaumView extends VerticalLayout {
      * Erstellt das Grid für die Räume
      */
     private void setupGrid() {
-        //updateGrid();
 
-        //dataView = roomGrid.getListDataView();
-        dataView = roomGrid.setItems(roomService.findAll());
         roomGrid.addColumn(Raum::getRefNr).setHeader("Referenznummer")
                 .setComparator(new refNrComparator())
                 .setKey("refNr");
@@ -139,7 +136,6 @@ public class RaumView extends VerticalLayout {
 
         roomGrid.setMinHeight("80vh");
 
-        setupFilter();
     }
 
     /**
@@ -192,13 +188,10 @@ public class RaumView extends VerticalLayout {
 
     /**
      * Erstellt die Filter für die Räume
-     *
-     *
      */
     private void setupFilter() {
         RoomFilter roomFilter = new RoomFilter(dataView);
 
-        //roomGrid.getHeaderRows().clear();
         if (headerRow == null) {
             headerRow = roomGrid.appendHeaderRow();
         }
