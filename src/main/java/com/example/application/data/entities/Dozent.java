@@ -1,5 +1,6 @@
 package com.example.application.data.entities;
 
+import com.example.application.data.enums.Anrede;
 import com.example.application.data.enums.Fachbereich;
 import jakarta.persistence.*;
 
@@ -11,9 +12,11 @@ public class Dozent {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private long id;
+    private Anrede anrede;
     private String nachname;
     private String vorname;
     private Fachbereich fachbereich;
+    private String akad_titel;
 
     // Konstruktor
     public Dozent() {
@@ -23,6 +26,14 @@ public class Dozent {
         this.nachname = nachname;
         this.vorname = vorname;
         this.fachbereich = fachbereich;
+    }
+
+    public Anrede getAnrede() {
+        return anrede;
+    }
+
+    public void setAnrede(Anrede anrede) {
+        this.anrede = anrede;
     }
 
     public long getId() {
@@ -56,6 +67,14 @@ public class Dozent {
 
     public void setFachbereich(Fachbereich fachbereich) {
         this.fachbereich = fachbereich;
+    }
+
+    public String getAkad_titel() {
+        return akad_titel;
+    }
+
+    public void setAkad_titel(String akad_titel) {
+        this.akad_titel = akad_titel;
     }
 
     @Override

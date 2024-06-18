@@ -15,6 +15,7 @@ public class PasswordResetService {
     @Autowired
     private PasswordResetRepository tokenRepository;
 
+    // Generieren einer einzigartigen Token-ID mit UUID
     public PasswordResetToken createToken(User user) {
         PasswordResetToken token = new PasswordResetToken();
         token.setToken(UUID.randomUUID().toString());
@@ -23,17 +24,22 @@ public class PasswordResetService {
         return tokenRepository.save(token);
     }
 
+    // Methode zur Validierung eines übergebenen Tokens
     public PasswordResetToken validateToken(String token) {
+        // Abrufen des Tokens aus der Datenbank
         PasswordResetToken resetToken = tokenRepository.findByToken(token);
+        // Überprüfen, ob das Token existiert und ob es nicht abgelaufen ist
         if (resetToken == null || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             if (resetToken != null) {
+                // Löschen des Token, wenn abgelaufen
                 deleteToken(resetToken);
             }
-            return null; // Token ist ungültig oder abgelaufen
+            return null; //Signalisiert das das Token ungültig oder abgelaufen ist
         }
-        return resetToken;
+        return resetToken; // Rückgabe des gültigen Tokens
     }
 
+    // Methode zum Löschen eines Tokens aus der Datenbank
     public void deleteToken(PasswordResetToken token) {
         tokenRepository.delete(token);
     }
