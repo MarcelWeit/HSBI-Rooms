@@ -35,16 +35,15 @@ public class ResetPasswordView extends VerticalLayout implements BeforeEnterObse
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
 
-        // Description
+        // Beschreibungstext zum Passwort-Reset
         Div description = new Div();
         description.setText("Bitte geben Sie Ihr neues Passwort ein.");
         description.getStyle().set("textAlign", "center");
         description.getStyle().set("marginBottom", "20px");
 
-        // Password fields
+        // Eingabefelder für das neue Passwort und die Passwortwiederholung
         PasswordField newPasswordField = new PasswordField("Neues Passwort");
         newPasswordField.setWidthFull();
-
         PasswordField confirmPasswordField = new PasswordField("Passwort wiederholen");
         confirmPasswordField.setWidthFull();
 
@@ -53,6 +52,7 @@ public class ResetPasswordView extends VerticalLayout implements BeforeEnterObse
             String newPassword = newPasswordField.getValue();
             String confirmPassword = confirmPasswordField.getValue();
 
+            // Validierung der Passworteingaben
             if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
                 Notification.show("Die Passwortfelder dürfen nicht leer sein.", 3000, Notification.Position.MIDDLE);
             } else if (newPassword.length() < 8) {
@@ -60,23 +60,24 @@ public class ResetPasswordView extends VerticalLayout implements BeforeEnterObse
             } else if (!newPassword.equals(confirmPassword)) {
                 Notification.show("Die Passwörter stimmen nicht überein.", 3000, Notification.Position.MIDDLE);
             } else {
+                // Prozess, wenn das Passwort geändert werden kann
                 if (token != null) {
-                    userService.updatePassword(token.getUser(), newPassword);
+                    userService.updatePassword(token.getUser(), newPassword);  // Aktualisieren des Passworts
                     Notification.show("Ihr Passwort wurde erfolgreich zurückgesetzt.", 3000, Notification.Position.MIDDLE);
-                    passwordResetService.deleteToken(token);
-                    getUI().ifPresent(ui -> ui.navigate("login"));
+                    passwordResetService.deleteToken(token); // Löschen des verwendeten Tokens
+                    getUI().ifPresent(ui -> ui.navigate("login")); // Zurück zur Login-Seite navigieren
                 } else {
                     Notification.show("Der Link zum zurücksetzen Ihres Passwortes ist abgelaufen.", 3000, Notification.Position.MIDDLE);
                 }
             }
         });
 
-        // Back to login button
+        // Zurück zum login button
         Button backButton = new Button("Zurück zum Login", event -> {
             getUI().ifPresent(ui -> ui.navigate("login"));
         });
 
-        // Layout
+        // Anordnung der Komponenten im Layout
         VerticalLayout formLayout = new VerticalLayout();
         formLayout.setAlignItems(Alignment.CENTER);
         formLayout.setWidth("100%");
@@ -90,11 +91,18 @@ public class ResetPasswordView extends VerticalLayout implements BeforeEnterObse
         add(formLayout);
     }
 
+    // Die beforeEnter Methode wird aufgerufen, bevor die Ansicht angezeigt wird.
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
+        // Abruf der Abfrageparameter aus der URL
         Map<String, List<String>> parameters = event.getLocation().getQueryParameters().getParameters();
+
+        // Überprüfen, ob ein "token" Parameter in der URL vorhanden ist
         if (parameters.containsKey("token")) {
-            String token = parameters.get("token").get(0); // Nimmt an, dass der Token nur einmal in der URL vorkommt
+            // Der Token wird aus der URL extrahiert.
+            String token = parameters.get("token").get(0);
+            // Überprüfen des Tokens durch den PasswordResetService
+            // Wenn das Token ungültig ist (z.B. abgelaufen oder nicht in der Datenbank gefunden), wird das Token-Attribut null gesetzt
             this.token = passwordResetService.validateToken(token);
             if (this.token == null) {
                 Notification.show("Der Link zum zurücksetzen Ihres Passwortes ist abgelaufen.", 3000, Notification.Position.MIDDLE);
