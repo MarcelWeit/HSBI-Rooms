@@ -5,6 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
+/**
+ * Entität Veranstaltung
+ *
+ * @author Leon Gepfner
+ */
 @Entity
 public class Veranstaltung {
 

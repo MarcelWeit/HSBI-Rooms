@@ -38,6 +38,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * View um Veranstaltungen zu verwalten. Veranstaltungen können erstellt, bearbeitet und gelöscht werden.
+ *
+ * @author Leon Gepfner
+ */
 @Route(value = "veranstaltungVerwaltung-crud", layout = MainLayout.class)
 @Secured({"ADMIN", "FBPlanung"})
 @RolesAllowed({"ADMIN", "FBPlanung"})
@@ -54,13 +59,15 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
     private GridListDataView<Veranstaltung> gridDataView;
     private HeaderRow headerRow;
 
-    //private final Crud<Veranstaltung> crud;
-
+    /**
+     * Konstruktur der Klasse VeranstaltungVerwaltungView
+     * @param veranstaltungService Service zur Kommunikation mit der Datenbank für die Entität Veranstaltung
+     * @param dozentService Service zur Kommunikation mit der Datenbank für die Entität Dozent
+     */
     public VeranstaltungVerwaltungView(VeranstaltungService veranstaltungService, DozentService dozentService) {
         this.veranstaltungService = veranstaltungService;
         this.dozentService = dozentService;
 
-        //crud = new Crud<>(Veranstaltung.class, createEditor());
 
         setupButtons();
         setupGrid();
@@ -70,6 +77,11 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
     }
 
+    /**
+     * Erstellt ein Textfeld zur Filterung von Textbasierten Spalten
+     * @param filterChangeConsumer Consumer für die Filterung
+     * @return Textfeld für die Filterung
+     */
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
         TextField textField = new TextField();
         textField.setValueChangeMode(ValueChangeMode.EAGER);
@@ -80,90 +92,9 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         return textField;
     }
 
-    /*
-    private CrudEditor<Veranstaltung> createEditor() {
-
-        TextField veranstaltung = new TextField("VeranstaltungsID");
-        TextField bezeichnung = new TextField("Bezeichnung");
-
-        ComboBox<Dozent> dozent = new ComboBox<>("Dozent");
-        dozent.setItems(dozentService.findAll());
-        dozent.setItemLabelGenerator(Dozent::getNachname);
-
-        IntegerField teiln = new IntegerField("Teilnehmerzahl");
-
-        ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
-        fachbereich.setItems(Fachbereich.values());
-        fachbereich.setItemLabelGenerator(Fachbereich::toString);
-
-        FormLayout form = new FormLayout(veranstaltung, bezeichnung, dozent, teiln, fachbereich);
-
-        Binder<Veranstaltung> binder = new Binder<>(Veranstaltung.class);
-        binder.forField(veranstaltung).asRequired().bind(Veranstaltung::getId, Veranstaltung::setId);
-        binder.forField(bezeichnung).asRequired().bind(Veranstaltung::getBezeichnung, Veranstaltung::setBezeichnung);
-        binder.forField(dozent).asRequired().bind(Veranstaltung::getDozent, Veranstaltung::setDozent);
-        binder.forField(teiln).asRequired().bind(Veranstaltung::getTeilnehmerzahl, Veranstaltung::setTeilnehmerzahl);
-        binder.forField(fachbereich).asRequired().bind(Veranstaltung::getFachbereich, Veranstaltung::setFachbereich);
-
-        return new BinderCrudEditor<>(binder, form);
-
-    }
-
-    private void setupGrid() {
-        Grid<Veranstaltung> grid = crud.getGrid();
-
-        grid.getColumnByKey("vaadin-crud-edit-column").setFrozenToEnd(true);
-
-        grid.setColumnOrder(
-                grid.getColumnByKey("veranstaltung"),
-                grid.getColumnByKey("bezeichnung"),
-                grid.getColumnByKey("dozent"),
-                grid.getColumnByKey("teilnehmerzahl"),
-                grid.getColumnByKey("fachbereich"),
-                grid.getColumnByKey("vaadin-crud-edit-column"));
-    }
-
-    private void setupDataProvider() {
-        VeranstaltungDataProvider dataProvider = new VeranstaltungDataProvider(veranstaltungService);
-        crud.setDataProvider(dataProvider);
-
-        crud.addDeleteListener(deleteEvent -> {
-            dataProvider.deleteVeranstaltung(deleteEvent.getItem());
-            dataProvider.refreshAll();
-        });
-        crud.addSaveListener(saveEvent -> {
-            dataProvider.saveVeranstaltung(saveEvent.getItem());
-            dataProvider.refreshAll();
-        });
-    }
-
-    private void setupLanguage() {
-        CrudI18n i18n = CrudI18n.createDefault();
-        i18n.setNewItem("Neuer Eintrag");
-        i18n.setEditItem("Bearbeiten");
-        i18n.setSaveItem("Speichern");
-        i18n.setCancel("Abbrechen");
-        i18n.setDeleteItem("Löschen");
-        i18n.setEditLabel("Bearbeiten");
-
-        CrudI18n.Confirmations.Confirmation delete = i18n.getConfirm()
-                .getDelete();
-        delete.setTitle("Eintrag löschen");
-        delete.setContent(
-                "Sind Sie sicher, dass Sie diesen Eintrag löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.");
-        delete.getButton().setConfirm("Bestätigen");
-        delete.getButton().setDismiss("Zurück");
-
-        CrudI18n.Confirmations.Confirmation cancel = i18n.getConfirm()
-                .getCancel();
-        cancel.setTitle("Änderungen verwerfen");
-        cancel.setContent("Sie haben Änderungen an diesem Eintrag vorgenommen, die noch nicht gespeichert wurden.");
-        cancel.getButton().setConfirm("Verwerfen");
-        cancel.getButton().setDismiss("Zurück");
-
-        crud.setI18n(i18n);
-    }
-
+    /**
+     *  Erstellt die Schaltflächen zur Bedienung der View bzw. der Tabellenfunktionen.
+     *  Jeweils ein Button zum Anlegen, Bearbeiten und Löschen einer Veranstaltung.
      */
     private void setupButtons() {
         Button create = new Button("Veranstaltung anlegen", new Icon(VaadinIcon.PLUS));
@@ -178,6 +109,9 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         buttonLayout.add(create, edit, delete);
     }
 
+    /**
+     * Erstellt das Grid für den View, in dem die Veranstaltungen abbgebildet sind.
+     */
     private void setupGrid() {
         gridDataView = grid.setItems(veranstaltungService.findAll());
 
@@ -196,7 +130,9 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
         setupFilters();
     }
-
+    /**
+     * Erstellt die Filter des Grids zum Selektieren von Datensätzen
+     */
     private void setupFilters() {
         VeranstaltungFilter vFilter = new VeranstaltungFilter(gridDataView);
 
@@ -234,16 +170,24 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         headerRow.getCell(grid.getColumnByKey("bezeichnung")).setComponent(createStringFilterHeader(vFilter::setBezeichnung));
     }
 
+    /**
+     * Überprüft ob man beim Klicken des Bearbeiten Buttons eine Veranstaltung angewählt hat.
+     * Ist dies nicht der Fall wird eine Benachrichtigung ausgegeben.
+     */
     private void checkEditDialog() {
         Optional<Veranstaltung> selectedEntry = grid.getSelectionModel().getFirstSelectedItem();
 
         if (selectedEntry.isPresent()) {
             createDialog(selectedEntry);
         } else {
-            Notification.show("Bitte wählen sie einen Eintrag aus!", 2000, Notification.Position.BOTTOM_CENTER);
+            Notification.show("Bitte wählen sie einen Eintrag aus!", 2000, Notification.Position.MIDDLE);
         }
     }
 
+    /**
+     * Öffnet einen Dialog zum erstellen oder editieren einer Veranstaltung.
+     * @param selectedEntry - Ausgewählte Veranstaltung zum editieren - Optional
+     */
     private void createDialog(Optional<Veranstaltung> selectedEntry) {
         Dialog dialog = new Dialog();
         FormLayout form = new FormLayout();
@@ -294,6 +238,10 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
 
     }
 
+    /**
+     * Öffnet einen Bestätigungsdialog zum Löschen einer Veranstaltung. Falls keine ausgewählt ist,
+     * wird eine Benachrichtigung ausgegeben.
+     */
     private void openDeleteDialog() {
         Optional<Veranstaltung> selected = grid.getSelectionModel().getFirstSelectedItem();
 
@@ -321,6 +269,10 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         }
     }
 
+    /**
+     * Interne Klasse zur Realisierung der Filterfunktion. Klasse speichert die Filterwerte ab, damit diese
+     * zur Selektierung der Datensätze verwendet werden kann.
+     */
     private void refreshGrid() {
         gridDataView = grid.setItems(veranstaltungService.findAll());
         setupFilters();
@@ -335,6 +287,10 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         private int teilnehmerzahl;
         private Set<Dozent> dozent;
 
+        /**
+         * Konstruktur der internen Klasse VeranstaltungFilter
+         * @param gridDataView Data View für die Veranstaltungen
+         */
         public VeranstaltungFilter(GridListDataView<Veranstaltung> gridDataView) {
             this.gridDataView = gridDataView;
             this.gridDataView.addFilter(this::createFilter);
@@ -365,6 +321,11 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
             this.gridDataView.refreshAll();
         }
 
+        /**
+         * Realisiert den Abgleich einer Veranstaltung mit den aktuellen Filterwerten
+         * @param v Veranstaltungsdatensatz der abgeglichen werden soll
+         * @return boolean Wert ob Veranstaltung Filtern entspricht
+         */
         private boolean createFilter(Veranstaltung v) {
             boolean matchesID = true;
             boolean matchesBez = true;
@@ -386,11 +347,23 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
             return matchesID && matchesBez && matchesFB && matchesTeiln && matchesDoz;
         }
 
+        /**
+         * Methode zum vergleichen von 2 Strings
+         * @param value Vergleichswert
+         * @param searchTerm Vergleichswert
+         * @return boolean Wert ob Werte übereinstimmen
+         */
         private boolean compare(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty()
                     || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
 
+        /**
+         * Methode zum überprüfen ob value im übergebenen Set enthalten ist
+         * @param value Vergleichswert
+         * @param searchTerm Zu überprüfendes Set
+         * @return boolean Wert ob value im Set zu finden ist
+         */
         private boolean compareSet(String value, Set<?> searchTerm) {
             if (searchTerm == null || searchTerm.isEmpty()) {
                 return true;

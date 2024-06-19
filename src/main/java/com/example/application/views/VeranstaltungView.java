@@ -2,6 +2,7 @@ package com.example.application.views;
 
 import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
+import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.services.BuchungService;
@@ -26,9 +27,7 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -51,9 +50,9 @@ public class VeranstaltungView extends VerticalLayout {
 
     /**
      * Konstruktur der Klasse VeranstaltungView
-     * @param veranstaltungService
-     * @param dozentService
-     * @param buchungService
+     * @param veranstaltungService Service zur Kommunikation mit der Datenbank für die Entität Veranstaltung
+     * @param dozentService Service zur Kommunikation mit der Datenbank für die Entität Dozent
+     * @param buchungService Service zur Kommunikation mit der Datenbank für die Entität Buchung
      */
     public VeranstaltungView(VeranstaltungService veranstaltungService, DozentService dozentService, BuchungService buchungService) {
         this.veranstaltungService = veranstaltungService;
@@ -65,17 +64,17 @@ public class VeranstaltungView extends VerticalLayout {
     }
 
     /**
-     *
-     * @return
+     * Erstellt einen Komponenten Renderer für die Detail Ansicht der Veranstaltungsdatensätze
+     * @return Komponenten Renderer
      */
     private static ComponentRenderer<VeranstaltungDetailsFormLayout, Veranstaltung> createDetailRenderer() {
         return new ComponentRenderer<>(VeranstaltungDetailsFormLayout::new, VeranstaltungDetailsFormLayout::linkData);
     }
 
     /**
-     *
-     * @param filterChangeConsumer
-     * @return
+     * Erstellt ein Textfeld zur Filterung von Textbasierten Spalten
+     * @param filterChangeConsumer Consumer für die Filterung
+     * @return Textfeld für die Filterung
      */
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
         TextField textField = new TextField();
@@ -117,6 +116,35 @@ public class VeranstaltungView extends VerticalLayout {
     }
 
     /**
+     * Methode zum Selektieren der Filterwerte
+     * Es werden nur Filterwerte angezeigt, die den Tabellendaten entsprechen
+     * @param data Alle möglichen Filterwerte
+     * @return Modifiziertes Set, welches die selektieren Filterwerte enthält
+     */
+    private Set<?> selectFilterData(Set<?> data) {
+        GridListDataView<Veranstaltung> dataView = grid.getListDataView();
+        List<Dozent> helpListDozent = dataView.getItems().map(Veranstaltung::getDozent).toList();
+        List<Fachbereich> helpListFachbereich = dataView.getItems().map(Veranstaltung::getFachbereich).toList();
+
+        List<String> buchungsDozent = helpListDozent.stream().map(Dozent::toString).toList();
+        List<String> buchungsFachbereich = helpListFachbereich.stream().map(Fachbereich::toString).toList();
+
+        Set<?> result = new HashSet<>(Set.copyOf(data));
+
+        for(Object item : data) {
+            if(item instanceof Dozent) {
+                if(!buchungsDozent.contains(item.toString())) {
+                    result.remove(item);
+                }
+            } else if(item instanceof Fachbereich) {
+                if(!buchungsFachbereich.contains(item.toString())) {
+                    result.remove(item);
+                }
+            }
+        }
+        return result;
+    }
+    /**
      * Erstellt die Filter des Grids zum Selektieren von Datensätzen
      * @param gridDataView Data View für die Veranstaltungen
      */
@@ -127,13 +155,13 @@ public class VeranstaltungView extends VerticalLayout {
 
         Consumer<Set<Fachbereich>> fachbereichFilterChangeConsumer = vFilter::setFachbereich;
         MultiSelectComboBox<Fachbereich> fachbereichComboBox = new MultiSelectComboBox<>();
-        fachbereichComboBox.setItems(Fachbereich.values());
+        fachbereichComboBox.setItems((Set<Fachbereich>) selectFilterData(Set.of(Fachbereich.values())));
         fachbereichComboBox.addValueChangeListener(e -> fachbereichFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("fachbereich")).setComponent(fachbereichComboBox);
 
         Consumer<Set<Dozent>> dozentFilterChangeConsumer = vFilter::setDozent;
         MultiSelectComboBox<Dozent> dozentComboBox = new MultiSelectComboBox<>();
-        dozentComboBox.setItems(dozentService.findAll());
+        dozentComboBox.setItems((Set<Dozent>) selectFilterData(dozentService.findAll()));
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("dozent")).setComponent(dozentComboBox);
 
@@ -196,6 +224,10 @@ public class VeranstaltungView extends VerticalLayout {
         private int teilnehmerzahl;
         private Set<Dozent> dozent;
 
+        /**
+         * Konstruktur der Internen Klasse VeranstaltungFilter
+         * @param gridDataView Data View für Veranstaltungen
+         */
         public VeranstaltungFilter(GridListDataView<Veranstaltung> gridDataView) {
             this.gridDataView = gridDataView;
             this.gridDataView.addFilter(this::createFilter);
@@ -250,16 +282,21 @@ public class VeranstaltungView extends VerticalLayout {
         }
 
         /**
-         *
-         * @param value
-         * @param searchTerm
-         * @return
+         * Methode zum vergleichen von 2 Strings
+         * @param value Vergleichswert
+         * @param searchTerm Vergleichswert
+         * @return boolean Wert ob Werte übereinstimmen
          */
         private boolean compare(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty()
                     || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
-
+        /**
+         * Methode zum überprüfen ob value im übergebenen Set enthalten ist
+         * @param value Vergleichswert
+         * @param searchTerm Zu überprüfendes Set
+         * @return boolean Wert ob value im Set zu finden ist
+         */
         private boolean compareSet(String value, Set<?> searchTerm) {
             if (searchTerm == null || searchTerm.isEmpty()) {
                 return true;
