@@ -28,6 +28,8 @@ import com.vaadin.flow.data.provider.SortDirection;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -128,9 +130,14 @@ public class BuchungenAnzeigenDialog extends Dialog {
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
-                dozentComboBox.setItems(dozentService.findAllByNachname(currentUser.get().get().getLastName()));
-                if (dozentService.findAllByNachname(currentUser.get().get().getLastName()).size() == 1) {
-                    dozentComboBox.setValue(dozentService.findAllByNachname(currentUser.get().get().getLastName()).getFirst());
+                Optional<Dozent> optionalDozent = dozentService.findByVornameAndNachname(
+                        currentUser.get().get().getFirstName(),
+                        currentUser.get().get().getLastName()
+                );
+                if (optionalDozent.isPresent()) {
+                    Dozent dozentFound = optionalDozent.get();
+                    dozentComboBox.setItems(List.of(dozentFound));
+                    dozentComboBox.setValue(dozentFound);
                     dozentComboBox.setEnabled(false);
                 }
             }

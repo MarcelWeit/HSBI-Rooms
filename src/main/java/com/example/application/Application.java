@@ -13,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -54,7 +55,6 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             ausstattungRepository.save(new Ausstattung("Mikrofon"));
             ausstattungRepository.save(new Ausstattung("Soundanlage"));
             ausstattungRepository.save(new Ausstattung("Kamera"));
-            System.out.println("Ausstattung Daten initialisiert");
         }
         if (roomRepository.count() == 0) {
             for (int i = 1; i < 5; i++) {
@@ -71,7 +71,6 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
                 roomRepository.save(room);
             }
             roomRepository.save(new Raum("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
-            System.out.println("Raum Daten initialisiert");
         }
         if (userRepository.count() == 0) {
             User admin = new User("admin@gmail.com", "Mustermann", "Max", passwordEncoder.encode("admin"), Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT, Anrede.HERR,
@@ -83,24 +82,22 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", passwordEncoder.encode("fbplanung"), Set.of(Role.FBPLANUNG), Fachbereich.SOZIALWESEN, Anrede.HERR,
                     "Prof. Dr.");
             userRepository.save(fbplan);
-            System.out.println("User Daten initialisiert");
         }
         if (dozentRepository.count() == 0) {
             dozentRepository.save(new Dozent("Wiemann", "Volker", Fachbereich.WIRTSCHAFT));
             dozentRepository.save(new Dozent("Küster", "Jochen", Fachbereich.WIRTSCHAFT));
             dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
-            System.out.println("Dozent Daten initialisiert");
         }
         if (veranstaltungRepository.count() == 0) {
-            veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozentRepository.findByNachname("Küster").get(), 100, Fachbereich.WIRTSCHAFT));
-            veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozentRepository.findByNachname("Wiemann").get(), 120, Fachbereich.WIRTSCHAFT));
-            System.out.println("Veranstaltung Daten initialisiert");
+            Optional<Dozent> dozentKuester = dozentRepository.findByNachname("Küster");
+            Optional<Dozent> dozentWiemann = dozentRepository.findByNachname("Wiemann");
+            dozentKuester.ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozent, 100, Fachbereich.WIRTSCHAFT)));
+            dozentWiemann.ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozent, 120, Fachbereich.WIRTSCHAFT)));
         }
         if (registrationRepository.count() == 0) {
             Registrierung r = new Registrierung("register@gmail.com", "Meyer", "Sabine", "", Role.DOZENT, Fachbereich.WIRTSCHAFT, Anrede.FRAU, "Prof. Dr.");
             r.setHashedPassword(passwordEncoder.encode("register"));
             registrationRepository.save(r);
-            System.out.println("Registrierung Daten initialisiert");
         }
     }
 }
