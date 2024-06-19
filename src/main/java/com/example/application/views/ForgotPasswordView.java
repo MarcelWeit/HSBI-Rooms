@@ -18,6 +18,12 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * View um ein neues Passwort zu beantragen
+ *
+ * @author Gabriel Greb
+ */
+
 @PageTitle("Passwort vergessen")
 @AnonymousAllowed
 @Route(value = "forgot-password")
