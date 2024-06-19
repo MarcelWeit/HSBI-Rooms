@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Service für die Entität Dozent
@@ -25,14 +26,17 @@ public class DozentService {
 
     public List<Dozent> findAll() {
         return repository.findAll();
+
+    public Dozent save(Dozent entity) {
+        return repository.save(entity);
+    }
+
+    public boolean existsById(Long id) {
+        return repository.existsById(id);
     }
 
     public Optional<Dozent> findByVornameAndNachname(String vorname, String nachname) {
         return repository.findByVornameAndNachname(vorname, nachname);
-    }
-
-    public Dozent save(Dozent entity) {
-        return repository.save(entity);
     }
 
     public void delete(Dozent dozent) {
