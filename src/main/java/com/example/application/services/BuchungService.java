@@ -24,10 +24,6 @@ public class BuchungService {
         this.buchungRepository = buchungRepository;
     }
 
-    public boolean roomBooked(Raum room, Zeitslot zeitslot, LocalDate date) {
-        return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot).isPresent();
-    }
-
     public Buchung save(Buchung buchung) {
         return buchungRepository.save(buchung);
     }
@@ -81,5 +77,9 @@ public class BuchungService {
     }
     public Set<Buchung> findAllByUserOrDozent(User user, Dozent dozent) {
         return buchungRepository.findAllByUserOrDozent(user, dozent);
+    }
+
+    public boolean roomBooked(Raum room, Zeitslot zeitslot, LocalDate date) {
+        return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot).isPresent();
     }
 }

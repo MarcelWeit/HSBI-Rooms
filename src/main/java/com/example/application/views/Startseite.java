@@ -1,6 +1,7 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.Buchung;
+import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.User;
 import com.example.application.data.enums.Role;
 import com.example.application.dialogs.BuchungAnlegenBearbeitenDialog;
@@ -19,16 +20,17 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
-import org.vaadin.stefan.fullcalendar.Entry;
-import org.vaadin.stefan.fullcalendar.FullCalendar;
-import org.vaadin.stefan.fullcalendar.FullCalendarBuilder;
-import org.vaadin.stefan.fullcalendar.dataprovider.EntryProvider;
+import org.vaadin.stefan.fullcalendar.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author Marcel Weithoener, Mike Wiebe
@@ -78,8 +80,6 @@ public class Startseite extends VerticalLayout {
         weekSpan.getStyle().set("border", "1px solid white");
         weekSpan.getStyle().set("padding", "10px");
 
-        FullCalendar fullCalendar = createCalendar();
-
         Button buchungAnlegen = new Button("Buchung anlegen", click -> {
             Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, null, null, raumService, dozentService, buchungService, veranstaltungService,
                     authenticatedUser);
@@ -91,27 +91,42 @@ public class Startseite extends VerticalLayout {
             showBookingsDialog.open();
         });
 
+        FullCalendar fullCalendar = createCalendar();
+
         HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
         HorizontalLayout buchungButtons = new HorizontalLayout(buchungAnlegen, eigeneBuchungen);
-        HorizontalLayout calenderLayout = new HorizontalLayout(fullCalendar);
 
-        add(h2, h3, horizontalLayout, buchungButtons, calenderLayout);
+        add(h2, h3, horizontalLayout, buchungButtons, fullCalendar);
     }
 
     public FullCalendar createCalendar() {
         FullCalendar calendar = FullCalendarBuilder.create().build();
-        List<Entry> entryList = new LinkedList<>();
-        EntryProvider<Entry> entryProvider;
 
-        Set<Buchung> buchungen = new HashSet<>();
+        calendar.setSizeFull();
+        calendar.setFirstDay(DayOfWeek.MONDAY);
+        calendar.setNowIndicatorShown(true);
+        calendar.setLocale(Locale.GERMAN);
+        calendar.setWeekends(false);
+        calendar.setBusinessHours(new BusinessHours(LocalTime.of(8, 0), LocalTime.of(23, 0)));
+        calendar.setHeightFull();
+        calendar.changeView(CalendarViewImpl.DAY_GRID_WEEK);
 
+
+        Set<Buchung> buchungen = null;
         if (authenticatedUser.get().isPresent()) {
             if (authenticatedUser.get().get().getRoles().contains(Role.DOZENT)) {
-                buchungen = buchungService.findAllByDozent(dozentService.findByVornameAndNachname(authenticatedUser.get().get().getFirstName(), authenticatedUser.get().get().getLastName()));
+                Optional<Dozent> dozentOptional = dozentService.findByVornameAndNachname(authenticatedUser.get().get().getFirstName(), authenticatedUser.get().get().getLastName());
+                if (dozentOptional.isPresent()) {
+                    buchungen = buchungService.findAllByDozent(dozentOptional.get());
+                }
             }
         }
 
         Entry entry = new Entry();
+//        entry.setStart(LocalDateTime.now());
+//        entry.setEnd(LocalDateTime.now().plusHours(2));
+//        entry.setTitle("Test");
+//        calendar.getEntryProvider().asInMemory().addEntries(entry);
         String start;
         String end;
         if (!buchungen.isEmpty()) {
@@ -173,12 +188,11 @@ public class Startseite extends VerticalLayout {
                         //Fehlermeldung oder so
                         break;
                 }
-
-                entryList.add(entry);
-
+                calendar.getEntryProvider().asInMemory().addEntries(entry);
             }
         }
 
+        calendar.render();
         return calendar;
     }
 

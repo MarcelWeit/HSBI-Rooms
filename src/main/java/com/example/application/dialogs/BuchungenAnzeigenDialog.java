@@ -148,8 +148,11 @@ public class BuchungenAnzeigenDialog extends Dialog {
         //Wenn der Nutzer ein Dozent ist, soll dieser nur die Buchungen einsehen können, in denen er selbst als Dozent eingetragen ist
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
-                dozentComboBox.setItems(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
-                dozentComboBox.setValue(dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName()));
+                Optional<Dozent> currentDozentOptional = dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName());
+                if (currentDozentOptional.isPresent()) {
+                    dozentComboBox.setItems(currentDozentOptional.get());
+                    dozentComboBox.setValue(currentDozentOptional.get());
+                }
                 dozentComboBox.setEnabled(false);
             }
         }
