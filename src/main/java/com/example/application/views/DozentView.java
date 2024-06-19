@@ -211,7 +211,7 @@ public class DozentView extends VerticalLayout {
 
     private void openDeleteDialog(Dozent selectedDozent) {
 
-        if (!veranstaltungService.findVeranstaltungSet(selectedDozent).isEmpty()) {
+        if (!veranstaltungService.findAllByDozent(selectedDozent).isEmpty()) {
             Notification.show("Dieser Dozent befindet sich in einer Veranstaltung und kann daher nicht gelöscht werden.", 3000, Notification.Position.MIDDLE);
             return;
         }
