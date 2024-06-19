@@ -28,6 +28,8 @@ import com.vaadin.flow.data.provider.SortDirection;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -148,12 +150,16 @@ public class BuchungenAnzeigenDialog extends Dialog {
         //Wenn der Nutzer ein Dozent ist, soll dieser nur die Buchungen einsehen können, in denen er selbst als Dozent eingetragen ist
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
-                Optional<Dozent> currentDozentOptional = dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName());
-                if (currentDozentOptional.isPresent()) {
-                    dozentComboBox.setItems(currentDozentOptional.get());
-                    dozentComboBox.setValue(currentDozentOptional.get());
+                Optional<Dozent> optionalDozent = dozentService.findByVornameAndNachname(
+                        currentUser.get().get().getFirstName(),
+                        currentUser.get().get().getLastName()
+                );
+                if (optionalDozent.isPresent()) {
+                    Dozent dozentFound = optionalDozent.get();
+                    dozentComboBox.setItems(List.of(dozentFound));
+                    dozentComboBox.setValue(dozentFound);
+                    dozentComboBox.setEnabled(false);
                 }
-                dozentComboBox.setEnabled(false);
             }
         }
         headerRow.getCell(raumBuchungGrid.getColumnByKey("dozent")).setComponent(dozentComboBox);

@@ -29,6 +29,7 @@ import com.vaadin.flow.data.binder.Binder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,12 +106,16 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
         //Wenn der Nutzer ein Dozent ist, soll dieser beim Anlegen der Buchung selbst als Dozent eingetragen und nicht änderbar sein damit jeder Dozent nur Buchungen für sich anlegen kann
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
-                Optional<Dozent> currentDozentOptional = dozentService.findByVornameAndNachname(currentUser.get().get().getFirstName(), currentUser.get().get().getLastName());
-                if (currentDozentOptional.isPresent()) {
-                    dozent.setItems(currentDozentOptional.get());
-                    dozent.setValue(currentDozentOptional.get());
+                Optional<Dozent> optionalDozent = dozentService.findByVornameAndNachname(
+                        currentUser.get().get().getFirstName(),
+                        currentUser.get().get().getLastName()
+                );
+                if (optionalDozent.isPresent()) {
+                    Dozent dozentFound = optionalDozent.get();
+                    dozent.setItems(List.of(dozentFound));
+                    dozent.setValue(dozentFound);
+                    dozent.setEnabled(false);
                 }
-                dozent.setEnabled(false);
             }
         }
         dozent.setRequiredIndicatorVisible(true);
