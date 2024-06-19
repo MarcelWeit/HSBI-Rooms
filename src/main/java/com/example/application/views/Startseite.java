@@ -57,11 +57,11 @@ public class Startseite extends VerticalLayout {
         H2 h2;
         if (authenticatedUser.get().isPresent()) {
             User currentUser = authenticatedUser.get().get();
-            h2 = new H2("Hallo " + currentUser.getFirstName() + " " + currentUser.getLastName() + "!");
+            h2 = new H2("Hallo " + currentUser.getAnrede() + " " + currentUser.getAkadTitel() + " " + currentUser.getFirstName() + " " + currentUser.getLastName() + "!");
         } else {
             h2 = new H2("Hallo !");
         }
-        H3 h3 = new H3("Herzlich Willkommen bei dem Raumplanungstool der HSBI");
+        H3 h3 = new H3("Herzlich Willkommen bei dem Raumplanungstool der HSBI.");
 
         Span dateSpan = new Span("Heutiges Datum: " + today.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         dateSpan.getStyle().set("border", "1px solid white");

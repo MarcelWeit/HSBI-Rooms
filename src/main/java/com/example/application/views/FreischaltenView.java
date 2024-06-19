@@ -131,7 +131,7 @@ public class FreischaltenView extends VerticalLayout {
                 newDozent.setNachname(registrierung.getLastName());
                 newDozent.setVorname(registrierung.getFirstName());
                 newDozent.setFachbereich(registrierung.getFachbereich());
-                newDozent.setAkad_titel(registrierung.getAkadTitel());
+                newDozent.setAkadTitel(registrierung.getAkadTitel());
                 dozentService.save(newDozent);
             }
         } catch (Exception e) {

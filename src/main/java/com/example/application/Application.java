@@ -1,10 +1,7 @@
 package com.example.application;
 
 import com.example.application.data.entities.*;
-import com.example.application.data.enums.Anrede;
-import com.example.application.data.enums.Fachbereich;
-import com.example.application.data.enums.Raumtyp;
-import com.example.application.data.enums.Role;
+import com.example.application.data.enums.*;
 import com.example.application.repository.*;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
@@ -13,6 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,8 +29,11 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
     private final DozentRepository dozentRepository;
     private final PasswordEncoder passwordEncoder;
     private final RegistrationRepository registrationRepository;
+    private final BuchungRepository buchungRepository;
 
-    public Application(AusstattungRepository ausstattungRepository, RaumRepository roomRepository, UserRepository userRepository, VeranstaltungRepository veranstaltungRepository, DozentRepository dozentRepository, PasswordEncoder passwordEncoder, RegistrationRepository registrationRepository) {
+    public Application(AusstattungRepository ausstattungRepository, RaumRepository roomRepository, UserRepository userRepository,
+                       VeranstaltungRepository veranstaltungRepository, DozentRepository dozentRepository, PasswordEncoder passwordEncoder,
+                       RegistrationRepository registrationRepository, BuchungRepository buchungRepository) {
         this.ausstattungRepository = ausstattungRepository;
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
@@ -40,6 +41,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
         this.dozentRepository = dozentRepository;
         this.passwordEncoder = passwordEncoder;
         this.registrationRepository = registrationRepository;
+        this.buchungRepository = buchungRepository;
     }
 
     public static void main(String[] args) {
@@ -84,9 +86,9 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             userRepository.save(fbplan);
         }
         if (dozentRepository.count() == 0) {
-            dozentRepository.save(new Dozent("Wiemann", "Volker", Fachbereich.WIRTSCHAFT));
-            dozentRepository.save(new Dozent("Küster", "Jochen", Fachbereich.WIRTSCHAFT));
-            dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
+            dozentRepository.save(new Dozent(Anrede.HERR, "Wiemann", "Volker", Fachbereich.WIRTSCHAFT, "Prof. Dr."));
+            dozentRepository.save(new Dozent(Anrede.HERR, "Küster", "Jochen", Fachbereich.WIRTSCHAFT, "Prof. Dr."));
+            dozentRepository.save(new Dozent(Anrede.HERR, "Hartel", "Peter", Fachbereich.WIRTSCHAFT, "Prof. Dr."));
         }
         if (veranstaltungRepository.count() == 0) {
             Optional<Dozent> dozentKuester = dozentRepository.findByNachname("Küster");
@@ -98,6 +100,18 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             Registrierung r = new Registrierung("register@gmail.com", "Meyer", "Sabine", "", Role.DOZENT, Fachbereich.WIRTSCHAFT, Anrede.FRAU, "Prof. Dr.");
             r.setHashedPassword(passwordEncoder.encode("register"));
             registrationRepository.save(r);
+        }
+        if (buchungRepository.count() == 0) {
+            Optional<Raum> raum = roomRepository.findByRefNr("C331");
+            Optional<Veranstaltung> veranstaltung = veranstaltungRepository.findById("CFR23");
+            Optional<Dozent> dozent = dozentRepository.findByNachname("Küster");
+            if (raum.isPresent() && veranstaltung.isPresent() && dozent.isPresent()) {
+                LocalDate date = LocalDate.of(2024, 4, 3);
+                while (date.isBefore(LocalDate.of(2024, 6, 28))) {
+                    buchungRepository.save(new Buchung(date, Zeitslot.EINS, raum.get(), veranstaltung.get(), dozent.get()));
+                    date = date.plusDays(7);
+                }
+            }
         }
     }
 }

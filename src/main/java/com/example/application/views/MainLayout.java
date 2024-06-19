@@ -100,11 +100,11 @@ public class MainLayout extends AppLayout {
         SideNavItem verwNav = new SideNavItem("Verwaltung");
         if (accessChecker.hasAccess(AusstattungView.class)) {
             verwNav.addItem(
-                    new SideNavItem("Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
+                    new SideNavItem("Raum-Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
         }
         if (accessChecker.hasAccess(RaumView.class)) {
             verwNav.addItem(
-                    new SideNavItem("Raum", RaumView.class, VaadinIcon.TABLE.create()));
+                    new SideNavItem("Räume", RaumView.class, VaadinIcon.TABLE.create()));
         }
         if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
             verwNav.addItem(
@@ -112,7 +112,7 @@ public class MainLayout extends AppLayout {
         }
         if (accessChecker.hasAccess(BenutzerVerwaltungsView.class)) {
             verwNav.addItem(
-                    new SideNavItem("BenutzerVerwaltung", BenutzerVerwaltungsView.class, VaadinIcon.TABLE.create()));
+                    new SideNavItem("Benutzerverwaltung", BenutzerVerwaltungsView.class, VaadinIcon.TABLE.create()));
         }
         if (accessChecker.hasAccess(FreischaltenView.class)) {
             verwNav.addItem(
