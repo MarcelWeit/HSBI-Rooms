@@ -77,7 +77,7 @@ public class VeranstaltungServiceTest {
 
         List<Veranstaltung> returnList = new ArrayList<>(veranstaltungService.findAll());
 
-        assertThat(returnList).isEqualTo(testList);
+        assertThat(returnList).containsExactlyInAnyOrder(testData, testData2);
 
     }
 }
