@@ -29,7 +29,11 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-
+/**
+ * View um eigene Buchungen einzusehen und zu verwalten
+ * Es werden Buchungen angezeigt die der Benutzer angelegt hat, sowie falls der Benutzer Dozent ist
+ * alle Buchungen in denen dieser als Dozent eingetragen ist
+ */
 @Route(value = "meine-buchungen", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "DOZENT", "FBPLANUNG"})
 @PageTitle("MeineBuchungen")
@@ -45,6 +49,15 @@ public class MeineBuchungenView extends VerticalLayout {
 
     private Grid<Buchung> grid;
 
+    /**
+     * Konstruktur für die Klasse MeineBuchungenView
+     * @param buchungService Service zur Kommunikation mit der Datenbank für die Entität Buchung
+     * @param userService Service zur Kommunikation mit der Datenbank für die Entität User
+     * @param dozentService Service zur Kommunikation mit der Datenbank für die Entität Dozent
+     * @param currentUser Angemeldeter User in der aktiven Session
+     * @param raumService Service zur Kommunikation mit der Datenbank für die Entität Raum
+     * @param veranstaltungService Service zur Kommunikation mit der Datenbank für die Entität Veranstaltung
+     */
     public MeineBuchungenView(BuchungService buchungService, UserService userService, DozentService dozentService, AuthenticatedUser currentUser, RaumService raumService, VeranstaltungService veranstaltungService) {
         this.buchungService = buchungService;
         this.userService = userService;
@@ -57,6 +70,10 @@ public class MeineBuchungenView extends VerticalLayout {
         add(grid);
 
     }
+
+    /**
+     * Erstellt das Grid für den View, indem die eigenen Buchungen abbgebildet sind
+     */
     private void setupGrid() {
         grid = new Grid<>();
 
@@ -74,9 +91,13 @@ public class MeineBuchungenView extends VerticalLayout {
 
         refreshGrid();
         setupButtons();
-        setupFilters();
+        setupFilters(grid.getListDataView());
 
     }
+
+    /**
+     * Aktualisiert die Datensätze des Grids, sowie die selektierten Filterwerte
+     */
     private void refreshGrid() {
         User userData = currentUser.get().get();
 
@@ -107,6 +128,13 @@ public class MeineBuchungenView extends VerticalLayout {
         }
 
     }
+
+    /**
+     * Methode zum Selektieren der Filterwerte
+     * Es werden nur Filterwerte angezeigt, die den Tabellendaten entsprechen
+     * @param data Alle möglichen Filterwerte
+     * @return Modifiziertes Set, welches die selektieren Filterwerte enthält
+     */
     private Set<?> selectFilterData(Set<?> data) {
         GridListDataView<Buchung> dataView = grid.getListDataView();
         List<Raum> helpListRaum = dataView.getItems().map(Buchung::getRoom).toList();
@@ -130,8 +158,13 @@ public class MeineBuchungenView extends VerticalLayout {
         }
         return result;
     }
-    private void setupFilters() {
-        BuchungFilter bFilter = new BuchungFilter(grid.getListDataView());
+
+    /**
+     * Erstellt die Filter des Grids zum Selektieren von Datensätzen
+     * @param gridDataView Data View für die Buchungen
+     */
+    private void setupFilters(GridListDataView<Buchung> gridDataView) {
+        BuchungFilter bFilter = new BuchungFilter(gridDataView);
 
         grid.getHeaderRows().clear();
         HeaderRow headerRow = grid.appendHeaderRow();
@@ -161,6 +194,10 @@ public class MeineBuchungenView extends VerticalLayout {
         headerRow.getCell(grid.getColumnByKey("datum")).setComponent(datePicker);
 
     }
+    /**
+     *  Erstellt die Schaltflächen zur Bedienung der View bzw. der Tabellenfunktionen.
+     *  Jeweils ein Button zum Bearbeiten und Löschen einer Buchung
+     */
     private void setupButtons() {
         Button buchungBearbeiten = new Button("Buchung bearbeiten", new Icon(VaadinIcon.EDIT));
         buchungBearbeiten.addClickListener(e -> {
@@ -187,6 +224,10 @@ public class MeineBuchungenView extends VerticalLayout {
 
         add(layout);
     }
+    /**
+     * Öffnet einen Bestätigungsdialog zum Löschen einer Veranstaltung. Falls keine ausgewählt ist,
+     * wird eine Benachrichtigung ausgegeben
+     */
     private void openDeleteDialog() {
         Optional<Buchung> selectedBuchung = grid.getSelectionModel().getFirstSelectedItem();
         if(selectedBuchung.isEmpty()) {
@@ -213,6 +254,10 @@ public class MeineBuchungenView extends VerticalLayout {
             deleteConfirmDialog.open();
         }
     }
+    /**
+     * Interne Klasse zur Realisierung der Filterfunktion. Klasse speichert die Filterwerte ab, damit diese
+     * zur Selektierung der Datensätze verwendet werden kann
+     */
     private static class BuchungFilter {
         private final GridListDataView<Buchung> dataView;
 
@@ -221,6 +266,10 @@ public class MeineBuchungenView extends VerticalLayout {
         private LocalDate date;
         private Set<Zeitslot> zeitslot;
 
+        /**
+         * Konstruktor der Internen Klasse BuchungFilter
+         * @param dataView DataView für Buchungen
+         */
         public BuchungFilter(GridListDataView<Buchung> dataView) {
             this.dataView = dataView;
             this.dataView.addFilter(this::createFilter);
@@ -242,6 +291,11 @@ public class MeineBuchungenView extends VerticalLayout {
             this.zeitslot = zeitslot;
             this.dataView.refreshAll();
         }
+        /**
+         * Realisiert den Abgleich einer Veranstaltung mit den aktuellen Filterwerten
+         * @param b Buchungsdatensatz der abgeglichen werden soll
+         * @return boolean Wert ob Buchung Filtern entspricht
+         */
         public boolean createFilter(Buchung b) {
             boolean matchesRaum = true;
             boolean matchesVeranstaltung = true;
@@ -257,6 +311,12 @@ public class MeineBuchungenView extends VerticalLayout {
 
             return matchesRaum && matchesVeranstaltung && matchesDate && matchesZeitslot;
         }
+        /**
+         * Methode zum überprüfen ob value im übergebenen Set enthalten ist
+         * @param value Vergleichswert
+         * @param searchTerm Zu überprüfendes Set
+         * @return boolean Wert ob value im Set zu finden ist
+         */
         private boolean compareSet(String value, Set<?> searchTerm) {
             if (searchTerm == null || searchTerm.isEmpty()) {
                 return true;

@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Repository für die Entität Raum
+ *
+ * @author Leon Gepfner
+ */
 @Repository
 public interface VeranstaltungRepository extends JpaRepository<Veranstaltung, Long>, JpaSpecificationExecutor<Veranstaltung> {
 

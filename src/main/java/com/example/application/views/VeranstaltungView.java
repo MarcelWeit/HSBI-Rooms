@@ -50,9 +50,9 @@ public class VeranstaltungView extends VerticalLayout {
 
     /**
      * Konstruktur der Klasse VeranstaltungView
-     * @param veranstaltungService
-     * @param dozentService
-     * @param buchungService
+     * @param veranstaltungService Service zur Kommunikation mit der Datenbank für die Entität Veranstaltung
+     * @param dozentService Service zur Kommunikation mit der Datenbank für die Entität Dozent
+     * @param buchungService Service zur Kommunikation mit der Datenbank für die Entität Buchung
      */
     public VeranstaltungView(VeranstaltungService veranstaltungService, DozentService dozentService, BuchungService buchungService) {
         this.veranstaltungService = veranstaltungService;
@@ -64,17 +64,17 @@ public class VeranstaltungView extends VerticalLayout {
     }
 
     /**
-     *
-     * @return
+     * Erstellt einen Komponenten Renderer für die Detail Ansicht der Veranstaltungsdatensätze
+     * @return Komponenten Renderer
      */
     private static ComponentRenderer<VeranstaltungDetailsFormLayout, Veranstaltung> createDetailRenderer() {
         return new ComponentRenderer<>(VeranstaltungDetailsFormLayout::new, VeranstaltungDetailsFormLayout::linkData);
     }
 
     /**
-     *
-     * @param filterChangeConsumer
-     * @return
+     * Erstellt ein Textfeld zur Filterung von Textbasierten Spalten
+     * @param filterChangeConsumer Consumer für die Filterung
+     * @return Textfeld für die Filterung
      */
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
         TextField textField = new TextField();
@@ -114,6 +114,13 @@ public class VeranstaltungView extends VerticalLayout {
         grid.setMinHeight("80vh");
 
     }
+
+    /**
+     * Methode zum Selektieren der Filterwerte
+     * Es werden nur Filterwerte angezeigt, die den Tabellendaten entsprechen
+     * @param data Alle möglichen Filterwerte
+     * @return Modifiziertes Set, welches die selektieren Filterwerte enthält
+     */
     private Set<?> selectFilterData(Set<?> data) {
         GridListDataView<Veranstaltung> dataView = grid.getListDataView();
         List<Dozent> helpListDozent = dataView.getItems().map(Veranstaltung::getDozent).toList();
@@ -217,6 +224,10 @@ public class VeranstaltungView extends VerticalLayout {
         private int teilnehmerzahl;
         private Set<Dozent> dozent;
 
+        /**
+         * Konstruktur der Internen Klasse VeranstaltungFilter
+         * @param gridDataView Data View für Veranstaltungen
+         */
         public VeranstaltungFilter(GridListDataView<Veranstaltung> gridDataView) {
             this.gridDataView = gridDataView;
             this.gridDataView.addFilter(this::createFilter);
@@ -271,16 +282,21 @@ public class VeranstaltungView extends VerticalLayout {
         }
 
         /**
-         *
-         * @param value
-         * @param searchTerm
-         * @return
+         * Methode zum vergleichen von 2 Strings
+         * @param value Vergleichswert
+         * @param searchTerm Vergleichswert
+         * @return boolean Wert ob Werte übereinstimmen
          */
         private boolean compare(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty()
                     || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
-
+        /**
+         * Methode zum überprüfen ob value im übergebenen Set enthalten ist
+         * @param value Vergleichswert
+         * @param searchTerm Zu überprüfendes Set
+         * @return boolean Wert ob value im Set zu finden ist
+         */
         private boolean compareSet(String value, Set<?> searchTerm) {
             if (searchTerm == null || searchTerm.isEmpty()) {
                 return true;
