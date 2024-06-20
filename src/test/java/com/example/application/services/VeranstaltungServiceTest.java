@@ -2,6 +2,7 @@ package com.example.application.services;
 
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Veranstaltung;
+import com.example.application.data.enums.Anrede;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.repository.VeranstaltungRepository;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ public class VeranstaltungServiceTest {
 
     @Test
     void save() {
-        Dozent dummy = new Dozent("Mustermann", "Max", Fachbereich.WIRTSCHAFT);
+        Dozent dummy = new Dozent(Anrede.HERR, "Mustermann", "Max", Fachbereich.WIRTSCHAFT, "Dr");
         Veranstaltung testData = new Veranstaltung("12WIP2024", "Mathematik für Ökonomen", dummy, 120, Fachbereich.WIRTSCHAFT);
         when(veranstaltungRepository.save(testData)).thenReturn(testData);
 
@@ -41,7 +42,7 @@ public class VeranstaltungServiceTest {
 
     @Test
     void delete() {
-        Dozent dummy = new Dozent("Mustermann", "Max", Fachbereich.WIRTSCHAFT);
+        Dozent dummy = new Dozent(Anrede.HERR, "Mustermann", "Max", Fachbereich.WIRTSCHAFT, "Dr");
         Veranstaltung testData = new Veranstaltung("12WIP2024", "Mathematik für Ökonomen", dummy, 120, Fachbereich.WIRTSCHAFT);
 
         veranstaltungService.save(testData);
@@ -53,7 +54,7 @@ public class VeranstaltungServiceTest {
 
     @Test
     void findById() {
-        Dozent dummy = new Dozent("Mustermann", "Max", Fachbereich.WIRTSCHAFT);
+        Dozent dummy = new Dozent(Anrede.HERR, "Mustermann", "Max", Fachbereich.WIRTSCHAFT, "Dr");
         Veranstaltung testData = new Veranstaltung("12WIP2024", "Mathematik für Ökonomen", dummy, 120, Fachbereich.WIRTSCHAFT);
         when(veranstaltungRepository.findById("12WIP2024")).thenReturn(Optional.of(testData));
 
@@ -65,7 +66,7 @@ public class VeranstaltungServiceTest {
     @Test
     void findAll() {
         List< Veranstaltung> testList = new ArrayList<>();
-        Dozent dummy = new Dozent("Mustermann", "Max", Fachbereich.WIRTSCHAFT);
+        Dozent dummy = new Dozent(Anrede.HERR, "Mustermann", "Max", Fachbereich.WIRTSCHAFT, "Dr");
         Veranstaltung testData = new Veranstaltung("12WIP2024", "Mathematik für Ökonomen", dummy, 120, Fachbereich.WIRTSCHAFT);
         Veranstaltung testData2 = new Veranstaltung("5WIP2024", "Mathematik für Wirtschaftsinformatiker", dummy, 120, Fachbereich.WIRTSCHAFT);
         testList.add(testData);
