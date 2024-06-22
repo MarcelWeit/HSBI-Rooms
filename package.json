@@ -82,11 +82,13 @@
     "@vaadin/vaadin-usage-statistics": "2.1.2",
     "@vaadin/vertical-layout": "24.3.10",
     "@vaadin/virtual-list": "24.3.10",
+    "apexcharts": "3.49.0",
     "construct-style-sheets-polyfill": "3.1.0",
     "date-fns": "2.29.3",
     "lit": "3.1.2",
     "moment": "2.29.4",
     "moment-timezone": "0.5.40",
+    "onecolor": "4.1.0",
     "proj4": "2.9.2"
   },
   "devDependencies": {
@@ -188,11 +190,13 @@
       "@vaadin/vaadin-usage-statistics": "2.1.2",
       "@vaadin/vertical-layout": "24.3.10",
       "@vaadin/virtual-list": "24.3.10",
+      "apexcharts": "3.49.0",
       "construct-style-sheets-polyfill": "3.1.0",
       "date-fns": "2.29.3",
       "lit": "3.1.2",
       "moment": "2.29.4",
       "moment-timezone": "0.5.40",
+      "onecolor": "4.1.0",
       "proj4": "2.9.2"
     },
     "devDependencies": {
@@ -213,7 +217,7 @@
       "workbox-core": "7.0.0",
       "workbox-precaching": "7.0.0"
     },
-    "hash": "a6dc4acd431a57ad364665355d415f9f362c93fa3b9222a6c16b1ba9f8586788"
+    "hash": "868a61bf20020938b7a81359fddfef3efa7bb8964a9ce77a7d48d4462d459fe5"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -300,6 +304,8 @@
     "@fullcalendar/daygrid": "$@fullcalendar/daygrid",
     "moment-timezone": "$moment-timezone",
     "@fullcalendar/multimonth": "$@fullcalendar/multimonth",
-    "@fullcalendar/moment": "$@fullcalendar/moment"
+    "@fullcalendar/moment": "$@fullcalendar/moment",
+    "apexcharts": "$apexcharts",
+    "onecolor": "$onecolor"
   }
 }

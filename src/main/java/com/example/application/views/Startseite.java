@@ -185,7 +185,7 @@ public class Startseite extends VerticalLayout {
                         entry.setEnd(LocalDateTime.parse(end));
                         break;
                     default:
-                        //Fehlermeldung oder so
+                        //Fehlermeldung
                         break;
                 }
                 calendar.getEntryProvider().asInMemory().addEntries(entry);
