@@ -19,6 +19,8 @@ import java.util.Optional;
 @Repository
 public interface DozentRepository extends JpaRepository<Dozent, Long>, JpaSpecificationExecutor<Dozent> {
 
+    List<Dozent> findAllByNachname(String nachname);
+    
     Optional<Dozent> findByNachname(String nachname);
 
     Optional<Dozent> findByVornameAndNachname(String vorname, String nachname);
