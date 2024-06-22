@@ -85,9 +85,9 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             userRepository.save(fbplan);
         }
         if (dozentRepository.count() == 0) {
-            dozentRepository.save(new Dozent("Wiemann", "Volker", Fachbereich.WIRTSCHAFT));
-            dozentRepository.save(new Dozent("Küster", "Jochen", Fachbereich.WIRTSCHAFT));
-            dozentRepository.save(new Dozent("Hartel", "Peter", Fachbereich.WIRTSCHAFT));
+            dozentRepository.save(new Dozent(Anrede.HERR, "Wiemann", "Volker", Fachbereich.WIRTSCHAFT, "Prof. Dr. rer. pol., Dipl.-Kfm."));
+            dozentRepository.save(new Dozent(Anrede.HERR, "Küster", "Jochen", Fachbereich.WIRTSCHAFT, "Prof. Dr. rer. nat."));
+            dozentRepository.save(new Dozent(Anrede.HERR, "Hartel", "Peter", Fachbereich.WIRTSCHAFT, "Prof. Dr.-Ing., Dipl.-Inform."));
         }
         if (veranstaltungRepository.count() == 0) {
             Optional<Dozent> dozentKuester = dozentRepository.findByNachname("Küster");
