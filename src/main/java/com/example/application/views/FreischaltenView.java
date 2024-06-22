@@ -14,6 +14,10 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Set;
+/**
+ * View zur Freischaltung von Benutzern aus der Registrierung
+
+ */
 
 @Route(value = "freischalten", layout = MainLayout.class)
 @PageTitle("User freischalten")

@@ -6,11 +6,14 @@ import com.example.application.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import com.example.application.data.enums.Fachbereich;
-import com.example.application.data.enums.Role;
 
 import java.util.Set;
-
+/**
+ * User Entity, wird für User verwendet, die sich registriert haben.
+ * User können so in einer extra Tabelle gespeichert werden.
+ *
+ * @author Marcel Weithoener,Tim Riechmann
+ */
 @Entity
 @Table(name = "application_user", uniqueConstraints = {
         @UniqueConstraint(columnNames = "username")

@@ -40,7 +40,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
                     }
                 }).reduce(Predicate::and).orElse(e -> true);
     }
-
+    // Sortieren der Daten
     private static Comparator<User> comparator(CrudFilter filter) {
         return filter.getSortOrders().entrySet().stream().map(sortClause -> {
             try {
@@ -58,7 +58,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
             }
         }).reduce(Comparator::thenComparing).orElse((o1, o2) -> 0);
     }
-
+    // Wert des Feldes
     private static Object valueOf(String fieldName, User user) {
         try {
             Field field = User.class.getDeclaredField(fieldName);

@@ -36,6 +36,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * View zur Verwaltung der Benutzer in der User Klasse
+ */
 @Route(value = "Benutzerverwaltung", layout = MainLayout.class)
 @RolesAllowed({"ADMIN"})
 @Uses(Icon.class)
