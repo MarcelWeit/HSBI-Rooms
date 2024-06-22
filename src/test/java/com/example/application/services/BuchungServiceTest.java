@@ -34,7 +34,7 @@ public class BuchungServiceTest {
     @Test
     void save() {
         Raum raum = new Raum("F1", Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "FB Wirtschaft Etage 1");
-        Dozent dozent = new Dozent("Test1", "Test1", Fachbereich.WIRTSCHAFT);
+        Dozent dozent = new Dozent(Anrede.HERR, "Test1", "Test1", Fachbereich.WIRTSCHAFT, "");
         Veranstaltung veranstaltung = new Veranstaltung("CFR1", "Test1", dozent, 50, Fachbereich.WIRTSCHAFT);
         Buchung buchung = new Buchung();
         buchung.setRoom(raum);
@@ -97,7 +97,7 @@ public class BuchungServiceTest {
     @Test
     void findAllByDozent() {
         Buchung buchung = createBuchung("6");
-        Dozent dozent = new Dozent("Test5", "Test5", Fachbereich.WIRTSCHAFT);
+        Dozent dozent = new Dozent(Anrede.HERR, "Test5", "Test5", Fachbereich.WIRTSCHAFT, "");
         when(buchungRepository.findAllByDozent(dozent)).thenReturn(Set.of(buchung));
         buchungService.save(buchung);
         assertThat(buchungService.findAllByDozent(dozent)).isNotNull();
@@ -127,7 +127,7 @@ public class BuchungServiceTest {
     @Test
     void findAllByVeranstaltung() {
         Buchung buchung = createBuchung("9");
-        Dozent dozent = new Dozent("Test9", "Test9", Fachbereich.WIRTSCHAFT);
+        Dozent dozent = new Dozent(Anrede.HERR, "Test9", "Test9", Fachbereich.WIRTSCHAFT, "");
         Veranstaltung veranstaltung = new Veranstaltung("CFR9", "Test9", dozent, 50, Fachbereich.WIRTSCHAFT);
         when(buchungRepository.findAllByVeranstaltung(veranstaltung)).thenReturn(Set.of(buchung));
         buchungService.save(buchung);
@@ -149,7 +149,7 @@ public class BuchungServiceTest {
     void findAllByUserOrDozent() {
         Buchung buchung = createBuchung("11");
         User user = new User("Test11@gmail.com", "Test11", "Test11", " ", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT, Anrede.HERR, "");
-        Dozent dozent = new Dozent("Test11", "Test11", Fachbereich.WIRTSCHAFT);
+        Dozent dozent = new Dozent(Anrede.HERR, "Test11", "Test11", Fachbereich.WIRTSCHAFT, "");
         when(buchungRepository.findAllByUserOrDozent(user, dozent)).thenReturn(Set.of(buchung));
         buchungService.save(buchung);
         assertThat(buchungService.findAllByUserOrDozent(user, dozent)).isNotNull();
@@ -168,7 +168,7 @@ public class BuchungServiceTest {
 
     private static Buchung createBuchung(String number) {
         Raum raum = new Raum("F".concat(number), Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "FB Wirtschaft Etage 1");
-        Dozent dozent = new Dozent("Test".concat(number), "Test".concat(number), Fachbereich.WIRTSCHAFT);
+        Dozent dozent = new Dozent(Anrede.HERR, "Test".concat(number), "Test".concat(number), Fachbereich.WIRTSCHAFT, "");
         Veranstaltung veranstaltung = new Veranstaltung("CFR".concat(number), "Test".concat(number), dozent, 50, Fachbereich.WIRTSCHAFT);
         User user = new User("Test".concat(number).concat("@gmail.com"), "Test".concat(number), "Test".concat(number), " ", Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT, Anrede.HERR, "");
         Buchung buchung = new Buchung();
