@@ -9,6 +9,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Service für das Zurücksetzen des Passwortes
+ *
+ * @author Gabriel Greb
+ */
+
 @Service
 public class PasswordResetService {
 

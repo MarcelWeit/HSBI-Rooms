@@ -10,10 +10,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository für die Entität Dozent
+ *
+ * @author Gabriel Greb
+ */
+
 @Repository
 public interface DozentRepository extends JpaRepository<Dozent, Long>, JpaSpecificationExecutor<Dozent> {
-
-    List<Dozent> findAllByNachname(String nachname);
 
     Optional<Dozent> findByNachname(String nachname);
 
