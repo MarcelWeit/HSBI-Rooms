@@ -164,7 +164,7 @@ public class RaumView extends VerticalLayout {
         Button showBookingsButton = new Button("Buchungen anzeigen", new Icon(VaadinIcon.CALENDAR));
         showBookingsButton.addClickListener(click -> openShowBookingsDialog());
 
-        Button showWeekBookingButton = new Button("KW Verfügbarkeit", new Icon(VaadinIcon.CALENDAR));
+        Button showWeekBookingButton = new Button("Verfügbarkeit", new Icon(VaadinIcon.CALENDAR));
         showWeekBookingButton.addClickListener(click -> {
             Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
             if (selectedRoom.isEmpty()) {

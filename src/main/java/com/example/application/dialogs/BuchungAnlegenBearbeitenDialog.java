@@ -39,11 +39,13 @@ import java.util.Optional;
  */
 public class BuchungAnlegenBearbeitenDialog extends Dialog {
 
+    // Services
     private final RaumService roomService;
     private final DozentService dozentService;
     private final BuchungService buchungService;
     private final VeranstaltungService veranstaltungService;
 
+    // UI
     private final Binder<Buchung> binder = new Binder<>(Buchung.class);
     private final ComboBox<Raum> raum = new ComboBox<>("Raumnummer");
     private final ComboBox<Veranstaltung> veranstaltung = new ComboBox<>("Veranstaltung");
@@ -55,11 +57,12 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
     private final DatePicker endDatum = new DatePicker("Letzter Buchungstag");
     private final ComboBox<Zeitslot> zeitslot = new ComboBox<>("Zeitslot");
 
+    // Variablen
     private final Buchung selectedBuchung;
     private final Raum selectedRoom;
     private final Veranstaltung selectedVeranstaltung;
     private final AuthenticatedUser currentUser;
-    private Buchung initialBuchung = null;
+    private final Buchung initialBuchung;
 
     public BuchungAnlegenBearbeitenDialog(Buchung selectedBuchung, Raum selectedRoom, Veranstaltung selectedVeranstaltung, RaumService roomService,
                                           DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
