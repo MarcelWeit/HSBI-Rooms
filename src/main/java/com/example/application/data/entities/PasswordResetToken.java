@@ -3,6 +3,12 @@ package com.example.application.data.entities;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * PasswordResetToken Entity
+ *
+ * @author Gabriel Greb
+ */
+
 @Entity
 public class PasswordResetToken {
 

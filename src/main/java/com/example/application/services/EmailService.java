@@ -5,6 +5,12 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service zum versenden von Emails
+ *
+ * @author Gabriel Greb
+ */
+
 @Service
 public class EmailService {
 

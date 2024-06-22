@@ -17,6 +17,12 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * View zum ändern seines Passwortes
+ *
+ * @author Gabriel Greb
+ */
+
 @PageTitle("Passwort zurücksetzen")
 @AnonymousAllowed
 @Route(value = "reset-password")

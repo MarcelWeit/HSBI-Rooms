@@ -35,6 +35,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * View für die Dozentenverwaltung (anzeigen, hinzufügen, bearbeiten, löschen von Dozenten)
+ *
+ * @author Gabriel Greb
+ */
+
 @Route(value = "dozent-crud", layout = MainLayout.class)
 @Secured({"ADMIN", "FBPLANUNG"})
 @RolesAllowed({"ADMIN", "FBPLANUNG"})
