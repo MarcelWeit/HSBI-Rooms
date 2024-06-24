@@ -26,9 +26,11 @@ import java.util.Optional;
  */
 public class MainLayout extends AppLayout {
 
+    private H2 viewTitle;
+
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
-    private H2 viewTitle;
+
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;

@@ -1,167 +1,93 @@
 package com.example.application.views;
 
-import com.example.application.data.dataProvider.RegistrierungDataProvider;
-import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Registrierung;
-import com.example.application.data.enums.Fachbereich;
-import com.example.application.data.enums.Role;
-import com.example.application.services.DozentService;
-import com.example.application.services.EmailService;
+import com.example.application.data.entities.User;
+import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.crud.*;
-import com.vaadin.flow.component.dependency.Uses;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import org.springframework.security.access.annotation.Secured;
+
+import java.util.Set;
+/**
+ * View zur Freischaltung von Benutzern aus der Registrierung
+
+ */
 
 @Route(value = "freischalten", layout = MainLayout.class)
-@PageTitle("User Approval")
-@Secured("ADMIN")
+@PageTitle("User freischalten")
 @RolesAllowed("ADMIN")
-@Uses(Icon.class)
 public class FreischaltenView extends VerticalLayout {
 
-    private final Crud<Registrierung> crud;
-    private final RegistrierungDataProvider registrierungDataProvider;
+    private final Grid<Registrierung> grid;
+    private final RegistrationService registrationService;
     private final UserService userService;
-    private final EmailService emailService;
-    private final DozentService dozentService;
 
-    public FreischaltenView(UserService userService, EmailService emailService, DozentService dozentService) {
+    public FreischaltenView(RegistrationService registrationService, UserService userService) {
+        this.registrationService = registrationService;
         this.userService = userService;
-        this.registrierungDataProvider = new RegistrierungDataProvider(userService);
-        this.emailService = emailService;
-
-        this.crud = new Crud<>(Registrierung.class, createEditor());
-        crud.addThemeVariants(CrudVariant.NO_BORDER);
-
-        //ohne "New Item" button
-        crud.setToolbarVisible(false);
-
-        setupDataProvider();
+        this.grid = new Grid<>(Registrierung.class, false);
         setupGrid();
-        setupLanguage();
-
-        add(crud);
-        this.dozentService = dozentService;
+        grid.setItems(registrationService.findAllRegistrierungen());
+        add(grid);
     }
-
-    private CrudEditor<Registrierung> createEditor() {
-        TextField vorname = new TextField("Vorname");
-        TextField nachname = new TextField("Nachname");
-        EmailField email = new EmailField("Email");
-        ComboBox<Fachbereich> fachbereich = new ComboBox<>("Fachbereich");
-        fachbereich.setItems(Fachbereich.values());
-        fachbereich.setItemLabelGenerator(Fachbereich::toString);
-        MultiSelectComboBox<Role> rolle = new MultiSelectComboBox<>("Rolle");
-        rolle.setItems(Role.values());
-        rolle.setItemLabelGenerator(Role::toString);
-
-        FormLayout form = new FormLayout(vorname, nachname, email, fachbereich, rolle);
-
-        Binder<Registrierung> binder = new BeanValidationBinder<>(Registrierung.class);
-        binder.forField(vorname).asRequired().bind(Registrierung::getFirstName, Registrierung::setFirstName);
-        binder.forField(nachname).asRequired().bind(Registrierung::getLastName, Registrierung::setLastName);
-        binder.forField(email).asRequired().bind(Registrierung::getUsername, Registrierung::setUsername);
-        binder.forField(fachbereich).asRequired().bind(Registrierung::getFachbereich, Registrierung::setFachbereich);
-        //binder.forField(rolle).asRequired().bind(Registrierung::getRole, Registrierung::setRole);
-
-        return new BinderCrudEditor<>(binder, form);
-    }
-
+    // Methode zur Einrichtung des Grids
     private void setupGrid() {
-        Grid<Registrierung> grid = crud.getGrid();
+        grid.setColumns("lastName", "firstName", "fachbereich", "role", "username");
 
-        grid.removeColumnByKey("id");
-        grid.removeColumnByKey("hashedPassword");
-
-        // ohne "Edit" button
-        grid.removeColumnByKey("vaadin-crud-edit-column");
+        grid.getColumnByKey("username").setHeader("Benutzername");
+        grid.getColumnByKey("firstName").setHeader("Vorname");
+        grid.getColumnByKey("lastName").setHeader("Nachname");
+        grid.getColumnByKey("role").setHeader("Rolle");
+        grid.getColumnByKey("fachbereich").setHeader("Fachbereich");
 
         grid.addComponentColumn(registrierung -> {
-            Button approveButton = new Button("Approve");
+            HorizontalLayout buttonsLayout = new HorizontalLayout();
+
+            // Freischalten Button
+            Button approveButton = new Button("Freischalten");
             approveButton.addClickListener(event -> approveRegistration(registrierung));
-            return approveButton;
-        }).setHeader("Actions");
+            buttonsLayout.add(approveButton);
 
-        // Make the new "Actions" column fixed at the end
-        grid.getColumns().forEach(column -> column.setAutoWidth(true));
+            // Ablehnen Button
+            Button deleteButton = new Button("Ablehnen");
+            deleteButton.addClickListener(event -> deleteRegistration(registrierung));
+            buttonsLayout.add(deleteButton);
+
+            return buttonsLayout;
+        }).setHeader("Aktionen");
     }
 
-    private void setupDataProvider() {
-        crud.setDataProvider(registrierungDataProvider);
+    // Methode zur Freischaltung der Registrierung
+    public void approveRegistration(Registrierung registrierung) {
+        User user = new User();
+        user.setUsername(registrierung.getUsername());
+        user.setFirstName(registrierung.getFirstName());
+        user.setLastName(registrierung.getLastName());
+        user.setHashedPassword(registrierung.getHashedPassword());
+        user.setRoles(Set.of(registrierung.getRole()));
+        user.setFachbereich(registrierung.getFachbereich());
+        user.setAnrede((registrierung.getAnrede()));
+        user.setAkadTitel((registrierung.getAkadTitel()));
 
-        crud.addDeleteListener(deleteEvent -> {
-            registrierungDataProvider.delete(deleteEvent.getItem());
-            registrierungDataProvider.refreshAll();
-        });
-
-        crud.addSaveListener(saveEvent -> {
-            try {
-                registrierungDataProvider.save(saveEvent.getItem());
-                registrierungDataProvider.refreshAll();
-            } catch (IllegalArgumentException e) {
-                Notification.show(e.getMessage(), 3000, Notification.Position.MIDDLE);
-            }
-        });
+        userService.save(user);
+        registrationService.delete(registrierung);
+        grid.setItems(registrationService.findAllRegistrierungen());
+        //Notification
+        Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
+    }
+    // Methode zum Löschen der Registrierung
+    private void deleteRegistration(Registrierung registrierung) {
+        registrationService.delete(registrierung);
+        grid.setItems(registrationService.findAllRegistrierungen());
+        Notification.show("Registrierung abgelehnt", 3000, Notification.Position.MIDDLE);
     }
 
-    private void approveRegistration(Registrierung registrierung) {
-        try {
-            userService.approveRegistration(registrierung);
-            registrierungDataProvider.refreshAll();
-            Notification.show("User approved and moved to Benutzerverwaltung", 3000, Notification.Position.MIDDLE);
-            emailService.sendAprovedMail(registrierung.getUsername());
-            if (registrierung.getRole() == Role.DOZENT) {
-                Dozent newDozent = new Dozent();
-                newDozent.setAnrede(registrierung.getAnrede());
-                newDozent.setNachname(registrierung.getLastName());
-                newDozent.setVorname(registrierung.getFirstName());
-                newDozent.setFachbereich(registrierung.getFachbereich());
-                newDozent.setAkadTitel(registrierung.getAkadTitel());
-                dozentService.save(newDozent);
-            }
-        } catch (Exception e) {
-            Notification.show("Error approving user: " + e.getMessage(), 3000, Notification.Position.MIDDLE);
-        }
-    }
-
-    private void setupLanguage() {
-        CrudI18n i18n = CrudI18n.createDefault();
-        i18n.setNewItem("Neuer Eintrag");
-        i18n.setEditItem("Bearbeiten");
-        i18n.setSaveItem("Speichern");
-        i18n.setCancel("Abbrechen");
-        i18n.setDeleteItem("Löschen");
-        i18n.setEditLabel("Bearbeiten");
-
-        CrudI18n.Confirmations.Confirmation delete = i18n.getConfirm().getDelete();
-        delete.setTitle("Eintrag löschen");
-        delete.setContent("Sind Sie sicher, dass Sie diesen Eintrag löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.");
-        delete.getButton().setConfirm("Bestätigen");
-        delete.getButton().setDismiss("Zurück");
-
-        CrudI18n.Confirmations.Confirmation cancel = i18n.getConfirm().getCancel();
-        cancel.setTitle("Änderungen verwerfen");
-        cancel.setContent("Sie haben Änderungen an diesem Eintrag vorgenommen, die noch nicht gespeichert wurden.");
-        cancel.getButton().setConfirm("Verwerfen");
-        cancel.getButton().setDismiss("Zurück");
-
-        crud.setI18n(i18n);
-    }
 }
 
 
