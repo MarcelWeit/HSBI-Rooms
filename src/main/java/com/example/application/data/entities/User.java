@@ -8,7 +8,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 
 import java.util.Set;
-
+/**
+ * User Entity, wird für User verwendet, die sich registriert haben.
+ * User können so in einer extra Tabelle gespeichert werden.
+ *
+ * @author Marcel Weithoener,Tim Riechmann
+ */
 @Entity
 @Table(name = "application_user", uniqueConstraints = {
         @UniqueConstraint(columnNames = "username")
@@ -121,5 +126,11 @@ public class User {
     public void setAkadTitel(String akadTitel) {
         this.akadTitel = akadTitel;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
 
 }

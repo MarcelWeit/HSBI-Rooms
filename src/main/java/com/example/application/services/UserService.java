@@ -13,7 +13,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
+/**
+ * Service-Klasse für die Benutzer
+ * *
+ *  * @author Tim Riechmann
+ */
 @Service
 public class UserService {
 
@@ -38,7 +42,7 @@ public class UserService {
     public User update(User entity) {
         return repository.save(entity);
     }
-
+    // Updaten des Passwortes
     public void updatePassword(User user, String newPassword) {
         user.setHashedPassword(passwordEncoder.encode(newPassword));
         update(user);
@@ -54,6 +58,10 @@ public class UserService {
 
     public Page<User> list(Pageable pageable, Specification<User> filter) {
         return repository.findAll(filter, pageable);
+    }
+
+    public User findById(Long id) {
+        return repository.findById(id).orElse(null);
     }
 
     public void delete(User user) {

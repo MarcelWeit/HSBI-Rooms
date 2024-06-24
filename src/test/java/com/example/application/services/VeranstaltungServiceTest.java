@@ -11,7 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -78,7 +81,7 @@ public class VeranstaltungServiceTest {
 
         List<Veranstaltung> returnList = new ArrayList<>(veranstaltungService.findAll());
 
-        assertThat(returnList).isEqualTo(testList);
+        assertThat(returnList).containsExactlyInAnyOrderElementsOf(testList);
 
     }
 }
