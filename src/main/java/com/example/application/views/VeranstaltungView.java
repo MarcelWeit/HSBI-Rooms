@@ -2,7 +2,6 @@ package com.example.application.views;
 
 import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.services.BuchungService;
@@ -50,9 +49,10 @@ public class VeranstaltungView extends VerticalLayout {
 
     /**
      * Konstruktur der Klasse VeranstaltungView
+     *
      * @param veranstaltungService Service zur Kommunikation mit der Datenbank für die Entität Veranstaltung
-     * @param dozentService Service zur Kommunikation mit der Datenbank für die Entität Dozent
-     * @param buchungService Service zur Kommunikation mit der Datenbank für die Entität Buchung
+     * @param dozentService        Service zur Kommunikation mit der Datenbank für die Entität Dozent
+     * @param buchungService       Service zur Kommunikation mit der Datenbank für die Entität Buchung
      */
     public VeranstaltungView(VeranstaltungService veranstaltungService, DozentService dozentService, BuchungService buchungService) {
         this.veranstaltungService = veranstaltungService;
@@ -65,6 +65,7 @@ public class VeranstaltungView extends VerticalLayout {
 
     /**
      * Erstellt einen Komponenten Renderer für die Detail Ansicht der Veranstaltungsdatensätze
+     *
      * @return Komponenten Renderer
      */
     private static ComponentRenderer<VeranstaltungDetailsFormLayout, Veranstaltung> createDetailRenderer() {
@@ -73,6 +74,7 @@ public class VeranstaltungView extends VerticalLayout {
 
     /**
      * Erstellt ein Textfeld zur Filterung von Textbasierten Spalten
+     *
      * @param filterChangeConsumer Consumer für die Filterung
      * @return Textfeld für die Filterung
      */
@@ -118,6 +120,7 @@ public class VeranstaltungView extends VerticalLayout {
     /**
      * Methode zum Selektieren der Filterwerte
      * Es werden nur Filterwerte angezeigt, die den Tabellendaten entsprechen
+     *
      * @param data Alle möglichen Filterwerte
      * @return Modifiziertes Set, welches die selektieren Filterwerte enthält
      */
@@ -131,21 +134,23 @@ public class VeranstaltungView extends VerticalLayout {
 
         Set<?> result = new HashSet<>(Set.copyOf(data));
 
-        for(Object item : data) {
-            if(item instanceof Dozent) {
-                if(!buchungsDozent.contains(item.toString())) {
+        for (Object item : data) {
+            if (item instanceof Dozent) {
+                if (!buchungsDozent.contains(item.toString())) {
                     result.remove(item);
                 }
-            } else if(item instanceof Fachbereich) {
-                if(!buchungsFachbereich.contains(item.toString())) {
+            } else if (item instanceof Fachbereich) {
+                if (!buchungsFachbereich.contains(item.toString())) {
                     result.remove(item);
                 }
             }
         }
         return result;
     }
+
     /**
      * Erstellt die Filter des Grids zum Selektieren von Datensätzen
+     *
      * @param gridDataView Data View für die Veranstaltungen
      */
     private void setupFilters(GridListDataView<Veranstaltung> gridDataView) {
@@ -161,7 +166,7 @@ public class VeranstaltungView extends VerticalLayout {
 
         Consumer<Set<Dozent>> dozentFilterChangeConsumer = vFilter::setDozent;
         MultiSelectComboBox<Dozent> dozentComboBox = new MultiSelectComboBox<>();
-        dozentComboBox.setItems((Set<Dozent>) selectFilterData(dozentService.findAll()));
+        dozentComboBox.setItems((Set<Dozent>) selectFilterData(Set.of(dozentService.findAll())));
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("dozent")).setComponent(dozentComboBox);
 
@@ -204,6 +209,7 @@ public class VeranstaltungView extends VerticalLayout {
 
         /**
          * Setzt die Buchungen des Grids für die jeweilig übergebene Veranstaltung
+         *
          * @param veranstaltung Angeklickte Veranstaltung
          */
         public void linkData(Veranstaltung veranstaltung) {
@@ -226,6 +232,7 @@ public class VeranstaltungView extends VerticalLayout {
 
         /**
          * Konstruktur der Internen Klasse VeranstaltungFilter
+         *
          * @param gridDataView Data View für Veranstaltungen
          */
         public VeranstaltungFilter(GridListDataView<Veranstaltung> gridDataView) {
@@ -260,6 +267,7 @@ public class VeranstaltungView extends VerticalLayout {
 
         /**
          * Realisiert den Abgleich einer Veranstaltung mit den aktuellen Filterwerten
+         *
          * @param v Veranstaltungsdatensatz die abgeglichen werden soll
          * @return boolean Wert ob Veranstaltung Filtern entspricht
          */
@@ -283,7 +291,8 @@ public class VeranstaltungView extends VerticalLayout {
 
         /**
          * Methode zum vergleichen von 2 Strings
-         * @param value Vergleichswert
+         *
+         * @param value      Vergleichswert
          * @param searchTerm Vergleichswert
          * @return boolean Wert ob Werte übereinstimmen
          */
@@ -291,9 +300,11 @@ public class VeranstaltungView extends VerticalLayout {
             return searchTerm == null || searchTerm.isEmpty()
                     || value.toLowerCase().contains(searchTerm.toLowerCase());
         }
+
         /**
          * Methode zum überprüfen ob value im übergebenen Set enthalten ist
-         * @param value Vergleichswert
+         *
+         * @param value      Vergleichswert
          * @param searchTerm Zu überprüfendes Set
          * @return boolean Wert ob value im Set zu finden ist
          */

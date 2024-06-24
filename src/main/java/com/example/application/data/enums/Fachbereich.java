@@ -11,9 +11,7 @@ public enum Fachbereich {
     GESTALTUNG("Gestaltung"),
     SOZIALWESEN("Sozialwesen"),
     INGENIEURWISSENSCHAFTENUNDMATHEMATIK("Ingenieurwissenschaften und Mathematik"),
-    GESUNDHEIT("Gesundheit"),
-    CAMPUSMINDEN("Campus Minden"),
-    CAMPUSGUETERSLOH("Campus Gütersloh");
+    GESUNDHEIT("Gesundheit");
 
     private final String anzeigeName;
 

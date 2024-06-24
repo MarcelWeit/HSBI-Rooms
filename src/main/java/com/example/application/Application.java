@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -72,6 +73,12 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
                 room.addAusstattung(ausstattungRepository.findByBez("Soundanlage").orElse(null));
                 roomRepository.save(room);
             }
+            for (int c = 1; c < 5; c++) {
+                Raum room = new Raum("A" + c, Raumtyp.HOERSAAL, 100, Fachbereich.GESTALTUNG, "Fachbereich Gestaltung Etage 1");
+                room.addAusstattung(ausstattungRepository.findByBez("Pult").orElse(null));
+                room.addAusstattung(ausstattungRepository.findByBez("Kamera").orElse(null));
+                roomRepository.save(room);
+            }
             roomRepository.save(new Raum("C331", Raumtyp.SEMINARRAUM, 60, Fachbereich.WIRTSCHAFT, "Fachbereich Wirtschaft Etage 3"));
         }
         if (userRepository.count() == 0) {
@@ -81,6 +88,10 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             User dozent = new User("jkuester@hsbi.de", "Küster", "Jochen", passwordEncoder.encode("kuester"), Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT, Anrede.HERR,
                     "Prof. Dr.");
             userRepository.save(dozent);
+            User dozentinSoziales = new User("smeier@hsbi.de", "Meier", "Sabine", passwordEncoder.encode("sozial"), Set.of(Role.DOZENT), Fachbereich.SOZIALWESEN,
+                    Anrede.FRAU,
+                    "Prof. Dr. rer. nat.");
+            userRepository.save(dozentinSoziales);
             User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", passwordEncoder.encode("fbplanung"), Set.of(Role.FBPLANUNG), Fachbereich.SOZIALWESEN, Anrede.HERR,
                     "Prof. Dr.");
             userRepository.save(fbplan);
@@ -89,12 +100,24 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             dozentRepository.save(new Dozent(Anrede.HERR, "Wiemann", "Volker", Fachbereich.WIRTSCHAFT, "Prof. Dr. rer. pol., Dipl.-Kfm."));
             dozentRepository.save(new Dozent(Anrede.HERR, "Küster", "Jochen", Fachbereich.WIRTSCHAFT, "Prof. Dr. rer. nat."));
             dozentRepository.save(new Dozent(Anrede.HERR, "Hartel", "Peter", Fachbereich.WIRTSCHAFT, "Prof. Dr.-Ing., Dipl.-Inform."));
+            dozentRepository.save(new Dozent(Anrede.HERR, "Schaefermeier", "Ulrich ", Fachbereich.WIRTSCHAFT, "Prof. Dr. rer. pol."));
+            dozentRepository.save(new Dozent(Anrede.FRAU, "Rau", "Meiken", Fachbereich.GESTALTUNG, "Prof. Dipl.-Des."));
+            dozentRepository.save(new Dozent(Anrede.FRAU, "Meier", "Sabine", Fachbereich.SOZIALWESEN, "Prof. Dr. rer. nat."));
+            dozentRepository.save(new Dozent(Anrede.FRAU, "Peters", "Ulrike", Fachbereich.GESUNDHEIT, "Dr. rer. pol."));
+            dozentRepository.save(new Dozent(Anrede.FRAU, "Engelnicht", "Anke", Fachbereich.INGENIEURWISSENSCHAFTENUNDMATHEMATIK, "Prof. Dr.-Ing."));
+
         }
         if (veranstaltungRepository.count() == 0) {
-            Optional<Dozent> dozentKuester = dozentRepository.findByNachname("Küster");
-            Optional<Dozent> dozentWiemann = dozentRepository.findByNachname("Wiemann");
-            dozentKuester.ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozent, 100, Fachbereich.WIRTSCHAFT)));
-            dozentWiemann.ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozent, 120, Fachbereich.WIRTSCHAFT)));
+            dozentRepository.findByNachname("Küster").ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CFR23", "Software Engineering", dozent, 100, Fachbereich.WIRTSCHAFT)));
+            dozentRepository.findByNachname("Wiemann").ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CGRH26", "Internes Rechnungswesen", dozent, 120, Fachbereich.WIRTSCHAFT)));
+            dozentRepository.findByNachname("Hartel").ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CGRH27", "Datenbanken", dozent, 120,
+                    Fachbereich.WIRTSCHAFT)));
+            dozentRepository.findByNachname("Schäfermeier").ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("CGRH28", "Wirtschaftsinformatik",
+                    dozent, 120, Fachbereich.WIRTSCHAFT)));
+            dozentRepository.findByNachname("Rau").ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("AGRH29", "Grafikdesign", dozent, 120, Fachbereich.GESTALTUNG)));
+            dozentRepository.findByNachname("Meier").ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("AGRH30", "Sozialpsychologie", dozent, 120, Fachbereich.SOZIALWESEN)));
+            dozentRepository.findByNachname("Peters").ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("AGRH31", "Gesundheitsökonomie", dozent, 120, Fachbereich.GESUNDHEIT)));
+            dozentRepository.findByNachname("Engelnicht").ifPresent(dozent -> veranstaltungRepository.save(new Veranstaltung("AGRH32", "Mathematik", dozent, 120, Fachbereich.INGENIEURWISSENSCHAFTENUNDMATHEMATIK)));
         }
         if (registrationRepository.count() == 0) {
             Registrierung r = new Registrierung("register@gmail.com", "Meyer", "Sabine", "", Role.DOZENT, Fachbereich.WIRTSCHAFT, Anrede.FRAU, "Prof. Dr.");
@@ -102,16 +125,21 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             registrationRepository.save(r);
         }
         if (buchungRepository.count() == 0) {
-            Optional<Raum> raum = roomRepository.findByRefNr("C331");
-            Optional<Veranstaltung> veranstaltung = veranstaltungRepository.findById("CFR23");
+            Optional<Raum> raum = roomRepository.findByRefNr("C1");
+            List<Veranstaltung> veranstaltungen = veranstaltungRepository.findAll();
             Optional<Dozent> dozent = dozentRepository.findByNachname("Küster");
-            if (raum.isPresent() && veranstaltung.isPresent() && dozent.isPresent()) {
-                LocalDate date = LocalDate.of(2024, 4, 3);
-                while (date.isBefore(LocalDate.of(2024, 6, 28))) {
-                    buchungRepository.save(new Buchung(date, Zeitslot.EINS, raum.get(), veranstaltung.get(), dozent.get()));
-                    date = date.plusDays(7);
+            if (raum.isPresent() && dozent.isPresent()) {
+                LocalDate date = LocalDate.of(2024, 5, 1);
+                while (date.isBefore(LocalDate.of(2024, 6, 1))) {
+                    int count = 0;
+                    for (Zeitslot zeitslot : Zeitslot.values()) {
+                        buchungRepository.save(new Buchung(date, zeitslot, raum.get(), veranstaltungen.get(count), dozent.get()));
+                        count++;
+                    }
+                    date = date.plusDays(1);
                 }
             }
         }
+        System.out.println("Datenbank initialisiert");
     }
 }

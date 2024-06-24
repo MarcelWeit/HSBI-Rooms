@@ -27,20 +27,18 @@ public class Dozent {
     public Dozent() {
     }
 
-    public Dozent(Anrede anrede, String nachname, String vorname, Fachbereich fachbereich, String akad_titel) {
-        this.anrede = anrede;
-        this.nachname = nachname;
-        this.vorname = vorname;
-        this.fachbereich = fachbereich;
-        this.akad_titel = akad_titel;
-    }
-
     public Dozent(Anrede anrede, String nachname, String vorname, Fachbereich fachbereich, String akadTitel) {
         this.anrede = anrede;
         this.nachname = nachname;
         this.vorname = vorname;
         this.fachbereich = fachbereich;
         this.akadTitel = akadTitel;
+    }
+
+    public Dozent(String nachname, String vorname, Fachbereich fachbereich) {
+        this.nachname = nachname;
+        this.vorname = vorname;
+        this.fachbereich = fachbereich;
     }
 
     public Anrede getAnrede() {
@@ -94,6 +92,6 @@ public class Dozent {
 
     @Override
     public String toString() {
-        return anrede + " " + akadTitel + " " + nachname;
+        return anrede + " " + akadTitel + " " + vorname + " " + nachname;
     }
 }
