@@ -65,21 +65,26 @@ public class FreischaltenView extends VerticalLayout {
 
     // Methode zur Freischaltung der Registrierung
     public void approveRegistration(Registrierung registrierung) {
-        User user = new User();
-        user.setUsername(registrierung.getUsername());
-        user.setFirstName(registrierung.getFirstName());
-        user.setLastName(registrierung.getLastName());
-        user.setHashedPassword(registrierung.getHashedPassword());
-        user.setRoles(Set.of(registrierung.getRole()));
-        user.setFachbereich(registrierung.getFachbereich());
-        user.setAnrede((registrierung.getAnrede()));
-        user.setAkadTitel((registrierung.getAkadTitel()));
+        User existingUser = userService.findByUsername(registrierung.getUsername());
+        if (existingUser != null) {
+            Notification.show("Benutzer existiert bereits", 3000, Notification.Position.MIDDLE);
+        } else {
+            User user = new User();
+            user.setUsername(registrierung.getUsername());
+            user.setFirstName(registrierung.getFirstName());
+            user.setLastName(registrierung.getLastName());
+            user.setHashedPassword(registrierung.getHashedPassword());
+            user.setRoles(Set.of(registrierung.getRole()));
+            user.setFachbereich(registrierung.getFachbereich());
+            user.setAnrede((registrierung.getAnrede()));
+            user.setAkadTitel((registrierung.getAkadTitel()));
 
-        userService.save(user);
-        registrationService.delete(registrierung);
-        grid.setItems(registrationService.findAllRegistrierungen());
-        //Notification
-        Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
+            userService.save(user);
+            registrationService.delete(registrierung);
+            grid.setItems(registrationService.findAllRegistrierungen());
+            //Notification
+            Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
+        }
     }
     // Methode zum Löschen der Registrierung
     private void deleteRegistration(Registrierung registrierung) {
