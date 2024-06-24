@@ -41,12 +41,6 @@ public class Dozent {
         this.fachbereich = fachbereich;
     }
 
-    public Dozent(String nachname, String vorname, Fachbereich fachbereich) {
-        this.nachname = nachname;
-        this.vorname = vorname;
-        this.fachbereich = fachbereich;
-    }
-
     public Anrede getAnrede() {
         return anrede;
     }
