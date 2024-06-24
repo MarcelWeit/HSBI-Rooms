@@ -9,7 +9,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -19,7 +18,6 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
@@ -57,19 +55,19 @@ public class Startseite extends VerticalLayout {
         H2 h2;
         if (authenticatedUser.get().isPresent()) {
             User currentUser = authenticatedUser.get().get();
-            h2 = new H2("Hallo " + currentUser.getFirstName() + " " + currentUser.getLastName() + "!");
+            h2 = new H2("Hallo " + currentUser.getAnrede() + " " + currentUser.getAkadTitel() + " " + currentUser.getFirstName() + " " + currentUser.getLastName() + "!");
         } else {
             h2 = new H2("Hallo !");
         }
-        H3 h3 = new H3("Herzlich Willkommen bei dem Raumplanungstool der HSBI");
+        H3 h3 = new H3("Herzlich Willkommen bei dem Raumplanungstool der HSBI.");
 
-        Span dateSpan = new Span("Heutiges Datum: " + today.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        dateSpan.getStyle().set("border", "1px solid white");
-        dateSpan.getStyle().set("padding", "10px");
-
-        Span weekSpan = new Span("Kalenderwoche: " + weekNumber);
-        weekSpan.getStyle().set("border", "1px solid white");
-        weekSpan.getStyle().set("padding", "10px");
+        //        Span dateSpan = new Span("Heutiges Datum: " + today.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        //        dateSpan.getStyle().set("border", "1px solid white");
+        //        dateSpan.getStyle().set("padding", "10px");
+        //
+        //        Span weekSpan = new Span("Kalenderwoche: " + weekNumber);
+        //        weekSpan.getStyle().set("border", "1px solid white");
+        //        weekSpan.getStyle().set("padding", "10px");
 
         Button buchungAnlegen = new Button("Buchung anlegen", click -> {
             Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, null, null, raumService, dozentService, buchungService, veranstaltungService,
@@ -82,10 +80,11 @@ public class Startseite extends VerticalLayout {
             showBookingsDialog.open();
         });
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
+        //        HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
         HorizontalLayout buchungButtons = new HorizontalLayout(buchungAnlegen, eigeneBuchungen);
 
-        add(h2, h3, horizontalLayout, buchungButtons);
+        //        add(h2, h3, horizontalLayout, buchungButtons);
+        add(h2, h3, buchungButtons);
     }
 
 }

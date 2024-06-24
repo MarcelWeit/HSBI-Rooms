@@ -21,7 +21,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElem
 
 @SpringBootTest(classes = {com.example.application.Application.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class RaumViewIT {
+public class RaumViewTest {
 
     private WebDriver driver;
 
