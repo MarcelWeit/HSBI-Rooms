@@ -21,18 +21,18 @@ public class Dozent {
     private String nachname;
     private String vorname;
     private Fachbereich fachbereich;
-    private String akad_titel;
+    private String akadTitel;
 
     // Konstruktor
     public Dozent() {
     }
 
-    public Dozent(Anrede anrede, String nachname, String vorname, Fachbereich fachbereich, String akad_titel) {
+    public Dozent(Anrede anrede, String nachname, String vorname, Fachbereich fachbereich, String akadTitel) {
         this.anrede = anrede;
         this.nachname = nachname;
         this.vorname = vorname;
         this.fachbereich = fachbereich;
-        this.akad_titel = akad_titel;
+        this.akadTitel = akadTitel;
     }
 
     public Dozent(String nachname, String vorname, Fachbereich fachbereich) {
@@ -82,16 +82,16 @@ public class Dozent {
         this.fachbereich = fachbereich;
     }
 
-    public String getAkad_titel() {
-        return akad_titel;
+    public String getAkadTitel() {
+        return akadTitel;
     }
 
-    public void setAkad_titel(String akad_titel) {
-        this.akad_titel = akad_titel;
+    public void setAkadTitel(String akadTitel) {
+        this.akadTitel = akadTitel;
     }
 
     @Override
     public String toString() {
-        return nachname + ", " + vorname;
+        return anrede + " " + akadTitel + " " + vorname + " " + nachname;
     }
 }

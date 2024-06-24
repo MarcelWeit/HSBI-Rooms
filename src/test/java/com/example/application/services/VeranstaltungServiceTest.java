@@ -38,7 +38,6 @@ public class VeranstaltungServiceTest {
 
         Veranstaltung returnData = veranstaltungService.save(testData);
 
-
         assertThat(returnData).isNotNull();
         assertThat(returnData).isEqualTo(testData);
     }

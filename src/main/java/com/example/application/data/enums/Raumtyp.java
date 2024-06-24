@@ -9,7 +9,9 @@ public enum Raumtyp {
     SEMINARRAUM("Seminarraum"),
     HOERSAAL("Hörsaal"),
     RECHNERRAUM("Rechnerraum"),
-    BESPRECHUNGSRAUM("Besprechungsraum");
+    BESPRECHUNGSRAUM("Besprechungsraum"),
+    LABOR("Labor"),
+    KONFERENZRAUM("Konferenzraum");
 
     private final String anzeigeName;
 

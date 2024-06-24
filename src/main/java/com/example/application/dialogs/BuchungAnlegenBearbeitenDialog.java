@@ -29,7 +29,6 @@ import com.vaadin.flow.data.binder.Binder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,11 +39,13 @@ import java.util.Optional;
  */
 public class BuchungAnlegenBearbeitenDialog extends Dialog {
 
+    // Services
     private final RaumService roomService;
     private final DozentService dozentService;
     private final BuchungService buchungService;
     private final VeranstaltungService veranstaltungService;
 
+    // UI
     private final Binder<Buchung> binder = new Binder<>(Buchung.class);
     private final ComboBox<Raum> raum = new ComboBox<>("Raumnummer");
     private final ComboBox<Veranstaltung> veranstaltung = new ComboBox<>("Veranstaltung");
@@ -56,11 +57,12 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
     private final DatePicker endDatum = new DatePicker("Letzter Buchungstag");
     private final ComboBox<Zeitslot> zeitslot = new ComboBox<>("Zeitslot");
 
+    // Variablen
     private final Buchung selectedBuchung;
     private final Raum selectedRoom;
     private final Veranstaltung selectedVeranstaltung;
-
     private final AuthenticatedUser currentUser;
+    private final Buchung initialBuchung;
 
     public BuchungAnlegenBearbeitenDialog(Buchung selectedBuchung, Raum selectedRoom, Veranstaltung selectedVeranstaltung, RaumService roomService,
                                           DozentService dozentService, BuchungService buchungService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
@@ -72,6 +74,8 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
         this.selectedRoom = selectedRoom;
         this.selectedVeranstaltung = selectedVeranstaltung;
         this.currentUser = currentUser;
+
+        initialBuchung = selectedBuchung != null ? new Buchung(selectedBuchung) : null;
 
         add(createInputLayout());
         createButtonLayout();
@@ -134,26 +138,31 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
         wiederholungsintervallRadioButtonGroup.setId("radiogroup-wiederholungsintervall");
         endDatum.setId("datepicker-enddate");
 
-        binder.forField(raum).asRequired("Bitte wählen Sie einem Raum aus").bind(Buchung::getRoom, Buchung::setRoom);
-        binder.forField(veranstaltung).asRequired().bind(Buchung::getVeranstaltung, Buchung::setVeranstaltung);
-        binder.forField(dozent).asRequired().bind(Buchung::getDozent, Buchung::setDozent);
-        binder.forField(date).asRequired().bind(Buchung::getDate, Buchung::setDate);
+        binder.forField(raum)
+                .asRequired("Bitte wählen Sie einem Raum aus").bind(Buchung::getRoom, Buchung::setRoom);
+        binder.forField(veranstaltung).asRequired("Bitte wählen Sie eine Veranstaltung aus").bind(Buchung::getVeranstaltung, Buchung::setVeranstaltung);
+        binder.forField(dozent).asRequired("Bitte wählen Sie einen Dozent aus").bind(Buchung::getDozent, Buchung::setDozent);
+        binder.forField(date).asRequired("Bitte wählen Sie ein Datum aus").bind(Buchung::getDate, Buchung::setDate);
 
+        // Buchung bearbeiten
         if (selectedBuchung != null) {
-            binder.forField(zeitslot).asRequired()
+            binder.forField(zeitslot).asRequired("Bitte wählen Sie einen Zeitslot aus")
                     .bind(Buchung::getZeitslot, Buchung::setZeitslot);
             binder.readBean(selectedBuchung);
-            zeitslot.setEnabled(false);
         } else {
-            binder.forField(zeitslot).asRequired()
-                    .withValidator(event -> !buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue()), "Raum bereits belegt")
+            binder.forField(zeitslot).asRequired("Bitte wählen Sie einen Zeitslot aus")
+                    .withValidator(event -> !buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue()), "Zeitslot bereits belegt")
                     .bind(Buchung::getZeitslot, Buchung::setZeitslot);
+            binder.forField(raum)
+                    .withValidator(event -> !buchungService.roomBooked(raum.getValue(), zeitslot.getValue(), date.getValue()), "Raum bereits belegt");
         }
+        // Einstieg in Dialog über Raum
         if (selectedRoom != null) {
             raum.setValue(selectedRoom);
             raum.setEnabled(false);
             zeitslot.setEnabled(true);
         }
+        // Einstieg in Dialog über Veranstaltung
         if (selectedVeranstaltung != null) {
             veranstaltung.setValue(selectedVeranstaltung);
             veranstaltung.setEnabled(false);
@@ -194,11 +203,9 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
     private boolean validateAndSave() {
         Wiederholungsintervall wiederholungsintervall = wiederholungsintervallRadioButtonGroup.getValue();
         Buchung firstBuchung;
-        if (selectedBuchung != null) {
-            firstBuchung = selectedBuchung;
-        } else {
-            firstBuchung = new Buchung();
-        }
+        firstBuchung = selectedBuchung != null ? selectedBuchung : new Buchung();
+
+        // Wenn eine Buchung ausgewählt wurde, werden hier die Binder zur Belegung nicht geprüft, da die Validation nicht hinzufügt wurden.
         if (binder.writeBeanIfValid(firstBuchung)) {
             if (currentUser.get().isPresent()) {
                 firstBuchung.setUser(currentUser.get().get());
@@ -207,8 +214,20 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
             Notification.show("Bitte alle Felder korrekt befüllen", 4000, Notification.Position.MIDDLE);
             return false;
         }
-        // Erste Buchung wird immer gespeichert, wenn alle Binder erfolgreich
+
+        // Erste Buchung wird immer gespeichert, wenn alle Binder erfolgreich.
+        // Wenn eine Buchung gewählt wurde, werden nur die Felder aktualisiert, die geändert wurden.
+        // Wiederholungsintervall ist automatisch einmalig, wenn Buchung geändert wird.
         if (wiederholungsintervall == Wiederholungsintervall.EINMALIG) {
+            if (selectedBuchung != null) {
+                // Veranstaltung und Dozent können geändert werden
+                if (initialBuchung.getZeitslot() != firstBuchung.getZeitslot() || !initialBuchung.getDate().equals(firstBuchung.getDate()) || initialBuchung.getRoom() != firstBuchung.getRoom()) {
+                    if (buchungService.roomBooked(firstBuchung.getRoom(), firstBuchung.getZeitslot(), firstBuchung.getDate())) {
+                        Notification.show("Der Raum ist bereits belegt", 4000, Notification.Position.MIDDLE);
+                        return false;
+                    }
+                }
+            }
             buchungService.save(firstBuchung);
             Notification sucessNotification = Notification.show("Buchung gespeichert", 4000, Notification.Position.MIDDLE);
             sucessNotification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -217,6 +236,7 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
         // Wiederholungsintervall soll bei existierenden Buchungen nicht beachtet werden, sondern immer nur die einzelne Buchung wird geändert
         if (selectedBuchung == null) {
             if (wiederholungsintervall == Wiederholungsintervall.WOECHENTLICH || wiederholungsintervall == Wiederholungsintervall.TAEGLICH || wiederholungsintervall == Wiederholungsintervall.JAEHRLICH) {
+                // Buchungen werden erst in einer Liste gespeichert und dann wird geschaut welche Konflikte auftreten
                 List<Buchung> gespeicherteBuchungen = new ArrayList<>();
                 gespeicherteBuchungen.add(firstBuchung);
                 LocalDate currentDate = firstBuchung.getDate();
@@ -234,6 +254,8 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                         currentDate = currentDate.plusYears(1); // wiederholungsintervall jährlich
                     }
                 }
+                // Gibt es einen Konflikt bei einer Buchung in den gespeicherten Buchungen?
+                // Dialog mit allen Konflikten wird angezeigt, wenn es Konflikte gibt
                 boolean fehlerBeiBuchung = false;
                 String fehlertext = "Der " + raum.getValue() + " ist bereits an folgenden Terminen belegt: \n";
                 for (Buchung buchung : gespeicherteBuchungen) {
@@ -258,6 +280,7 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                     errorDialog.open();
                     return false;
                 } else {
+                    // Keine Fehler -> Alle Buchungen speichern
                     for (Buchung buchung : gespeicherteBuchungen) {
                         buchungService.save(buchung);
                     }

@@ -185,22 +185,22 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
     private void openDeleteDialog() {
         Optional<User> selectedUser = userGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedUser.isEmpty()) {
-            Notification.show("Please select a user", 2000, Notification.Position.MIDDLE);
+            Notification.show("Bitte einen User Auswählen", 2000, Notification.Position.MIDDLE);
         } else {
             ConfirmDialog confirmDeleteDialog = new ConfirmDialog();
-            confirmDeleteDialog.setHeader("Delete user " + selectedUser.get().getUsername() + "?");
-            confirmDeleteDialog.setText("This action cannot be undone.");
+            confirmDeleteDialog.setHeader("User " + selectedUser.get().getUsername() + " löschen?");
+            confirmDeleteDialog.setText("Diese Aktion kann nicht rückgängig gemacht werden.");
 
             confirmDeleteDialog.setCancelable(true);
             confirmDeleteDialog.setConfirmButtonTheme("error primary");
 
-            confirmDeleteDialog.setConfirmButton("Delete", event -> {
+            confirmDeleteDialog.setConfirmButton("Löschen", event -> {
                 userService.delete(selectedUser.get());
                 userGrid.setItems(userService.findAll());
                 confirmDeleteDialog.close();
             });
 
-            confirmDeleteDialog.setCancelButton("Cancel", event -> confirmDeleteDialog.close());
+            confirmDeleteDialog.setCancelButton("Abbrechen", event -> confirmDeleteDialog.close());
 
             confirmDeleteDialog.open();
         }

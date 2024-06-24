@@ -28,7 +28,6 @@ import com.vaadin.flow.data.provider.SortDirection;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -150,8 +149,6 @@ public class BuchungenAnzeigenDialog extends Dialog {
         datePicker.setClearButtonVisible(true);
         datePicker.addValueChangeListener(e -> dateFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(raumBuchungGrid.getColumnByKey("date")).setComponent(datePicker);
-
-        //@todo filter zeitslot
     }
 
     private void openEditDialog() {

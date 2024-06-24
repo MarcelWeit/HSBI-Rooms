@@ -29,6 +29,7 @@ public class VeranstaltungService {
     public Set<Veranstaltung> findAllByDozent(Dozent dozent) {
         return Set.copyOf(repository.findAllByDozent(dozent));
     }
+    
     public Optional<Veranstaltung> findById(String id) {
         return repository.findById(id);
     }

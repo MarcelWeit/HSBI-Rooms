@@ -18,7 +18,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
-
 import java.util.Set;
 /**
  * View zur Freischaltung von Benutzern aus der Registrierung
@@ -75,15 +74,19 @@ public class FreischaltenView extends VerticalLayout {
 
     // Methode zur Freischaltung der Registrierung
     public void approveRegistration(Registrierung registrierung) {
-        User user = new User();
-        user.setUsername(registrierung.getUsername());
-        user.setFirstName(registrierung.getFirstName());
-        user.setLastName(registrierung.getLastName());
-        user.setHashedPassword(registrierung.getHashedPassword());
-        user.setRoles(Set.of(registrierung.getRole()));
-        user.setFachbereich(registrierung.getFachbereich());
-        user.setAnrede((registrierung.getAnrede()));
-        user.setAkadTitel((registrierung.getAkadTitel()));
+        User existingUser = userService.findByUsername(registrierung.getUsername());
+        if (existingUser != null) {
+            Notification.show("Benutzer existiert bereits", 3000, Notification.Position.MIDDLE);
+        } else {
+            User user = new User();
+            user.setUsername(registrierung.getUsername());
+            user.setFirstName(registrierung.getFirstName());
+            user.setLastName(registrierung.getLastName());
+            user.setHashedPassword(registrierung.getHashedPassword());
+            user.setRoles(Set.of(registrierung.getRole()));
+            user.setFachbereich(registrierung.getFachbereich());
+            user.setAnrede((registrierung.getAnrede()));
+            user.setAkadTitel((registrierung.getAkadTitel()));
 
         userService.save(user);
 
