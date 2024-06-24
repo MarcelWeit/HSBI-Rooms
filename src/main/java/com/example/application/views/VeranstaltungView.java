@@ -2,7 +2,6 @@ package com.example.application.views;
 
 import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.entities.Raum;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.services.BuchungService;
@@ -161,7 +160,7 @@ public class VeranstaltungView extends VerticalLayout {
 
         Consumer<Set<Dozent>> dozentFilterChangeConsumer = vFilter::setDozent;
         MultiSelectComboBox<Dozent> dozentComboBox = new MultiSelectComboBox<>();
-        dozentComboBox.setItems((Set<Dozent>) selectFilterData(dozentService.findAll()));
+//        dozentComboBox.setItems((Set<Dozent>) selectFilterData(dozentService.findAll()));
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("dozent")).setComponent(dozentComboBox);
 

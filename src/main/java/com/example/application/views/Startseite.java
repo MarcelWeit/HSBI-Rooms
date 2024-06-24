@@ -91,12 +91,12 @@ public class Startseite extends VerticalLayout {
             showBookingsDialog.open();
         });
 
-        FullCalendar fullCalendar = createCalendar();
+//        FullCalendar fullCalendar = createCalendar();
 
         HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
         HorizontalLayout buchungButtons = new HorizontalLayout(buchungAnlegen, eigeneBuchungen);
 
-        add(h2, h3, horizontalLayout, buchungButtons, fullCalendar);
+        add(h2, h3, horizontalLayout, buchungButtons);
     }
 
     public FullCalendar createCalendar() {

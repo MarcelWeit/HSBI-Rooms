@@ -7,13 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
-/**
- * Service für die Entität Dozent
- *
- * @author Gabriel Greb
- */
 
 @Service
 public class DozentService {
@@ -24,9 +17,6 @@ public class DozentService {
         this.repository = repository;
     }
 
-    public List<Dozent> findAll() {
-        return repository.findAll();
-
     public Dozent save(Dozent entity) {
         return repository.save(entity);
     }
@@ -35,12 +25,35 @@ public class DozentService {
         return repository.existsById(id);
     }
 
-    public Optional<Dozent> findByVornameAndNachname(String vorname, String nachname) {
-        return repository.findByVornameAndNachname(vorname, nachname);
+    public List<Dozent> findAll() {
+        return repository.findAll();
     }
 
     public void delete(Dozent dozent) {
         repository.delete(dozent);
+    }
+
+    public long count() {
+        return repository.count();
+    }
+
+    public Dozent findById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    public Optional<Dozent> findByNachname(String nachname) {
+        return repository.findByNachname(nachname);
+    }
+    public List<Dozent> findAllByNachname(String nachname) {
+        return repository.findAllByNachname(nachname);
+    }
+
+    public Optional<Dozent> findByVornameAndNachname(String vorname, String nachname) {
+        return repository.findByVornameAndNachname(vorname, nachname);
+    }
+
+    public List<Dozent> findByFachbereich(Fachbereich fachbereich) {
+        return repository.findByFachbereich(fachbereich);
     }
 }
 
