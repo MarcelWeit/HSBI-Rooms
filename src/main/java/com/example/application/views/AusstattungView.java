@@ -32,7 +32,7 @@ import java.util.Set;
 
 @Route(value = "show-ausstattung", layout = MainLayout.class)
 @PageTitle("Ausstattung")
-@RolesAllowed({"ADMIN", "FBPLANUNG", "DOZENT"})
+@RolesAllowed({"ADMIN", "FBPLANUNG"})
 @Uses(Icon.class)
 public class AusstattungView extends VerticalLayout {
 

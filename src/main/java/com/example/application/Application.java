@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
+ * @Author Marcel Weithoener
+ * wird beim Start der Anwendung ausgeführt und initialisiert die Datenbank mit Testdaten
  * The entry point of the Spring Boot application.
  * Use the @PWA annotation make the application installable on phones, tablets
  * and some desktop browsers.
