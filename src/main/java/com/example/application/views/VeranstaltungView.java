@@ -161,7 +161,7 @@ public class VeranstaltungView extends VerticalLayout {
 
         Consumer<Set<Dozent>> dozentFilterChangeConsumer = vFilter::setDozent;
         MultiSelectComboBox<Dozent> dozentComboBox = new MultiSelectComboBox<>();
-        dozentComboBox.setItems((Set<Dozent>) selectFilterData(dozentService.findAll()));
+        dozentComboBox.setItems((Set<Dozent>) selectFilterData(Set.copyOf(dozentService.findAll())));
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("dozent")).setComponent(dozentComboBox);
 
