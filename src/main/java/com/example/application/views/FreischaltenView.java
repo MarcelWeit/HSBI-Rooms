@@ -1,9 +1,14 @@
 package com.example.application.views;
 
+import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.User;
+import com.example.application.data.enums.Role;
+import com.example.application.services.EmailService;
 import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
+import com.example.application.services.EmailService;
+import com.example.application.services.DozentService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
@@ -12,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+
 
 import java.util.Set;
 /**
@@ -27,10 +33,14 @@ public class FreischaltenView extends VerticalLayout {
     private final Grid<Registrierung> grid;
     private final RegistrationService registrationService;
     private final UserService userService;
+    private final EmailService emailService;
+    private final DozentService dozentService;
 
-    public FreischaltenView(RegistrationService registrationService, UserService userService) {
+    public FreischaltenView(RegistrationService registrationService, UserService userService, EmailService emailService, DozentService dozentService) {
         this.registrationService = registrationService;
         this.userService = userService;
+        this.emailService = emailService;
+        this.dozentService = dozentService;
         this.grid = new Grid<>(Registrierung.class, false);
         setupGrid();
         grid.setItems(registrationService.findAllRegistrierungen());
@@ -76,6 +86,19 @@ public class FreischaltenView extends VerticalLayout {
         user.setAkadTitel((registrierung.getAkadTitel()));
 
         userService.save(user);
+
+        emailService.sendAprovedMail(registrierung.getUsername());
+
+        if (registrierung.getRole() == Role.DOZENT) {
+            Dozent newDozent = new Dozent();
+            newDozent.setAnrede(registrierung.getAnrede());
+            newDozent.setNachname(registrierung.getLastName());
+            newDozent.setVorname(registrierung.getFirstName());
+            newDozent.setFachbereich(registrierung.getFachbereich());
+            newDozent.setAkad_titel(registrierung.getAkadTitel());
+            dozentService.save(newDozent);
+        }
+
         registrationService.delete(registrierung);
         grid.setItems(registrationService.findAllRegistrierungen());
         //Notification
