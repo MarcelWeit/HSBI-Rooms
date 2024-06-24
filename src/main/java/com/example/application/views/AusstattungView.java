@@ -29,6 +29,7 @@ import java.util.Set;
  *
  * @author Marcel Weithoener
  */
+
 @Route(value = "show-ausstattung", layout = MainLayout.class)
 @PageTitle("Ausstattung")
 @RolesAllowed({"ADMIN", "FBPLANUNG"})

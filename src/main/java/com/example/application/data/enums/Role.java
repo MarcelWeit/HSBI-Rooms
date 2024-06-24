@@ -9,4 +9,5 @@ public enum Role {
     DOZENT,
     ADMIN,
     FBPLANUNG
+
 }

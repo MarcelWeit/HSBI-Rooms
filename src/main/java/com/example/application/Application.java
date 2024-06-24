@@ -17,8 +17,9 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @author Marcel Weithoener
- * wird bei Start der Anwendung ausgeführt und initialisiert die Datenbank mit Testdaten.
+ * @Author Marcel Weithoener
+ *
+ * Wird bei dem Start der Anwendung ausgeführt und initialisiert die Datenbank mit Testdaten.
  */
 @SpringBootApplication
 @Theme(value = "raumbuchung")

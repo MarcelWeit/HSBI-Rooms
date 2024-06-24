@@ -21,11 +21,9 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
     private final UserService userService;
     private final List<User> users;
     private Consumer<Long> sizeChangeListener;
-    private final boolean fetchLockedUsers;
 
     public UserDataProvider(UserService userService, boolean fetchLockedUsers) {
         this.userService = userService;
-        this.fetchLockedUsers = fetchLockedUsers;
         users = new ArrayList<>(userService.findAll());
     }
 
@@ -42,7 +40,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
                     }
                 }).reduce(Predicate::and).orElse(e -> true);
     }
-
+    // Sortieren der Daten
     private static Comparator<User> comparator(CrudFilter filter) {
         return filter.getSortOrders().entrySet().stream().map(sortClause -> {
             try {
@@ -60,7 +58,7 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
             }
         }).reduce(Comparator::thenComparing).orElse((o1, o2) -> 0);
     }
-
+    // Wert des Feldes
     private static Object valueOf(String fieldName, User user) {
         try {
             Field field = User.class.getDeclaredField(fieldName);
@@ -70,14 +68,13 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
             throw new RuntimeException(ex);
         }
     }
-
+    // Fetchen der Daten
     @Override
     protected Stream<User> fetchFromBackEnd(Query<User, CrudFilter> query) {
         int offset = query.getOffset();
         int limit = query.getLimit();
 
         Stream<User> stream = users.stream();
-     //           .filter(user -> user.isLocked() == fetchLockedUsers);  // Filter by locked status
 
         if (query.getFilter().isPresent()) {
             stream = stream.filter(predicate(query.getFilter().get()))
@@ -102,31 +99,26 @@ public class UserDataProvider extends AbstractBackEndDataProvider<User, CrudFilt
         sizeChangeListener = listener;
     }
 
+    // Speichen eines neuen Nutzers
     public void save(User user) {
         Optional<User> existingUser = users.stream()
                 .filter(u -> u.getId().equals(user.getId()))
                 .findFirst();
 
         if (existingUser.isPresent()) {
-            // Update existing user
+            // Existierenden User Updaten
             User userToUpdate = existingUser.get();
             userToUpdate.setFirstName(user.getFirstName());
             userToUpdate.setLastName(user.getLastName());
             userToUpdate.setUsername(user.getUsername());
             userToUpdate.setFachbereich(user.getFachbereich());
             userToUpdate.setRoles(user.getRoles());
-            //userToUpdate.setLocked(user.isLocked());
             userService.update(userToUpdate);
         } else {
             // Save new user
             userService.save(user);
             users.add(user);
         }
-    }
-
-    public void approveUser(User user) {
-        //user.setLocked(false);
-        save(user);
     }
 
     Optional<User> find(String username) {
