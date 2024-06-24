@@ -88,24 +88,25 @@ public class FreischaltenView extends VerticalLayout {
             user.setAnrede((registrierung.getAnrede()));
             user.setAkadTitel((registrierung.getAkadTitel()));
 
-        userService.save(user);
+            userService.save(user);
 
-        emailService.sendAprovedMail(registrierung.getUsername());
+            emailService.sendAprovedMail(registrierung.getUsername());
 
-        if (registrierung.getRole() == Role.DOZENT) {
-            Dozent newDozent = new Dozent();
-            newDozent.setAnrede(registrierung.getAnrede());
-            newDozent.setNachname(registrierung.getLastName());
-            newDozent.setVorname(registrierung.getFirstName());
-            newDozent.setFachbereich(registrierung.getFachbereich());
-            newDozent.setAkad_titel(registrierung.getAkadTitel());
-            dozentService.save(newDozent);
+            if (registrierung.getRole() == Role.DOZENT) {
+                Dozent newDozent = new Dozent();
+                newDozent.setAnrede(registrierung.getAnrede());
+                newDozent.setNachname(registrierung.getLastName());
+                newDozent.setVorname(registrierung.getFirstName());
+                newDozent.setFachbereich(registrierung.getFachbereich());
+                newDozent.setAkadTitel(registrierung.getAkadTitel());
+                dozentService.save(newDozent);
+            }
+
+            registrationService.delete(registrierung);
+            grid.setItems(registrationService.findAllRegistrierungen());
+            //Notification
+            Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
         }
-
-        registrationService.delete(registrierung);
-        grid.setItems(registrationService.findAllRegistrierungen());
-        //Notification
-        Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
     }
     // Methode zum Löschen der Registrierung
     private void deleteRegistration(Registrierung registrierung) {
