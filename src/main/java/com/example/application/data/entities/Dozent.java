@@ -35,6 +35,12 @@ public class Dozent {
         this.akad_titel = akad_titel;
     }
 
+    public Dozent(String nachname, String vorname, Fachbereich fachbereich) {
+        this.nachname = nachname;
+        this.vorname = vorname;
+        this.fachbereich = fachbereich;
+    }
+
     public Anrede getAnrede() {
         return anrede;
     }

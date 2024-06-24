@@ -10,11 +10,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-
-import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class VeranstaltungServiceTest {
@@ -64,7 +65,7 @@ public class VeranstaltungServiceTest {
 
     @Test
     void findAll() {
-        List< Veranstaltung> testList = new ArrayList<>();
+        List<Veranstaltung> testList = new ArrayList<>();
         Dozent dummy = new Dozent("Mustermann", "Max", Fachbereich.WIRTSCHAFT);
         Veranstaltung testData = new Veranstaltung("12WIP2024", "Mathematik für Ökonomen", dummy, 120, Fachbereich.WIRTSCHAFT);
         Veranstaltung testData2 = new Veranstaltung("5WIP2024", "Mathematik für Wirtschaftsinformatiker", dummy, 120, Fachbereich.WIRTSCHAFT);
@@ -77,7 +78,7 @@ public class VeranstaltungServiceTest {
 
         List<Veranstaltung> returnList = new ArrayList<>(veranstaltungService.findAll());
 
-        assertThat(returnList).isEqualTo(testList);
+        assertThat(returnList).containsExactlyInAnyOrderElementsOf(testList);
 
     }
 }

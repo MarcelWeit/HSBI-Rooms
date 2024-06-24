@@ -1,13 +1,11 @@
 package com.example.application.services;
 
 import com.example.application.data.entities.Dozent;
-import com.example.application.data.enums.Fachbereich;
 import com.example.application.repository.DozentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Service für die Entität Dozent
@@ -26,6 +24,7 @@ public class DozentService {
 
     public List<Dozent> findAll() {
         return repository.findAll();
+    }
 
     public Dozent save(Dozent entity) {
         return repository.save(entity);
