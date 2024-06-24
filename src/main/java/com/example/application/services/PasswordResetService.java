@@ -34,13 +34,15 @@ public class PasswordResetService {
     public PasswordResetToken validateToken(String token) {
         // Abrufen des Tokens aus der Datenbank
         PasswordResetToken resetToken = tokenRepository.findByToken(token);
-        // Überprüfen, ob das Token existiert und ob es nicht abgelaufen ist
-        if (resetToken == null || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            if (resetToken != null) {
-                // Löschen des Token, wenn abgelaufen
-                deleteToken(resetToken);
-            }
-            return null; //Signalisiert das das Token ungültig oder abgelaufen ist
+
+        // Überprüfen, ob das Token existiert
+        if (resetToken == null){
+            return null;
+        }
+        // Überprüfen, ob das Token nicht abgelaufen ist
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())){
+            deleteToken(resetToken);
+            return null;
         }
         return resetToken; // Rückgabe des gültigen Tokens
     }
