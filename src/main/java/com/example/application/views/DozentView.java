@@ -4,6 +4,8 @@ import com.example.application.comparator.NachnameComparator;
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.enums.Anrede;
 import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
 import com.vaadin.flow.component.button.Button;
@@ -55,10 +57,13 @@ public class DozentView extends VerticalLayout {
     private GridListDataView<Dozent> dataView;
     private HeaderRow headerRow;
 
+    private final AuthenticatedUser currentUser;
 
-    public DozentView(DozentService dozentService, VeranstaltungService veranstaltungService) {
+
+    public DozentView(DozentService dozentService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.dozentService = dozentService;
         this.veranstaltungService = veranstaltungService;
+        this.currentUser = currentUser;
 
         //Grid/Buttons einrichten
         setupGrid();
@@ -135,6 +140,10 @@ public class DozentView extends VerticalLayout {
         fachbereichComboBox.setItems(Fachbereich.values());
         fachbereichComboBox.setClearButtonVisible(true);
         fachbereichComboBox.addValueChangeListener(e -> dozentFilter.setFachbereich(e.getValue()));
+        if(currentUser.get().isPresent() && currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+            fachbereichComboBox.setValue(currentUser.get().get().getFachbereich());
+            fachbereichComboBox.setEnabled(false);
+        }
         headerRow.getCell(dozentGrid.getColumnByKey("fachbereich")).setComponent(fachbereichComboBox);
     }
 
