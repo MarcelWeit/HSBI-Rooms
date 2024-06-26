@@ -3,6 +3,7 @@ package com.example.application.views;
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Veranstaltung;
 import com.example.application.data.enums.Fachbereich;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
 import com.vaadin.flow.component.Component;
@@ -44,8 +45,8 @@ import java.util.function.Consumer;
  * @author Leon Gepfner
  */
 @Route(value = "veranstaltungVerwaltung-crud", layout = MainLayout.class)
-@Secured({"ADMIN", "FBPlanung"})
-@RolesAllowed({"ADMIN", "FBPlanung"})
+@Secured({"ADMIN", "FBPLANUNG"})
+@RolesAllowed({"ADMIN", "FBPLANUNG"})
 @Uses(Icon.class)
 @PageTitle("Veranstaltungen")
 public class VeranstaltungVerwaltungView extends VerticalLayout {
@@ -59,22 +60,23 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
     private GridListDataView<Veranstaltung> gridDataView;
     private HeaderRow headerRow;
 
+    private AuthenticatedUser currentUser;
+
     /**
      * Konstruktur der Klasse VeranstaltungVerwaltungView
      * @param veranstaltungService Service zur Kommunikation mit der Datenbank für die Entität Veranstaltung
      * @param dozentService Service zur Kommunikation mit der Datenbank für die Entität Dozent
      */
-    public VeranstaltungVerwaltungView(VeranstaltungService veranstaltungService, DozentService dozentService) {
+    public VeranstaltungVerwaltungView(VeranstaltungService veranstaltungService, DozentService dozentService, AuthenticatedUser currentUser) {
         this.veranstaltungService = veranstaltungService;
         this.dozentService = dozentService;
-
+        this.currentUser = currentUser;
 
         setupButtons();
         setupGrid();
 
         add(buttonLayout);
         add(grid);
-
     }
 
     /**
@@ -145,6 +147,11 @@ public class VeranstaltungVerwaltungView extends VerticalLayout {
         fachbereichComboBox.setItems(Fachbereich.values());
         fachbereichComboBox.addValueChangeListener(e -> fachbereichFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(grid.getColumnByKey("fachbereich")).setComponent(fachbereichComboBox);
+
+        if(currentUser.get().isPresent() && currentUser.get().get().getFachbereich() == Fachbereich.WIRTSCHAFT){
+            fachbereichComboBox.setValue(Set.of(currentUser.get().get().getFachbereich()));
+            fachbereichComboBox.setEnabled(false);
+        }
 
         Consumer<Set<Dozent>> dozentFilterChangeConsumer = vFilter::setDozent;
         MultiSelectComboBox<Dozent> dozentComboBox = new MultiSelectComboBox<>();
