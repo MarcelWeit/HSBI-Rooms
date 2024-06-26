@@ -16,8 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * @Author Marcel Weithoener
- *
+ * @author Marcel Weithoener
+ * <p>
  * Wird bei dem Start der Anwendung ausgeführt und initialisiert die Datenbank mit Testdaten.
  */
 @SpringBootApplication

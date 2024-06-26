@@ -1,9 +1,9 @@
 package com.example.application.views;
 
 import com.example.application.comparator.LastNameComparator;
+import com.example.application.data.entities.User;
 import com.example.application.data.enums.Fachbereich;
 import com.example.application.data.enums.Role;
-import com.example.application.data.entities.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.UserService;
 import com.vaadin.flow.component.Component;
@@ -59,6 +59,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         setupGrid();
         add(buttonLayout, userGrid);
     }
+
     // Methode zur Erstellung des Filter-Headers
     private static Component createStringFilterHeader(Consumer<String> filterChangeConsumer) {
         TextField textField = new TextField();
@@ -69,6 +70,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         return textField;
     }
+
     // Methode zur Einrichtung des Grids
     private void setupGrid() {
         GridListDataView<User> dataView = userGrid.setItems(userService.findAll());
@@ -89,7 +91,6 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         userGrid.getColumnByKey("benutzername");
 
 
-
         // Sortierung nach Nachname
         GridSortOrder<User> sortOrder = new GridSortOrder<>(userGrid.getColumnByKey("nachname"), SortDirection.ASCENDING);
         ArrayList<GridSortOrder<User>> sortOrders = new ArrayList<>();
@@ -100,6 +101,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         setupFilter(dataView);
     }
+
     // Methode zur Einrichtung der Buttons
     private void setupButtons() {
 
@@ -117,7 +119,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
         Button deleteUserButton = new Button("Benutzer Löschen", new Icon(VaadinIcon.TRASH));
         deleteUserButton.addClickListener(e -> openDeleteDialog());
 
-        buttonLayout.add( editUserButton, deleteUserButton);
+        buttonLayout.add(editUserButton, deleteUserButton);
     }
 
     // Methode zum Öffnen des Dialogs zum Bearbeiten oder Erstellen eines Benutzers
@@ -181,6 +183,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
 
         dialog.open();
     }
+
     // Methode zum Öffnen des Dialogs zum Löschen eines Benutzers
     private void openDeleteDialog() {
         Optional<User> selectedUser = userGrid.getSelectionModel().getFirstSelectedItem();
@@ -205,6 +208,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
             confirmDeleteDialog.open();
         }
     }
+
     // Methode zum Einrichten des Filters
     private void setupFilter(GridListDataView<User> dataView) {
         UserFilter userFilter = new UserFilter(dataView);
@@ -269,6 +273,7 @@ public class BenutzerVerwaltungsView extends VerticalLayout {
                     && matches(user.getRoles().stream().map(Enum::name).collect(Collectors.joining(",")), role)
                     && matches(user.getUsername(), username);
         }
+
         // Methode zum Überprüfen, ob ein Wert einem Suchbegriff entspricht
         private boolean matches(String value, String searchTerm) {
             return searchTerm == null || searchTerm.isEmpty()

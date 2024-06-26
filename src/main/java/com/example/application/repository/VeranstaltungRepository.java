@@ -16,7 +16,7 @@ import java.util.Set;
  * @author Leon Gepfner
  */
 @Repository
-public interface VeranstaltungRepository extends JpaRepository<Veranstaltung, Long>, JpaSpecificationExecutor<Veranstaltung> {
+public interface VeranstaltungRepository extends JpaRepository<Veranstaltung, String>, JpaSpecificationExecutor<Veranstaltung> {
 
     Optional<Veranstaltung> findById(String id);
 

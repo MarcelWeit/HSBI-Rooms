@@ -4,11 +4,10 @@ import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.User;
 import com.example.application.data.enums.Role;
+import com.example.application.services.DozentService;
 import com.example.application.services.EmailService;
 import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
-import com.example.application.services.EmailService;
-import com.example.application.services.DozentService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
@@ -19,9 +18,9 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Set;
+
 /**
  * View zur Freischaltung von Benutzern aus der Registrierung
-
  */
 
 @Route(value = "freischalten", layout = MainLayout.class)
@@ -45,6 +44,7 @@ public class FreischaltenView extends VerticalLayout {
         grid.setItems(registrationService.findAllRegistrierungen());
         add(grid);
     }
+
     // Methode zur Einrichtung des Grids
     private void setupGrid() {
         grid.setColumns("lastName", "firstName", "fachbereich", "role", "username");
@@ -108,6 +108,7 @@ public class FreischaltenView extends VerticalLayout {
             Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
         }
     }
+
     // Methode zum Löschen der Registrierung
     private void deleteRegistration(Registrierung registrierung) {
         registrationService.delete(registrierung);

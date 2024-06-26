@@ -1,18 +1,16 @@
 package com.example.application.views;
 
-import com.example.application.services.UserService;
+import com.example.application.data.entities.PasswordResetToken;
+import com.example.application.data.entities.User;
 import com.example.application.services.EmailService;
 import com.example.application.services.PasswordResetService;
-import com.example.application.data.entities.User;
-import com.example.application.data.entities.PasswordResetToken;
+import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -27,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Passwort vergessen")
 @AnonymousAllowed
 @Route(value = "forgot-password")
-public class ForgotPasswordView extends VerticalLayout  {
+public class ForgotPasswordView extends VerticalLayout {
 
     private final UserService userService;
     private final EmailService emailService;
