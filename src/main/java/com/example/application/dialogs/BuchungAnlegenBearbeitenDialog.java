@@ -276,8 +276,8 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
                 boolean fehlerBeiBuchung = false;
                 String fehlertext = "Der " + raum.getValue() + " ist bereits an folgenden Terminen belegt: \n";
                 for (Buchung buchung : gespeicherteBuchungen) {
-                    if (buchungService.roomBooked(buchung.getRoom(), buchung.getZeitslot(), buchung.getDate())) {
-                        Optional<Buchung> konfliktBuchung = buchungService.findByDateAndRoomAndZeitslot(buchung.getDate(), buchung.getRoom(), buchung.getZeitslot());
+                    Optional<Buchung> konfliktBuchung = buchungService.findByDateAndRoomAndZeitslot(buchung.getDate(), buchung.getRoom(), buchung.getZeitslot());
+                    if (konfliktBuchung.isPresent()) {
                         fehlertext =
                                 fehlertext.concat(buchung.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " von " + buchung.getZeitslot() + ": " + konfliktBuchung.get().getVeranstaltung().toString() +
                                         "\n");
