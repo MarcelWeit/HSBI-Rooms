@@ -1,4 +1,4 @@
-package UI;
+package com.example.application.UI;
 
 import com.example.application.repository.RaumRepository;
 import io.github.bonigarcia.wdm.WebDriverManager;

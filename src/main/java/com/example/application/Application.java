@@ -86,7 +86,8 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
             User admin = new User("admin@gmail.com", "Mustermann", "Max", passwordEncoder.encode("admin"), Set.of(Role.ADMIN), Fachbereich.WIRTSCHAFT, Anrede.HERR,
                     "Prof. Dr.");
             userRepository.save(admin);
-            User dozent = new User("jkuester@hsbi.de", "Küster", "Jochen", passwordEncoder.encode("kuester"), Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT, Anrede.HERR,
+            User dozent = new User("testdozent@gmail.com", "Küster", "Jochen", passwordEncoder.encode("dozent"), Set.of(Role.DOZENT), Fachbereich.WIRTSCHAFT,
+                    Anrede.HERR,
                     "Prof. Dr.");
             userRepository.save(dozent);
             User dozentinSoziales = new User("smeier@hsbi.de", "Meier", "Sabine", passwordEncoder.encode("sozial"), Set.of(Role.DOZENT), Fachbereich.SOZIALWESEN,
