@@ -113,7 +113,7 @@ public class MeineBuchungenView extends VerticalLayout {
             }
             grid.setItems(allBuchungen);
 
-            HeaderRow headerRow = grid.getHeaderRows().get(grid.getHeaderRows().size() - 1);
+            HeaderRow headerRow = grid.getHeaderRows().getLast();
             MultiSelectComboBox<Raum> raumFilter = (MultiSelectComboBox<Raum>) headerRow.getCell(grid.getColumnByKey("raum")).getComponent();
             MultiSelectComboBox<Veranstaltung> veranstaltungFilter = (MultiSelectComboBox<Veranstaltung>) headerRow.getCell(grid.getColumnByKey("veranstaltung")).getComponent();
 
