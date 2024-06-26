@@ -94,11 +94,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.vaadin.stefan</groupId>
-            <artifactId>fullcalendar2</artifactId>
-            <version>6.2.2</version>
-        </dependency>
         <!-- Email -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
