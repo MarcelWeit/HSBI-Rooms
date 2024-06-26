@@ -4,27 +4,26 @@ import com.example.application.data.entities.Buchung;
 import com.example.application.data.entities.Raum;
 import com.example.application.services.BuchungService;
 import com.example.application.services.RaumService;
+import com.github.appreciated.apexcharts.ApexCharts;
+import com.github.appreciated.apexcharts.ApexChartsBuilder;
+import com.github.appreciated.apexcharts.config.builder.*;
 import com.github.appreciated.apexcharts.config.chart.Type;
+import com.github.appreciated.apexcharts.config.chart.builder.ToolbarBuilder;
 import com.github.appreciated.apexcharts.config.subtitle.Align;
 import com.github.appreciated.apexcharts.config.subtitle.builder.StyleBuilder;
+import com.github.appreciated.apexcharts.config.yaxis.builder.LabelsBuilder;
+import com.github.appreciated.apexcharts.helper.Series;
 import com.nimbusds.jose.shaded.gson.Gson;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
-import com.github.appreciated.apexcharts.ApexCharts;
-import com.github.appreciated.apexcharts.ApexChartsBuilder;
-import com.github.appreciated.apexcharts.config.builder.*;
-import com.github.appreciated.apexcharts.config.chart.builder.ToolbarBuilder;
-import com.github.appreciated.apexcharts.config.builder.YAxisBuilder;
-import com.github.appreciated.apexcharts.config.yaxis.builder.LabelsBuilder;
-import com.github.appreciated.apexcharts.helper.Series;
-import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.component.UI;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -44,11 +43,11 @@ public class AuslastungView extends VerticalLayout {
 
     private final BuchungService buchungService;
     private final RaumService raumService;
-    private Grid<RaumAuslastung> grid;
-    private ApexCharts lineChart;
-    private  ApexCharts pieChart;
     HorizontalLayout mainLayout;
     VerticalLayout chartLayout;
+    private Grid<RaumAuslastung> grid;
+    private ApexCharts lineChart;
+    private ApexCharts pieChart;
 
     //Konstruktor
     public AuslastungView(BuchungService buchungService, RaumService raumService) {
@@ -148,10 +147,10 @@ public class AuslastungView extends VerticalLayout {
     /**
      * Setzt das Liniendiagramm mit den gegebenen Parametern auf.
      *
-     * @param xLabels       Die Labels, die auf der X-Achse angezeigt werden sollen.
-     * @param seriesData    Die Datenwerte, die im Diagramm dargestellt werden sollen.
-     * @param startDate     Das Startdatum des Zeitraums.
-     * @param endDate       Das Enddatum des Zeitraums.
+     * @param xLabels        Die Labels, die auf der X-Achse angezeigt werden sollen.
+     * @param seriesData     Die Datenwerte, die im Diagramm dargestellt werden sollen.
+     * @param startDate      Das Startdatum des Zeitraums.
+     * @param endDate        Das Enddatum des Zeitraums.
      * @param ignoreWeekends Ob Wochenenden ignoriert werden sollen.
      * @return Eine konfigurierte Instanz von ApexCharts für das Liniendiagramm.
      */
@@ -199,8 +198,8 @@ public class AuslastungView extends VerticalLayout {
                 .build();
     }
 
-     // Wird von setupLineChart aufgerufen
-     // Generiert eine Liste aller Datumsangaben zwischen zwei angegebenen Daten
+    // Wird von setupLineChart aufgerufen
+    // Generiert eine Liste aller Datumsangaben zwischen zwei angegebenen Daten
     private List<String> generateAllDates(LocalDate startDate, LocalDate endDate, boolean ignoreWeekends) {
         List<String> allDates = new ArrayList<>();      // Liste zur Speicherung der Datumsangaben
         LocalDate currentDate = startDate;              // Initialisiert das aktuelle Datum mit dem Startdatum
@@ -221,12 +220,11 @@ public class AuslastungView extends VerticalLayout {
         return allDates;
     }
 
-     // Wird von setupLineChart aufgerufen
-     // Konfiguriert die Toolbar des Liniendiagramms mit CSS
+    // Wird von setupLineChart aufgerufen
+    // Konfiguriert die Toolbar des Liniendiagramms mit CSS
     private void injectCustomStyles() {
         // CSS für die Toolbar und den Download-Button
-        String customCSS = ""
-                + ".apexcharts-toolbar { color: blue !important; }" // Toolbar-Textfarbe
+        String customCSS = ".apexcharts-toolbar { color: blue !important; }" // Toolbar-Textfarbe
                 + ".apexcharts-menu-item:hover { color: red !important; }" // Hover-Farbe für Menü-Items
                 + ".apexcharts-menu-item { color: black !important; }"; // Standard-Textfarbe für Menü-Items
 
@@ -301,7 +299,7 @@ public class AuslastungView extends VerticalLayout {
         } else {
             // Entfernt die Diagramme, wenn die Gesamtauslastung 0 ist
             mainLayout.remove(lineChart);
-            if (mainLayout != null && chartLayout != null){
+            if (mainLayout != null && chartLayout != null) {
                 remove(chartLayout);
             }
         }
@@ -345,7 +343,7 @@ public class AuslastungView extends VerticalLayout {
                 }
 
                 // Berechnung der prozentualen Auslastung für das aktuelle Datum
-                double totalAuslastung =  anzReaume > 0 ? sumAuslastung /  anzReaume : 0.0; // Vermeiden von Division durch Null, falls count 0 ist
+                double totalAuslastung = anzReaume > 0 ? sumAuslastung / anzReaume : 0.0; // Vermeiden von Division durch Null, falls count 0 ist
 
                 // Speichern der prozentualen Auslastung für das aktuelle Datum in der Map
                 dateToAuslastung.put(currentDate, totalAuslastung);
@@ -383,11 +381,11 @@ public class AuslastungView extends VerticalLayout {
     /**
      * Aktualisiert das Tortendiagramm basierend auf den gegebenen Parametern.
      *
-     * @param raumAuslastungen       Eine Liste von RaumAuslastung-Objekten, die die Auslastungsdaten enthalten.
+     * @param raumAuslastungen         Eine Liste von RaumAuslastung-Objekten, die die Auslastungsdaten enthalten.
      * @param totalAuslastungInPercent Die gesamte Auslastung in Prozent, die zur Skalierung der Veranstaltungsauslastung verwendet wird.
-     * @param startDate              Das Startdatum des Zeitraums, für den die Auslastung berechnet wird.
-     * @param endDate                Das Enddatum des Zeitraums, für den die Auslastung berechnet wird.
-     * @param ignoreWeekends         Gibt an ob Wochenenden ausgeschlossen werden sollen.
+     * @param startDate                Das Startdatum des Zeitraums, für den die Auslastung berechnet wird.
+     * @param endDate                  Das Enddatum des Zeitraums, für den die Auslastung berechnet wird.
+     * @param ignoreWeekends           Gibt an ob Wochenenden ausgeschlossen werden sollen.
      */
     private void updatePieChart(List<RaumAuslastung> raumAuslastungen, double totalAuslastungInPercent, LocalDate startDate, LocalDate endDate, boolean ignoreWeekends) {
         Map<String, Double> eventAuslastung = new HashMap<>();
@@ -485,8 +483,8 @@ public class AuslastungView extends VerticalLayout {
             return String.format("%.2f", getAuslastung()) + " %";
         }
 
-         // Berechnet die gesamte Auslastung des Raums über den angegebenen Zeitraum.
-         // @return Die gesamte prozentuale Auslastung des Raums im Zeitraum.
+        // Berechnet die gesamte Auslastung des Raums über den angegebenen Zeitraum.
+        // @return Die gesamte prozentuale Auslastung des Raums im Zeitraum.
         public double getAuslastung() {
             LocalDate currentDate = startDate;
             double auslastung = 0;
@@ -507,10 +505,9 @@ public class AuslastungView extends VerticalLayout {
             return auslastung / daycount;
         }
 
-
-         // Berechnet die Auslastung des Raums für ein bestimmtes Datum.
-         // @param date Das Datum, für das die Auslastung berechnet werden soll.
-         // @return Die Auslastung des Raums an dem angegebenen Datum.
+        // Berechnet die Auslastung des Raums für ein bestimmtes Datum.
+        // @param date Das Datum, für das die Auslastung berechnet werden soll.
+        // @return Die Auslastung des Raums an dem angegebenen Datum.
         public double getDailyAuslastung(LocalDate date) {
             if (ignoreWeekends && (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY)) {
                 return 0;
@@ -518,10 +515,9 @@ public class AuslastungView extends VerticalLayout {
             return calculateAuslastung(buchungService.findAllByDateAndRoom(date, raum));
         }
 
-
-         // Berechnet die Auslastung basierend auf der Anzahl an Buchungen für einen bestimmten Tag.
-         // @param buchungen Eine Menge von Buchungen für den Tag.
-         // @return Die Auslastung als Prozentsatz.
+        // Berechnet die Auslastung basierend auf der Anzahl an Buchungen für einen bestimmten Tag.
+        // @param buchungen Eine Menge von Buchungen für den Tag.
+        // @return Die Auslastung als Prozentsatz.
         private double calculateAuslastung(Set<Buchung> buchungen) {
             return buchungen.size() / 7.0 * 100;
         }

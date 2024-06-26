@@ -1,9 +1,6 @@
 package com.example.application.views;
 
-import com.example.application.data.entities.Buchung;
-import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.User;
-import com.example.application.data.enums.Role;
 import com.example.application.dialogs.BuchungAnlegenBearbeitenDialog;
 import com.example.application.dialogs.BuchungenAnzeigenDialog;
 import com.example.application.security.AuthenticatedUser;
@@ -12,7 +9,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -20,17 +16,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.access.annotation.Secured;
-import org.vaadin.stefan.fullcalendar.*;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * @author Marcel Weithoener, Mike Wiebe
@@ -66,19 +55,19 @@ public class Startseite extends VerticalLayout {
         H2 h2;
         if (authenticatedUser.get().isPresent()) {
             User currentUser = authenticatedUser.get().get();
-            h2 = new H2("Hallo " + currentUser.getFirstName() + " " + currentUser.getLastName() + "!");
+            h2 = new H2("Hallo " + currentUser.getAnrede() + " " + currentUser.getAkadTitel() + " " + currentUser.getFirstName() + " " + currentUser.getLastName() + "!");
         } else {
             h2 = new H2("Hallo !");
         }
-        H3 h3 = new H3("Herzlich Willkommen bei dem Raumplanungstool der HSBI");
+        H3 h3 = new H3("Herzlich Willkommen bei dem Raumplanungstool der HSBI.");
 
-        Span dateSpan = new Span("Heutiges Datum: " + today.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        dateSpan.getStyle().set("border", "1px solid white");
-        dateSpan.getStyle().set("padding", "10px");
-
-        Span weekSpan = new Span("Kalenderwoche: " + weekNumber);
-        weekSpan.getStyle().set("border", "1px solid white");
-        weekSpan.getStyle().set("padding", "10px");
+        //        Span dateSpan = new Span("Heutiges Datum: " + today.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        //        dateSpan.getStyle().set("border", "1px solid white");
+        //        dateSpan.getStyle().set("padding", "10px");
+        //
+        //        Span weekSpan = new Span("Kalenderwoche: " + weekNumber);
+        //        weekSpan.getStyle().set("border", "1px solid white");
+        //        weekSpan.getStyle().set("padding", "10px");
 
         Button buchungAnlegen = new Button("Buchung anlegen", click -> {
             Dialog roomBookDialog = new BuchungAnlegenBearbeitenDialog(null, null, null, raumService, dozentService, buchungService, veranstaltungService,
@@ -91,109 +80,11 @@ public class Startseite extends VerticalLayout {
             showBookingsDialog.open();
         });
 
-//        FullCalendar fullCalendar = createCalendar();
-
-        HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
+        //        HorizontalLayout horizontalLayout = new HorizontalLayout(dateSpan, weekSpan);
         HorizontalLayout buchungButtons = new HorizontalLayout(buchungAnlegen, eigeneBuchungen);
 
-        add(h2, h3, horizontalLayout, buchungButtons);
-    }
-
-    public FullCalendar createCalendar() {
-        FullCalendar calendar = FullCalendarBuilder.create().build();
-
-        calendar.setSizeFull();
-        calendar.setFirstDay(DayOfWeek.MONDAY);
-        calendar.setNowIndicatorShown(true);
-        calendar.setLocale(Locale.GERMAN);
-        calendar.setWeekends(false);
-        calendar.setBusinessHours(new BusinessHours(LocalTime.of(8, 0), LocalTime.of(23, 0)));
-        calendar.setHeightFull();
-        calendar.changeView(CalendarViewImpl.DAY_GRID_WEEK);
-
-
-        Set<Buchung> buchungen = null;
-        if (authenticatedUser.get().isPresent()) {
-            if (authenticatedUser.get().get().getRoles().contains(Role.DOZENT)) {
-                Optional<Dozent> dozentOptional = dozentService.findByVornameAndNachname(authenticatedUser.get().get().getFirstName(), authenticatedUser.get().get().getLastName());
-                if (dozentOptional.isPresent()) {
-                    buchungen = buchungService.findAllByDozent(dozentOptional.get());
-                }
-            }
-        }
-
-        Entry entry = new Entry();
-//        entry.setStart(LocalDateTime.now());
-//        entry.setEnd(LocalDateTime.now().plusHours(2));
-//        entry.setTitle("Test");
-//        calendar.getEntryProvider().asInMemory().addEntries(entry);
-        String start;
-        String end;
-        if (!buchungen.isEmpty()) {
-            for (Buchung buchung : buchungen) {
-                entry.setTitle(buchung.getVeranstaltung().toString());
-                entry.setDescription(buchung.getRoom().toString());
-
-                switch (buchung.getZeitslot()) {
-                    case EINS:
-                        start = buchung.getDate().toString().concat("T08:00:00");
-                        end = buchung.getDate().toString().concat("T09:30:00");
-
-                        entry.setStart(LocalDateTime.parse(start));
-                        entry.setEnd(LocalDateTime.parse(end));
-                        break;
-                    case ZWEI:
-                        start = buchung.getDate().toString().concat("T09:45:00");
-                        end = buchung.getDate().toString().concat("T11:15:00");
-
-                        entry.setStart(LocalDateTime.parse(start));
-                        entry.setEnd(LocalDateTime.parse(end));
-                        break;
-                    case DREI:
-                        start = buchung.getDate().toString().concat("T11:30:00");
-                        end = buchung.getDate().toString().concat("T13:00:00");
-
-                        entry.setStart(LocalDateTime.parse(start));
-                        entry.setEnd(LocalDateTime.parse(end));
-                        break;
-                    case VIER:
-                        start = buchung.getDate().toString().concat("T14:00:00");
-                        end = buchung.getDate().toString().concat("T15:30:00");
-
-                        entry.setStart(LocalDateTime.parse(start));
-                        entry.setEnd(LocalDateTime.parse(end));
-                        break;
-                    case FUENF:
-                        start = buchung.getDate().toString().concat("T15:45:00");
-                        end = buchung.getDate().toString().concat("T17:15:00");
-
-                        entry.setStart(LocalDateTime.parse(start));
-                        entry.setEnd(LocalDateTime.parse(end));
-                        break;
-                    case SECHS:
-                        start = buchung.getDate().toString().concat("T17:30:00");
-                        end = buchung.getDate().toString().concat("T19:00:00");
-
-                        entry.setStart(LocalDateTime.parse(start));
-                        entry.setEnd(LocalDateTime.parse(end));
-                        break;
-                    case SIEBEN:
-                        start = buchung.getDate().toString().concat("T19:15:00");
-                        end = buchung.getDate().toString().concat("T20:45:00");
-
-                        entry.setStart(LocalDateTime.parse(start));
-                        entry.setEnd(LocalDateTime.parse(end));
-                        break;
-                    default:
-                        //Fehlermeldung
-                        break;
-                }
-                calendar.getEntryProvider().asInMemory().addEntries(entry);
-            }
-        }
-
-        calendar.render();
-        return calendar;
+        //        add(h2, h3, horizontalLayout, buchungButtons);
+        add(h2, h3, buchungButtons);
     }
 
 }

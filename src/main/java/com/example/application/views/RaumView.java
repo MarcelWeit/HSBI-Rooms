@@ -164,7 +164,7 @@ public class RaumView extends VerticalLayout {
         Button showBookingsButton = new Button("Buchungen anzeigen", new Icon(VaadinIcon.CALENDAR));
         showBookingsButton.addClickListener(click -> openShowBookingsDialog());
 
-        Button showWeekBookingButton = new Button("KW Verfügbarkeit", new Icon(VaadinIcon.CALENDAR));
+        Button showWeekBookingButton = new Button("Verfügbarkeit", new Icon(VaadinIcon.CALENDAR));
         showWeekBookingButton.addClickListener(click -> {
             Optional<Raum> selectedRoom = roomGrid.getSelectionModel().getFirstSelectedItem();
             if (selectedRoom.isEmpty()) {
@@ -201,7 +201,13 @@ public class RaumView extends VerticalLayout {
         Consumer<Fachbereich> fachbereichFilterChangeConsumer = roomFilter::setFachbereich;
         ComboBox<Fachbereich> fachbereichComboBox = new ComboBox<>();
         fachbereichComboBox.setWidthFull();
-        fachbereichComboBox.setItems(Fachbereich.values());
+        if (currentUser.get().isPresent() && !currentUser.get().get().getRoles().contains(Role.ADMIN)) {
+            fachbereichComboBox.setItems(currentUser.get().get().getFachbereich());
+            fachbereichComboBox.setValue(currentUser.get().get().getFachbereich());
+            fachbereichComboBox.setEnabled(false);
+        } else {
+            fachbereichComboBox.setItems(Fachbereich.values());
+        }
         fachbereichComboBox.setClearButtonVisible(true);
         fachbereichComboBox.addValueChangeListener(e -> fachbereichFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(roomGrid.getColumnByKey("fachbereich")).setComponent(fachbereichComboBox);

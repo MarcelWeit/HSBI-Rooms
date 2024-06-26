@@ -1,9 +1,14 @@
 package com.example.application.views;
 
+import com.example.application.data.entities.Dozent;
 import com.example.application.data.entities.Registrierung;
 import com.example.application.data.entities.User;
+import com.example.application.data.enums.Role;
+import com.example.application.services.EmailService;
 import com.example.application.services.RegistrationService;
 import com.example.application.services.UserService;
+import com.example.application.services.EmailService;
+import com.example.application.services.DozentService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
@@ -27,10 +32,14 @@ public class FreischaltenView extends VerticalLayout {
     private final Grid<Registrierung> grid;
     private final RegistrationService registrationService;
     private final UserService userService;
+    private final EmailService emailService;
+    private final DozentService dozentService;
 
-    public FreischaltenView(RegistrationService registrationService, UserService userService) {
+    public FreischaltenView(RegistrationService registrationService, UserService userService, EmailService emailService, DozentService dozentService) {
         this.registrationService = registrationService;
         this.userService = userService;
+        this.emailService = emailService;
+        this.dozentService = dozentService;
         this.grid = new Grid<>(Registrierung.class, false);
         setupGrid();
         grid.setItems(registrationService.findAllRegistrierungen());
@@ -65,21 +74,39 @@ public class FreischaltenView extends VerticalLayout {
 
     // Methode zur Freischaltung der Registrierung
     public void approveRegistration(Registrierung registrierung) {
-        User user = new User();
-        user.setUsername(registrierung.getUsername());
-        user.setFirstName(registrierung.getFirstName());
-        user.setLastName(registrierung.getLastName());
-        user.setHashedPassword(registrierung.getHashedPassword());
-        user.setRoles(Set.of(registrierung.getRole()));
-        user.setFachbereich(registrierung.getFachbereich());
-        user.setAnrede((registrierung.getAnrede()));
-        user.setAkadTitel((registrierung.getAkadTitel()));
+        User existingUser = userService.findByUsername(registrierung.getUsername());
+        if (existingUser != null) {
+            Notification.show("Benutzer existiert bereits", 3000, Notification.Position.MIDDLE);
+        } else {
+            User user = new User();
+            user.setUsername(registrierung.getUsername());
+            user.setFirstName(registrierung.getFirstName());
+            user.setLastName(registrierung.getLastName());
+            user.setHashedPassword(registrierung.getHashedPassword());
+            user.setRoles(Set.of(registrierung.getRole()));
+            user.setFachbereich(registrierung.getFachbereich());
+            user.setAnrede((registrierung.getAnrede()));
+            user.setAkadTitel((registrierung.getAkadTitel()));
 
-        userService.save(user);
-        registrationService.delete(registrierung);
-        grid.setItems(registrationService.findAllRegistrierungen());
-        //Notification
-        Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
+            userService.save(user);
+
+            emailService.sendAprovedMail(registrierung.getUsername());
+
+            if (registrierung.getRole() == Role.DOZENT) {
+                Dozent newDozent = new Dozent();
+                newDozent.setAnrede(registrierung.getAnrede());
+                newDozent.setNachname(registrierung.getLastName());
+                newDozent.setVorname(registrierung.getFirstName());
+                newDozent.setFachbereich(registrierung.getFachbereich());
+                newDozent.setAkadTitel(registrierung.getAkadTitel());
+                dozentService.save(newDozent);
+            }
+
+            registrationService.delete(registrierung);
+            grid.setItems(registrationService.findAllRegistrierungen());
+            //Notification
+            Notification.show("Registrierung freigeschaltet", 3000, Notification.Position.MIDDLE);
+        }
     }
     // Methode zum Löschen der Registrierung
     private void deleteRegistration(Registrierung registrierung) {

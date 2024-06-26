@@ -1,6 +1,7 @@
 package com.example.application.views;
 
 import com.example.application.data.entities.User;
+import com.example.application.data.enums.Role;
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -99,34 +100,50 @@ public class MainLayout extends AppLayout {
         }
 
         // Kopf Navigation Verwaltung mit Unterpunkten
-        SideNavItem verwNav = new SideNavItem("Verwaltung");
-        if (accessChecker.hasAccess(AusstattungView.class)) {
-            verwNav.addItem(
-                    new SideNavItem("Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
+        boolean isfbPlanung = authenticatedUser.get().isPresent() && authenticatedUser.get().get().getRoles().contains(Role.FBPLANUNG);
+        boolean isDozent = authenticatedUser.get().isPresent() && authenticatedUser.get().get().getRoles().contains(Role.DOZENT);
+        if (authenticatedUser.get().isPresent() && (isDozent || isfbPlanung)) {
+            if (accessChecker.hasAccess(RaumView.class)) {
+                nav.addItem(
+                        new SideNavItem("Räume", RaumView.class, VaadinIcon.TABLE.create()));
+            }
+            if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
+                nav.addItem(
+                        new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
+            }
+            if (accessChecker.hasAccess(DozentView.class)) {
+                nav.addItem(
+                        new SideNavItem("Dozenten", DozentView.class, VaadinIcon.TABLE.create()));
+            }
+        } else {
+            SideNavItem verwNav = new SideNavItem("Verwaltung");
+            if (accessChecker.hasAccess(AusstattungView.class)) {
+                verwNav.addItem(
+                        new SideNavItem("Raum-Ausstattung", AusstattungView.class, VaadinIcon.TABLE.create()));
+            }
+            if (accessChecker.hasAccess(RaumView.class)) {
+                verwNav.addItem(
+                        new SideNavItem("Räume", RaumView.class, VaadinIcon.TABLE.create()));
+            }
+            if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
+                verwNav.addItem(
+                        new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
+            }
+            if (accessChecker.hasAccess(BenutzerVerwaltungsView.class)) {
+                verwNav.addItem(
+                        new SideNavItem("Benutzerverwaltung", BenutzerVerwaltungsView.class, VaadinIcon.TABLE.create()));
+            }
+            if (accessChecker.hasAccess(FreischaltenView.class)) {
+                verwNav.addItem(
+                        new SideNavItem("Registrierungen", FreischaltenView.class, VaadinIcon.TABLE.create()));
+            }
+            if (accessChecker.hasAccess(DozentView.class)) {
+                verwNav.addItem(
+                        new SideNavItem("Dozenten", DozentView.class, VaadinIcon.USERS.create()));
+            }
+            verwNav.setExpanded(true);
+            nav.addItem(verwNav);
         }
-        if (accessChecker.hasAccess(RaumView.class)) {
-            verwNav.addItem(
-                    new SideNavItem("Raum", RaumView.class, VaadinIcon.TABLE.create()));
-        }
-        if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
-            verwNav.addItem(
-                    new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
-        }
-        if (accessChecker.hasAccess(BenutzerVerwaltungsView.class)) {
-            verwNav.addItem(
-                    new SideNavItem("BenutzerVerwaltung", BenutzerVerwaltungsView.class, VaadinIcon.TABLE.create()));
-        }
-        if (accessChecker.hasAccess(FreischaltenView.class)) {
-            verwNav.addItem(
-                    new SideNavItem("Registrierungen", FreischaltenView.class, VaadinIcon.TABLE.create()));
-        }
-        if (accessChecker.hasAccess(DozentView.class)) {
-            verwNav.addItem(
-                    new SideNavItem("Dozenten", DozentView.class, VaadinIcon.USERS.create()));
-        }
-
-        verwNav.setExpanded(true);
-        nav.addItem(verwNav);
 
         return nav;
     }
@@ -139,9 +156,6 @@ public class MainLayout extends AppLayout {
             User user = maybeUser.get();
 
             Avatar avatar = new Avatar(user.getFirstName());
-            //            StreamResource resource = new StreamResource("profile-pic",
-            //                    () -> new ByteArrayInputStream(user.getProfilePicture()));
-            //            avatar.setImageResource(resource);
             avatar.setThemeName("xsmall");
             avatar.getElement().setAttribute("tabindex", "-1");
 

@@ -35,6 +35,14 @@ public class Buchung {
     public Buchung() {
     }
 
+    public Buchung(LocalDate date, Zeitslot zeitslot, Raum room, Veranstaltung veranstaltung, Dozent dozent) {
+        this.date = date;
+        this.zeitslot = zeitslot;
+        this.room = room;
+        this.veranstaltung = veranstaltung;
+        this.dozent = dozent;
+    }
+
     // Copy Konstruktor ohne ID
     public Buchung(Buchung buchung) {
         this.date = buchung.getDate();
@@ -88,9 +96,13 @@ public class Buchung {
         this.dozent = dozent;
     }
 
-    public User getUser() { return user; }
+    public User getUser() {
+        return user;
+    }
 
-    public void setUser(User user) { this.user = user; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     @Override
     public String toString() {

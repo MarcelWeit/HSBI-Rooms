@@ -4,6 +4,8 @@ import com.example.application.comparator.NachnameComparator;
 import com.example.application.data.entities.Dozent;
 import com.example.application.data.enums.Anrede;
 import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Role;
+import com.example.application.security.AuthenticatedUser;
 import com.example.application.services.DozentService;
 import com.example.application.services.VeranstaltungService;
 import com.vaadin.flow.component.button.Button;
@@ -55,16 +57,29 @@ public class DozentView extends VerticalLayout {
     private GridListDataView<Dozent> dataView;
     private HeaderRow headerRow;
 
+    private final AuthenticatedUser currentUser;
 
-    public DozentView(DozentService dozentService, VeranstaltungService veranstaltungService) {
+
+    public DozentView(DozentService dozentService, VeranstaltungService veranstaltungService, AuthenticatedUser currentUser) {
         this.dozentService = dozentService;
         this.veranstaltungService = veranstaltungService;
+        this.currentUser = currentUser;
 
         //Grid/Buttons einrichten
         setupGrid();
         setupButtons();
 
         add(buttonLayout, dozentGrid);
+    }
+
+    // Methode zur Erstellung eines Textfelds für die Filterung mit einem angegebenen Platzhalter und Filterfunktion
+    private static TextField createStringFilterHeader(String placeholder, Consumer<String> filterChangeConsumer) {
+        TextField textField = new TextField();
+        textField.setPlaceholder(placeholder);
+        textField.setValueChangeMode(ValueChangeMode.EAGER);
+        textField.setClearButtonVisible(true);
+        textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
+        return textField;
     }
 
     // Methode zur Einrichtung des Grids
@@ -79,7 +94,7 @@ public class DozentView extends VerticalLayout {
                 .setKey("nachname");
         dozentGrid.addColumn(Dozent::getVorname).setHeader("Vorname").setKey("vorname");
         dozentGrid.addColumn(Dozent::getFachbereich).setHeader("Fachbereich").setKey("fachbereich");
-        dozentGrid.addColumn(Dozent::getAkad_titel).setHeader("Akademischer Titel").setKey("akad_titel");
+        dozentGrid.addColumn(Dozent::getAkadTitel).setHeader("Akademischer Titel").setKey("akad_titel");
         dozentGrid.setColumnReorderingAllowed(true);
         dozentGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         dozentGrid.getColumns().forEach(column -> column.setAutoWidth(true));
@@ -125,17 +140,11 @@ public class DozentView extends VerticalLayout {
         fachbereichComboBox.setItems(Fachbereich.values());
         fachbereichComboBox.setClearButtonVisible(true);
         fachbereichComboBox.addValueChangeListener(e -> dozentFilter.setFachbereich(e.getValue()));
+        if(currentUser.get().isPresent() && currentUser.get().get().getRoles().contains(Role.FBPLANUNG)) {
+            fachbereichComboBox.setValue(currentUser.get().get().getFachbereich());
+            fachbereichComboBox.setEnabled(false);
+        }
         headerRow.getCell(dozentGrid.getColumnByKey("fachbereich")).setComponent(fachbereichComboBox);
-    }
-
-    // Methode zur Erstellung eines Textfelds für die Filterung mit einem angegebenen Platzhalter und Filterfunktion
-    private static TextField createStringFilterHeader(String placeholder, Consumer<String> filterChangeConsumer) {
-        TextField textField = new TextField();
-        textField.setPlaceholder(placeholder);
-        textField.setValueChangeMode(ValueChangeMode.EAGER);
-        textField.setClearButtonVisible(true);
-        textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
-        return textField;
     }
 
     // Methode zur Einrichtung der Buttons für Hinzufügen, Bearbeiten und Löschen von Dozenten
@@ -224,7 +233,7 @@ public class DozentView extends VerticalLayout {
         binder.forField(nachname).asRequired("Bitte Nachname angeben.").bind(Dozent::getNachname, Dozent::setNachname);
         binder.forField(vorname).asRequired("Bitte Vorname angeben.").bind(Dozent::getVorname, Dozent::setVorname);
         binder.forField(fachbereich).asRequired("Bitte einen Fachbereich auswählen.").bind(Dozent::getFachbereich, Dozent::setFachbereich);
-        binder.forField(akad_titel).asRequired("Bitte einen Akademischen Titel angeben.").bind(Dozent::getAkad_titel, Dozent::setAkad_titel);
+        binder.forField(akad_titel).asRequired("Bitte einen Akademischen Titel angeben.").bind(Dozent::getAkadTitel, Dozent::setAkadTitel);
 
         // Falls im Bearbeitungsmodus, die Werte der Felder mit den Daten des ausgewählten Dozenten füllen
         if (inEditDialog) {
@@ -285,6 +294,7 @@ public class DozentView extends VerticalLayout {
         confirmDeleteDialog.setCancelButton("Abbrechen", event -> confirmDeleteDialog.close());
         confirmDeleteDialog.open();
     }
+
     //Grid aktualisieren indem die dataview neu gesetzt wird und die Filter neu eingerichtet werden
     private void refreshGrid() {
         dataView = dozentGrid.setItems(dozentService.findAll());
@@ -336,8 +346,8 @@ public class DozentView extends VerticalLayout {
             boolean matchesNachname = matches(dozent.getNachname(), nachname);
             boolean matchesVorname = matches(dozent.getVorname(), vorname);
             boolean matchesFachbereich = fachbereich == null || dozent.getFachbereich() == fachbereich;
-            boolean matchesAkadTitel = matches(dozent.getAkad_titel(), akad_titel);
-            return  matchesAnrede && matchesNachname && matchesVorname && matchesFachbereich && matchesAkadTitel;
+            boolean matchesAkadTitel = matches(dozent.getAkadTitel(), akad_titel);
+            return matchesAnrede && matchesNachname && matchesVorname && matchesFachbereich && matchesAkadTitel;
         }
 
         // Hilfsmethode zum Überprüfen, ob ein Wert mit einem Suchbegriff übereinstimmt
