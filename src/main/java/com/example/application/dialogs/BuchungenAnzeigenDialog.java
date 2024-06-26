@@ -33,6 +33,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
+ * Dialog um Buchungen anzuzeigen
+ *
  * @author Mike Wiebe
  */
 public class BuchungenAnzeigenDialog extends Dialog {
@@ -58,6 +60,11 @@ public class BuchungenAnzeigenDialog extends Dialog {
         add(buttonLayout, raumBuchungGrid);
     }
 
+    /**
+     * Methode um die Buttons zum Bearbeiten und Löschen von Buchungen hinzuzufügen
+     *
+     * @author Mike Wiebe
+     */
     private void setupButtons() {
         Button editBookingButton = new Button("Buchung bearbeiten", new Icon(VaadinIcon.EDIT));
         editBookingButton.addClickListener(click -> openEditDialog());
@@ -69,6 +76,11 @@ public class BuchungenAnzeigenDialog extends Dialog {
         buttonLayout.add(editBookingButton, deleteBookingButton);
     }
 
+    /**
+     * Methode um das Grid zu erstellen um darin Buchungen anzuzeigen
+     *
+     * @author Mike Wiebe
+     */
     private void setupGrid() {
 
         GridListDataView<Buchung> dataView = raumBuchungGrid.setItems(buchungService.findAll());
@@ -78,15 +90,15 @@ public class BuchungenAnzeigenDialog extends Dialog {
         raumBuchungGrid.addColumn(Buchung::getDate).setHeader("Datum").setKey("date");
         raumBuchungGrid.addColumn(Buchung::getZeitslot).setHeader("Zeitslot").setKey("zeitslot");
 
-        raumBuchungGrid.getColumnByKey("room").setAutoWidth(true).setFlexGrow(0);
-        raumBuchungGrid.getColumnByKey("veranstaltung").setAutoWidth(true).setFlexGrow(0);
-        raumBuchungGrid.getColumnByKey("dozent").setAutoWidth(true).setFlexGrow(0);
-        raumBuchungGrid.getColumnByKey("date").setAutoWidth(true).setFlexGrow(0);
-        raumBuchungGrid.getColumnByKey("zeitslot").setAutoWidth(true).setFlexGrow(0);
+        raumBuchungGrid.getColumnByKey("room").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        raumBuchungGrid.getColumnByKey("veranstaltung").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        raumBuchungGrid.getColumnByKey("dozent").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        raumBuchungGrid.getColumnByKey("date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        raumBuchungGrid.getColumnByKey("zeitslot").setAutoWidth(true).setFlexGrow(0).setSortable(true);
 
-        GridSortOrder<Buchung> sortOrder = new GridSortOrder<>(raumBuchungGrid.getColumnByKey("veranstaltung"), SortDirection.ASCENDING);
+        GridSortOrder<Buchung> sortOrderRoom = new GridSortOrder<>(raumBuchungGrid.getColumnByKey("room"), SortDirection.ASCENDING);
         ArrayList<GridSortOrder<Buchung>> sortOrders = new ArrayList<>();
-        sortOrders.add(sortOrder);
+        sortOrders.add(sortOrderRoom);
         raumBuchungGrid.sort(sortOrders);
 
         raumBuchungGrid.setMinHeight("80vh");
@@ -95,6 +107,13 @@ public class BuchungenAnzeigenDialog extends Dialog {
         setupFilter(dataView);
     }
 
+    /**
+     * Methode um die Filter zu den einzelnen Attributen der Buchung in dem Grid zu erstellen
+     *
+     * @param dataView
+     *
+     * @author Mike Wiebe
+     */
     private void setupFilter(GridListDataView<Buchung> dataView) {
         BuchungFilter buchungFilter = new BuchungFilter(dataView);
 
@@ -127,6 +146,7 @@ public class BuchungenAnzeigenDialog extends Dialog {
         dozentComboBox.setItems(dozentService.findAll());
         dozentComboBox.setClearButtonVisible(true);
         dozentComboBox.addValueChangeListener(e -> dozentFilterChangeConsumer.accept(e.getValue()));
+        //Wenn der Nutzer ein Dozent ist, soll dieser nur die Buchungen einsehen können, in denen er selbst als Dozent eingetragen ist
         if (currentUser.get().isPresent()) {
             if (currentUser.get().get().getRoles().contains(Role.DOZENT)) {
                 Optional<Dozent> optionalDozent = dozentService.findByVornameAndNachname(
@@ -149,8 +169,20 @@ public class BuchungenAnzeigenDialog extends Dialog {
         datePicker.setClearButtonVisible(true);
         datePicker.addValueChangeListener(e -> dateFilterChangeConsumer.accept(e.getValue()));
         headerRow.getCell(raumBuchungGrid.getColumnByKey("date")).setComponent(datePicker);
+
+        Consumer<Zeitslot> zeitslotFilterChangeConsumer = buchungFilter::setZeitslot;
+        ComboBox<Zeitslot> zeitslotComboBox = new ComboBox<>();
+        zeitslotComboBox.setWidthFull();
+        zeitslotComboBox.setClearButtonVisible(true);
+        zeitslotComboBox.addValueChangeListener(e -> zeitslotFilterChangeConsumer.accept(e.getValue()));
+        headerRow.getCell(raumBuchungGrid.getColumnByKey("zeitslot")).setComponent(zeitslotComboBox);
     }
 
+    /**
+     * Methode um die Eingabemaske zum editieren einer Buchung zu öffnen
+     *
+     * @author Mike Wiebe
+     */
     private void openEditDialog() {
         Optional<Buchung> selectedBuchung = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBuchung.isPresent()) {
@@ -164,6 +196,11 @@ public class BuchungenAnzeigenDialog extends Dialog {
         }
     }
 
+    /**
+     * Methode um die Eingabemaske zum löschen einer Buchung zu öffnen
+     *
+     * @author Mike Wiebe
+     */
     private void openDeleteDialog() {
         Optional<Buchung> selectedBooking = raumBuchungGrid.getSelectionModel().getFirstSelectedItem();
         if (selectedBooking.isEmpty()) {
@@ -187,6 +224,11 @@ public class BuchungenAnzeigenDialog extends Dialog {
         }
     }
 
+    /**
+     * Klasse um die einzelnen Filter zu implementieren um Buchungen zu filtern
+     *
+     * @author Mike Wiebe
+     */
     private static class BuchungFilter {
         private final GridListDataView<Buchung> dataView;
         private Raum room;
