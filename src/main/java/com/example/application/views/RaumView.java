@@ -201,7 +201,7 @@ public class RaumView extends VerticalLayout {
         Consumer<Fachbereich> fachbereichFilterChangeConsumer = roomFilter::setFachbereich;
         ComboBox<Fachbereich> fachbereichComboBox = new ComboBox<>();
         fachbereichComboBox.setWidthFull();
-        if (currentUser.get().isPresent()) {
+        if (currentUser.get().isPresent() && !currentUser.get().get().getRoles().contains(Role.ADMIN)) {
             fachbereichComboBox.setItems(currentUser.get().get().getFachbereich());
             fachbereichComboBox.setValue(currentUser.get().get().getFachbereich());
             fachbereichComboBox.setEnabled(false);
