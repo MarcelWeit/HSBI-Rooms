@@ -107,6 +107,14 @@ public class MainLayout extends AppLayout {
                 nav.addItem(
                         new SideNavItem("Räume", RaumView.class, VaadinIcon.TABLE.create()));
             }
+            if (accessChecker.hasAccess(VeranstaltungVerwaltungView.class)) {
+                nav.addItem(
+                        new SideNavItem("Veranstaltungen", VeranstaltungVerwaltungView.class, VaadinIcon.TABLE.create()));
+            }
+            if (accessChecker.hasAccess(DozentView.class)) {
+                nav.addItem(
+                        new SideNavItem("Dozenten", DozentView.class, VaadinIcon.TABLE.create()));
+            }
         } else {
             SideNavItem verwNav = new SideNavItem("Verwaltung");
             if (accessChecker.hasAccess(AusstattungView.class)) {

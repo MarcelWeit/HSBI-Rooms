@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Service für die Buchungen, alle Datenbankabfragen
+ *
+ * @author Mike Wiebe
+ */
 @Service
 public class BuchungService {
 
@@ -17,10 +22,6 @@ public class BuchungService {
 
     public BuchungService(BuchungRepository buchungRepository) {
         this.buchungRepository = buchungRepository;
-    }
-
-    public boolean roomBooked(Raum room, Zeitslot zeitslot, LocalDate date) {
-        return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot).isPresent();
     }
 
     public Buchung save(Buchung buchung) {
@@ -76,5 +77,9 @@ public class BuchungService {
     }
     public Set<Buchung> findAllByUserOrDozent(User user, Dozent dozent) {
         return buchungRepository.findAllByUserOrDozent(user, dozent);
+    }
+
+    public boolean roomBooked(Raum room, Zeitslot zeitslot, LocalDate date) {
+        return buchungRepository.findByDateAndRoomAndZeitslot(date, room, zeitslot).isPresent();
     }
 }

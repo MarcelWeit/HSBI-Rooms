@@ -93,7 +93,7 @@ public class Application implements AppShellConfigurator, CommandLineRunner {
                     Anrede.FRAU,
                     "Prof. Dr. rer. nat.");
             userRepository.save(dozentinSoziales);
-            User fbplan = new User("fbplanung@gmail.com", "Mustermann", "Max", passwordEncoder.encode("fbplanung"), Set.of(Role.FBPLANUNG), Fachbereich.SOZIALWESEN, Anrede.HERR,
+            User fbplan = new User("fbplanung@gmail.com", "Musterfrau", "Petra", passwordEncoder.encode("fbplanung"), Set.of(Role.FBPLANUNG), Fachbereich.WIRTSCHAFT, Anrede.HERR,
                     "Prof. Dr.");
             userRepository.save(fbplan);
         }

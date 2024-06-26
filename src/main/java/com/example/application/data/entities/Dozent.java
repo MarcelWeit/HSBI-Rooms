@@ -92,6 +92,6 @@ public class Dozent {
 
     @Override
     public String toString() {
-        return anrede + " " + akadTitel + " " + vorname + " " + nachname;
+        return vorname + " " + nachname;
     }
 }

@@ -10,6 +10,11 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Repository für Buchungen
+ *
+ * @author Mike Wiebe
+ */
 @Repository
 public interface BuchungRepository extends JpaRepository<Buchung, Long>, JpaSpecificationExecutor<Buchung> {
     Optional<Buchung> findBuchungById(long id);
