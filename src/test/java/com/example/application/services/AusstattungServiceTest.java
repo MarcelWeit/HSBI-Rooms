@@ -52,7 +52,7 @@ class AusstattungServiceTest {
     @Test
     void existsByBezEqualsIgnoreCase() {
         Ausstattung ausstattungToTest = new Ausstattung("Beamer");
-        when(ausstattungRepository.existsByBezEqualsIgnoreCase(ausstattungToTest.getBez())).thenReturn(true);
+        when(ausstattungRepository.existsByBezEqualsIgnoreCase(ausstattungToTest.getBez())).thenReturn(Boolean.TRUE);
         ausstattungService.save(ausstattungToTest);
         assertThat(ausstattungService.existsByBezEqualsIgnoreCase("Beamer")).isTrue();
     }

@@ -1,5 +1,8 @@
-package UI;
+package com.example.application.UI;
 
+import com.example.application.data.entities.Raum;
+import com.example.application.data.enums.Fachbereich;
+import com.example.application.data.enums.Raumtyp;
 import com.example.application.data.enums.Zeitslot;
 import com.example.application.repository.BuchungRepository;
 import com.example.application.repository.RaumRepository;
@@ -71,7 +74,13 @@ public class RaumBuchenTest {
         driver.findElement(By.id("combobox-zeitslot")).sendKeys("08:00 - 09:30");
         driver.findElement(By.id("combobox-zeitslot")).sendKeys(Keys.ENTER);
 
-        assertNotEquals(Optional.empty(), buchungRepository.findByDateAndRoomAndZeitslot(LocalDate.of(2024, 6, 13), raumRepository.findByRefNr("A1").get(), Zeitslot.EINS));
+        Raum raum;
+        if (raumRepository.findByRefNr("A1").isPresent()) {
+            raum = raumRepository.findByRefNr("A1").get();
+        } else {
+            raum = new Raum("A1", Raumtyp.HOERSAAL, 100, Fachbereich.WIRTSCHAFT, "FB Wirtschaft Etage 1");
+        }
+        assertNotEquals(Optional.empty(), buchungRepository.findByDateAndRoomAndZeitslot(LocalDate.of(2024, 6, 13), raum, Zeitslot.EINS));
     }
 
     @Test

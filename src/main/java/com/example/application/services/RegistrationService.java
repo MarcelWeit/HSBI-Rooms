@@ -3,6 +3,7 @@ package com.example.application.services;
 import com.example.application.data.entities.Registrierung;
 import com.example.application.repository.RegistrationRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 /**

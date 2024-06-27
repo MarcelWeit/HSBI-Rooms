@@ -27,7 +27,6 @@ import jakarta.annotation.security.RolesAllowed;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * View um eigene Buchungen einzusehen und zu verwalten
@@ -51,11 +50,12 @@ public class MeineBuchungenView extends VerticalLayout {
 
     /**
      * Konstruktur für die Klasse MeineBuchungenView
-     * @param buchungService Service zur Kommunikation mit der Datenbank für die Entität Buchung
-     * @param userService Service zur Kommunikation mit der Datenbank für die Entität User
-     * @param dozentService Service zur Kommunikation mit der Datenbank für die Entität Dozent
-     * @param currentUser Angemeldeter User in der aktiven Session
-     * @param raumService Service zur Kommunikation mit der Datenbank für die Entität Raum
+     *
+     * @param buchungService       Service zur Kommunikation mit der Datenbank für die Entität Buchung
+     * @param userService          Service zur Kommunikation mit der Datenbank für die Entität User
+     * @param dozentService        Service zur Kommunikation mit der Datenbank für die Entität Dozent
+     * @param currentUser          Angemeldeter User in der aktiven Session
+     * @param raumService          Service zur Kommunikation mit der Datenbank für die Entität Raum
      * @param veranstaltungService Service zur Kommunikation mit der Datenbank für die Entität Veranstaltung
      */
     public MeineBuchungenView(BuchungService buchungService, UserService userService, DozentService dozentService, AuthenticatedUser currentUser, RaumService raumService, VeranstaltungService veranstaltungService) {
@@ -99,32 +99,31 @@ public class MeineBuchungenView extends VerticalLayout {
      * Aktualisiert die Datensätze des Grids, sowie die selektierten Filterwerte
      */
     private void refreshGrid() {
-        User userData = currentUser.get().get();
+        if (currentUser.get().isPresent()) {
+            User userData = currentUser.get().get();
 
-        Optional<Dozent> dozent = dozentService.findByVornameAndNachname(userData.getFirstName(), userData.getLastName());
+            Optional<Dozent> dozent = dozentService.findByVornameAndNachname(userData.getFirstName(), userData.getLastName());
 
-        Set<Buchung> userBuchungen = buchungService.findAllByUser(userData);
+            Set<Buchung> allBuchungen;
 
-        Set<Buchung> allBuchungen = new HashSet<>();
+            if (dozent.isPresent()) {
+                allBuchungen = buchungService.findAllByUserOrDozent(userData, dozent.get());
+            } else {
+                allBuchungen = buchungService.findAllByUser(userData);
+            }
+            grid.setItems(allBuchungen);
 
-        if(dozent.isPresent()) {
-            allBuchungen = buchungService.findAllByUserOrDozent(userData, dozent.get());
-        }
-        else {
-            allBuchungen = buchungService.findAllByUser(userData);
-        }
-        grid.setItems(allBuchungen);
+            HeaderRow headerRow = grid.getHeaderRows().getLast();
+            MultiSelectComboBox<Raum> raumFilter = (MultiSelectComboBox<Raum>) headerRow.getCell(grid.getColumnByKey("raum")).getComponent();
+            MultiSelectComboBox<Veranstaltung> veranstaltungFilter = (MultiSelectComboBox<Veranstaltung>) headerRow.getCell(grid.getColumnByKey("veranstaltung")).getComponent();
 
-        HeaderRow headerRow = grid.getHeaderRows().getLast();
-        MultiSelectComboBox<Raum> raumFilter = (MultiSelectComboBox<Raum>) headerRow.getCell(grid.getColumnByKey("raum")).getComponent();
-        MultiSelectComboBox<Veranstaltung> veranstaltungFilter = (MultiSelectComboBox<Veranstaltung>) headerRow.getCell(grid.getColumnByKey("veranstaltung")).getComponent();
+            if (raumFilter != null) {
+                raumFilter.setItems((Set<Raum>) selectFilterData(raumService.findAll()));
+            }
 
-        if(raumFilter != null) {
-            raumFilter.setItems((Set<Raum>) selectFilterData(raumService.findAll()));
-        }
-
-        if(veranstaltungFilter != null) {
-            veranstaltungFilter.setItems((Set<Veranstaltung>) selectFilterData(veranstaltungService.findAll()));
+            if (veranstaltungFilter != null) {
+                veranstaltungFilter.setItems((Set<Veranstaltung>) selectFilterData(veranstaltungService.findAll()));
+            }
         }
 
     }
@@ -132,6 +131,7 @@ public class MeineBuchungenView extends VerticalLayout {
     /**
      * Methode zum Selektieren der Filterwerte
      * Es werden nur Filterwerte angezeigt, die den Tabellendaten entsprechen
+     *
      * @param data Alle möglichen Filterwerte
      * @return Modifiziertes Set, welches die selektieren Filterwerte enthält
      */
@@ -145,13 +145,13 @@ public class MeineBuchungenView extends VerticalLayout {
 
         Set<?> result = new HashSet<>(Set.copyOf(data));
 
-        for(Object item : data) {
-            if(item instanceof Raum) {
-                if(!buchungsRaum.contains(item.toString())) {
+        for (Object item : data) {
+            if (item instanceof Raum) {
+                if (!buchungsRaum.contains(item.toString())) {
                     result.remove(item);
                 }
-            } else if(item instanceof Veranstaltung) {
-                if(!buchungsVeranstaltung.contains(item.toString())) {
+            } else if (item instanceof Veranstaltung) {
+                if (!buchungsVeranstaltung.contains(item.toString())) {
                     result.remove(item);
                 }
             }
@@ -161,6 +161,7 @@ public class MeineBuchungenView extends VerticalLayout {
 
     /**
      * Erstellt die Filter des Grids zum Selektieren von Datensätzen
+     *
      * @param gridDataView Data View für die Buchungen
      */
     private void setupFilters(GridListDataView<Buchung> gridDataView) {
@@ -194,9 +195,10 @@ public class MeineBuchungenView extends VerticalLayout {
         headerRow.getCell(grid.getColumnByKey("datum")).setComponent(datePicker);
 
     }
+
     /**
-     *  Erstellt die Schaltflächen zur Bedienung der View bzw. der Tabellenfunktionen.
-     *  Jeweils ein Button zum Bearbeiten und Löschen einer Buchung
+     * Erstellt die Schaltflächen zur Bedienung der View bzw. der Tabellenfunktionen.
+     * Jeweils ein Button zum Bearbeiten und Löschen einer Buchung
      */
     private void setupButtons() {
         Button buchungBearbeiten = new Button("Buchung bearbeiten", new Icon(VaadinIcon.EDIT));
@@ -209,7 +211,7 @@ public class MeineBuchungenView extends VerticalLayout {
                         currentUser);
                 buchungEditDialog.open();
                 buchungEditDialog.addOpenedChangeListener(event -> {
-                    if(!event.isOpened()) {
+                    if (!event.isOpened()) {
                         refreshGrid();
                     }
                 });
@@ -224,13 +226,14 @@ public class MeineBuchungenView extends VerticalLayout {
 
         add(layout);
     }
+
     /**
      * Öffnet einen Bestätigungsdialog zum Löschen einer Veranstaltung. Falls keine ausgewählt ist,
      * wird eine Benachrichtigung ausgegeben
      */
     private void openDeleteDialog() {
         Optional<Buchung> selectedBuchung = grid.getSelectionModel().getFirstSelectedItem();
-        if(selectedBuchung.isEmpty()) {
+        if (selectedBuchung.isEmpty()) {
             Notification.show("Bitte wählen Sie eine Buchung aus", 2000, Notification.Position.MIDDLE);
         } else {
             Buchung current = selectedBuchung.get();
@@ -254,6 +257,7 @@ public class MeineBuchungenView extends VerticalLayout {
             deleteConfirmDialog.open();
         }
     }
+
     /**
      * Interne Klasse zur Realisierung der Filterfunktion. Klasse speichert die Filterwerte ab, damit diese
      * zur Selektierung der Datensätze verwendet werden kann
@@ -268,6 +272,7 @@ public class MeineBuchungenView extends VerticalLayout {
 
         /**
          * Konstruktor der Internen Klasse BuchungFilter
+         *
          * @param dataView DataView für Buchungen
          */
         public BuchungFilter(GridListDataView<Buchung> dataView) {
@@ -279,20 +284,25 @@ public class MeineBuchungenView extends VerticalLayout {
             this.raum = raum;
             this.dataView.refreshAll();
         }
+
         public void setVeranstaltung(Set<Veranstaltung> veranstaltung) {
             this.veranstaltung = veranstaltung;
             this.dataView.refreshAll();
         }
+
         public void setDate(LocalDate date) {
             this.date = date;
             this.dataView.refreshAll();
         }
+
         public void setZeitslot(Set<Zeitslot> zeitslot) {
             this.zeitslot = zeitslot;
             this.dataView.refreshAll();
         }
+
         /**
          * Realisiert den Abgleich einer Veranstaltung mit den aktuellen Filterwerten
+         *
          * @param b Buchungsdatensatz der abgeglichen werden soll
          * @return boolean Wert ob Buchung Filtern entspricht
          */
@@ -303,7 +313,7 @@ public class MeineBuchungenView extends VerticalLayout {
             boolean matchesZeitslot = true;
 
             matchesRaum = compareSet(b.getRoom().toString(), raum);
-            if(date != null) {
+            if (date != null) {
                 matchesDate = date.equals(b.getDate());
             }
             matchesZeitslot = compareSet(b.getZeitslot().toString(), zeitslot);
@@ -311,9 +321,11 @@ public class MeineBuchungenView extends VerticalLayout {
 
             return matchesRaum && matchesVeranstaltung && matchesDate && matchesZeitslot;
         }
+
         /**
          * Methode zum überprüfen ob value im übergebenen Set enthalten ist
-         * @param value Vergleichswert
+         *
+         * @param value      Vergleichswert
          * @param searchTerm Zu überprüfendes Set
          * @return boolean Wert ob value im Set zu finden ist
          */
