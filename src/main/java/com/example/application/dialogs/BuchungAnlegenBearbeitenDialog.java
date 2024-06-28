@@ -85,8 +85,7 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
      * Methode zum Erstellen der Eingabemaske um eine Buchung anzulegen
      *
      * @return FormLayout
-     *
-     * @author Mike Wiebe, Marcel Weiterhoener
+     * @author Mike Wiebe
      */
     private FormLayout createInputLayout() {
         FormLayout dialogLayout = new FormLayout();
@@ -214,8 +213,7 @@ public class BuchungAnlegenBearbeitenDialog extends Dialog {
      * Methode zum Prüfen und Speichern einer eingegebenen Buchung
      *
      * @return boolean, Speichern erfolgreich oder nicht
-     *
-     * @author Marcel Weiterhoener, Mike Wiebe
+     * @author Mike Wiebe
      */
     private boolean validateAndSave() {
         Wiederholungsintervall wiederholungsintervall = wiederholungsintervallRadioButtonGroup.getValue();
