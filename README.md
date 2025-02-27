@@ -18,10 +18,11 @@ Alternativ können sie selber postgresql auf ihrem Rechner installieren.
 Diese können Sie kostenfrei unter https://www.postgresql.org/ herunterladen.
 Führen sie die Installation durch und starten sie pgAdmin um eine neue Datenbank zu erstellen.
 
-Folgende Parameter sind standardmäßig gesetzt. Sollten sie andere Parameter für ihre Datenbank benutzen müssen Sie diese in den application.properties ändern.
-spring.datasource.url=jdbc:postgresql://localhost:5432/BookARoom
-spring.datasource.username=dev
-spring.datasource.password=dev
+Folgende Parameter sind standardmäßig gesetzt.\
+Sollten sie andere Parameter für ihre Datenbank benutzen müssen Sie diese in den application.properties ändern.
+- spring.datasource.url=jdbc:postgresql://localhost:5432/BookARoom
+- spring.datasource.username=dev
+- spring.datasource.password=dev
 
 ## Verschiedene User mit Rollen stehen neben der Registrierung zur Verfügung
 | Rolle          |Username                       |Passwort                     |
@@ -30,6 +31,8 @@ spring.datasource.password=dev
 |FBPlanung          |fbplanung@gmail.com            |fbplanung            |
 |Dozent          |testdozent@gmail.com|dozent|
 |Dozent          |smeier@hsbi.de|sozial|
+
+## Starten des Programms
 
 Wenn sie die Datenbank passend eingerichtet haben und alle Bibliotheken über Maven heruntergeladen haben können Sie das Programm über Run Application starten.
 Anschließend öffnet sich ein Browserfenster mit dem Link http://localhost:8080/login.
